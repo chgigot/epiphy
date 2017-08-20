@@ -5,15 +5,19 @@
 \alias{sadie.data.frame}
 \title{Spatial Analysis by Distance IndicEs (SADIE)}
 \usage{
-sadie(data, index = c("perry", "LMX", "all"), nperm = 100, rseed = TRUE,
-  seed = 12345, cost)
+sadie(data, index, nperm, rseed, seed, cost)
 
-\method{sadie}{data.frame}(data, index, nperm, rseed, seed, cost)
+\method{sadie}{data.frame}(data, index = c("perry", "LMX", "all"),
+  nperm = 100, rseed = TRUE, seed = 12345, cost)
 }
 \arguments{
-\item{data}{A data frame.}
+\item{data}{A data frame or a matrix with the counts for the different sampling units. The data
+set must decribe a complete (no missing data) squared or rectangular
+data set.
+or a matrix (x-y)}
 
-\item{index}{The name of the index to use: "perry", "li-madden-xu" or "all".}
+\item{index}{The name of the index to use: "perry", "li-madden-xu (LMX)" or "all".
+By default, only Perry's index is computed.}
 
 \item{nperm}{Number of permutations for each sampling unit.}
 
@@ -30,12 +34,6 @@ the cost of transporting single unit between the corresponding source and
 destination sampling unit. If not specified, the distance between each
 couple of adjacent sampling units (rook's sense) is assumed to be equal
 to 1.}
-
-\item{count}{An object of class \code{Count} (see \code{\link{Count-object}}),
-or a matrix with the counts for the different sampling units. The data
-set must decribe a complete (no missing data) squared or rectangular
-data set.
-or a matrix (x-y)}
 }
 \description{
 The SADIE approach is implemented in this package. Refer to the documentation
@@ -44,6 +42,16 @@ this approach.
 The \code{sadie} function estimates the parameters of a SADIE approach based
 on the number of permutations specified (\code{nperm}). It also computes the
 Ia indice and Pa probability.
+}
+\examples{
+# Possible datasets:
+#aphid_counts
+#arthropods_counts
+#codling_moth_counts
+res <- sadie(aphid_counts)
+summary(res)
+plot(res)
+
 }
 \references{
 Perry JN. 1995. Spatial analysis by distance indices. Journal of Animal

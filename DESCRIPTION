@@ -9,3 +9,13 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
+LinkingTo: Rcpp
+Imports:
+    transport,
+    emdist,
+    Rcpp
+Collate: 
+    'RcppExports.R'
+    'data.R'
+    'epiphy.R'
+    'sadie.R'

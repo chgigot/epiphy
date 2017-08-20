@@ -5,5 +5,7 @@
 #'
 #' @docType package
 #' @name epiphy
+#' @useDynLib epiphy
+#' @importFrom Rcpp sourceCpp
 #------------------------------------------------------------------------------#
 NULL
