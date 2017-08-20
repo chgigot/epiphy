@@ -132,6 +132,12 @@ sadie.data.frame <- function(data, index = c("perry", "LMX", "all"), # needed to
                                     new.index      = li_madden_xu[["clustering"]],
                                     prob           = new_prob)
 
+    # Summary indices
+    summary_indices <- data.frame(overall = c(mean(abs(clusteringIndices$original.index)), NA),
+                                  inflow  = c(mean(clusteringIndices$original.index[clusteringIndices$original.index < 0]), NA),
+                                  outflow = c(mean(clusteringIndices$original.index[clusteringIndices$original.index > 0]), NA))
+    rownames(summary_indices) <- c("Perry's index", "Li-Madden-Xu's index")
+
     #    return(Sadie())
     res <- list(clusteringIndices = clusteringIndices,
                 Da = Da,
@@ -139,6 +145,7 @@ sadie.data.frame <- function(data, index = c("perry", "LMX", "all"), # needed to
                 Pa = Pa,
                 Ea_perry = perry_[["Ea"]],
                 Ea_li = li_madden_xu[["Dis_all"]],
+                summary_indices = summary_indices,
                 nperm = nperm,
                 rseed = rseed,
                 seed = NA_real_)
@@ -180,21 +187,14 @@ print.summary.sadie <- function(x, ...) {
     #printCoefmat(x$clusteringIndices)
     #cat("number of permutations: ", object$nperm, "\n",
     #    "random seed: ", object$rseed, "\n", sep = "")
-    cat("\nOverall:\n")
-    cat("Missing things-----------------")
+    cat("\nSummary indices:\n")
+    print(x$summary_indices)
+    cat("\nMain outputs:")
     cat("\nIa: ", format(x$Ia, digits = 1, nsmall = 4),
         " (Pa = ", format.pval(x$Pa), ")\n", sep = "")
     cat("\n'Total cost': ", x$Da, "\n",
         "Number of permutations: ", x$nperm, "\n",
         "Random Seed?: ", x$rseed, "(", x$seed, ")\n\n", sep = "")
-
-    # Note:
-    # overall-indice > overall
-    # -> abs(res$clusteringIndices$original.index) %>% mean()
-    # overall-indice > inflow
-    # -> res$clusteringIndices %>% filter(original.index < 0) %>% .$original.index %>% mean()
-    # overall-indice > outflow
-    # -> res$clusteringIndices %>% filter(original.index > 0) %>% .$original.index %>% mean()
 }
 
 #------------------------------------------------------------------------------#
