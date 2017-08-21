@@ -1,4 +1,5 @@
 # To test the SADIE procedure:
+library(magrittr)
 
 #------------------------------------------------------------------------------#
 # Export aphid counts (Perry et al., 1999)
@@ -13,7 +14,7 @@ devtools::use_data(aphid_counts)
 #------------------------------------------------------------------------------#
 # Export arthropods counts (Holland et al., 1999)
 #------------------------------------------------------------------------------#
-arthropods_counts <- read.csv("data-raw/arthropods_counts.csv")
+arthropods_counts <- read.csv("data-raw/arthropods_counts.csv", header = TRUE)
 arthropods_counts_splitted <- split(arthropods_counts, arthropods_counts$set)
 
 opar <- par()
@@ -31,4 +32,18 @@ devtools::use_data(arthropods_counts)
 #------------------------------------------------------------------------------#
 # Export codling moth counts (Lavigne et al., 2010)
 #------------------------------------------------------------------------------#
+codling_moth_counts <- read.csv("data-raw/codling_moth_counts.csv", header = TRUE)
+
+coef <- 80 # Coef to convert arbitrary units into meters (m = coef * u.a.)
+codling_moth_counts[, 1:2] %<>% multiply_by(coef)
+
+with(codling_moth_counts, plot(x, y, pch = NA))
+with(codling_moth_counts, text(x, y, labels = d))
+
+devtools::use_data(codling_moth_counts)
+
+
+
+
+
 

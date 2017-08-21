@@ -34,15 +34,23 @@
 "arthropods_counts"
 
 #------------------------------------------------------------------------------#
-# Codling moth counts
-#
-# @source Lavigne C, Ricci B, Franck P, Senoussi R. 2010. Spatial analyses of
-#     ecological count data: A density map comparison approach. Basic and
-#     Applied Ecology 11: 734-42.
-#     \href{http://dx.doi.org/10.1016/j.baae.2010.08.011}{10.1016/j.baae.2010.08.011}
+#' Codling moth counts
+#'
+#' TODO.
+#'
+#' @format A data frame with 30 rows and 3 variables:
+#' \tabular{lll}{
+#'     [, 1:2] \tab x,y \tab Spatial coordonates. \cr
+#'     [, 3]   \tab d   \tab Counts. \cr
+#' }
+#'
+#' @source Lavigne C, Ricci B, Franck P, Senoussi R. 2010. Spatial analyses of
+#'     ecological count data: A density map comparison approach. Basic and
+#'     Applied Ecology 11: 734-42.
+#'     \href{http://dx.doi.org/10.1016/j.baae.2010.08.011}{10.1016/j.baae.2010.08.011}
 #------------------------------------------------------------------------------#
-#"codling_moth_counts"
-#
+"codling_moth_counts"
+
 
 
 
