@@ -414,7 +414,8 @@ Ia <- function(Da, Ea) {return(Da/Ea)} # Da = observed, Ea = mean of randomized 
 #' @include sadie.R
 #' @export
 #------------------------------------------------------------------------------#
-plot.sadie <- function(x, y, ..., onlySignificant = FALSE, resolution = rep(100, 2)) { # + specify significancy we want (0.95,...)
+plot.sadie <- function(x, y, ..., isoclines = FALSE, onlySignificant = FALSE,
+                       resolution = rep(100, 2)) { # + specify significancy we want (0.95,...)
 
     data1 <- x$clusteringIndices
 
@@ -425,6 +426,8 @@ plot.sadie <- function(x, y, ..., onlySignificant = FALSE, resolution = rep(100,
     interpolated <- predict(dataLoess, expand.grid(x = x, y = y))
 
     data2 <- data.frame(expand.grid(x = x, y = y), z = as.vector(interpolated))
+
+    data3 <- data.frame(lapply(split(data2, data2$y), function(XX) XX$z))
 
     thres <- c(-1.5, 1.5)
     cpt <- function(x) {
@@ -458,9 +461,22 @@ plot.sadie <- function(x, y, ..., onlySignificant = FALSE, resolution = rep(100,
 
 
 
-    with(data1, plot(x, y, pch = 21, cex = abs(original.index),
-                     col = "black", bg = col))
-
+    if (isoclines) {
+        filled.contour(x = unique(data2$x), y = unique(data2$y), z = as.matrix(data3),
+                       color.palette = terrain.colors,
+                       plot.axes = {
+                           with(data1, points(x, y, pch = 21,
+                                              cex = abs(original.index),
+                                              col = "black", bg = col));
+                           contour(x = unique(data2$x), y = unique(data2$y),
+                                   z = as.matrix(data3),
+                                   col = "black", lty = "solid", add = TRUE,
+                                   vfont = c("sans serif", "plain"))
+                       })
+    } else {
+        with(data1, plot(x, y, pch = 21, cex = abs(original.index),
+                         col = "black", bg = col))
+    }
 }
 
 
