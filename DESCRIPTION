@@ -19,3 +19,4 @@ Collate:
     'data.R'
     'epiphy.R'
     'sadie.R'
+    'utils.R'
