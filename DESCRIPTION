@@ -18,5 +18,6 @@ Collate:
     'RcppExports.R'
     'data.R'
     'epiphy.R'
-    'sadie.R'
     'utils.R'
+    'intensity-classes.R'
+    'sadie.R'
