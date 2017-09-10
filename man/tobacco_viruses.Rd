@@ -6,7 +6,7 @@
 \title{Incidence of tobacco plants infected with viruses}
 \format{A data frame with 75 rows and 2 variables:
 \tabular{rll}{
-    [, 1] \tab d \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
+    [, 1] \tab r \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
     [, 2] \tab n \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
 }}
 \source{

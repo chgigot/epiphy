@@ -7,7 +7,7 @@
 \format{A data frame with 32 rows and 3 variables:
 \tabular{rll}{
     [, 1]   \tab group \tab Either control or treated group. \cr
-    [, 2]   \tab d   \tab Pups weaned. \cr
+    [, 2]   \tab r   \tab Pups weaned. \cr
     [, 3]   \tab n   \tab Pups alive at 4 days. \cr
 }}
 \source{

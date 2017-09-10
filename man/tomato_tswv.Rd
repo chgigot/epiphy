@@ -10,7 +10,7 @@
     [, 2]   \tab irrigation \tab \cr
     [, 3:4] \tab x,y \tab Spatial coordinates. \cr
     [, 5]   \tab t   \tab Time of the disease assessments. \cr
-    [, 6]   \tab d   \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
+    [, 6]   \tab r   \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
     [, 7]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
 }
 
@@ -18,7 +18,7 @@
 \tabular{rll}{
     [, 1:2] \tab x,y \tab Spatial coordinates. \cr
     [, 3]   \tab t   \tab Time of the disease assessments. 1: 18 December 1929, 2: 31 December 1929, 3: 22 January 1930. \cr
-    [, 4]   \tab d   \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
+    [, 4]   \tab r   \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
     [, 5]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
 }}
 \source{

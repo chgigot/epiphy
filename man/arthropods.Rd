@@ -8,7 +8,7 @@
 \tabular{lll}{
     [, 1]   \tab set \tab Grid id. \cr
     [, 2:3] \tab x,y \tab Spatial coordonates. \cr
-    [, 4]   \tab d   \tab Counts. \cr
+    [, 4]   \tab r   \tab Counts. \cr
 }}
 \source{
 Holland JM, Winder L, Perry JN. 1999. Arthropod prey of farmland

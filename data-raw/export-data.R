@@ -2,10 +2,9 @@
 # Useful packages
 #------------------------------------------------------------------------------#
 library(magrittr)
-library(dplyr)
-library(tidyr)
+library(tidyverse)
 library(devtools)
-options(stringsAsFactors = FALSE) # To use "standard" data frame, do noy use that.
+#options(stringsAsFactors = FALSE) # To use "standard" data frame, do noy use that.
 
 #------------------------------------------------------------------------------#
 # Useful functions
@@ -27,7 +26,7 @@ generateGrid <- function(data, times) {
                        t = times,
                        KEEP.OUT.ATTRS = FALSE)
     res   <- res %>% arrange(x, y, t)
-    res$d <- 0
+    res$r <- 0
     res$n <- 0
     res
 }
@@ -40,7 +39,7 @@ fillDis <- function(data, listVals) {
                 apply(select(listVals[[id]], x, y), 1, paste0, collapse = "_"))
         # idb: row-ids in data where t >= id
         idb <- which(data$t >= id)
-        data[intersect(ida, idb), ]$d <<- 1 # Here, 1 means diseased (0: healthy)
+        data[intersect(ida, idb), ]$r <<- 1 # Here, 1 means diseased (0: healthy)
     })
     data
 }
@@ -170,7 +169,58 @@ with(codling_moths, text(x, y, labels = r))
 devtools::use_data(codling_moths)
 
 
+#------------------------------------------------------------------------------#
 
+# reorg <- function(my_data, year) {
+#
+#     my_data$x  <- round((my_data$x * (50.4 / 50)) / 2.1) + 1
+#     my_data$y  <- round((my_data$y * (90   / 90)) / 1.8) + 1
+#     my_data$r  <- 1
+#
+#     tmp <- expand.grid(x = min(my_data$x):max(my_data$x),
+#                        y = min(my_data$y):max(my_data$y))
+#
+#     my_data <- left_join(tmp, my_data)
+#     my_data[is.na(my_data$r), ]$r <- 0
+#     my_data$n  <- 1
+#     my_data$xm <- (my_data$x - 1) * 2.1
+#     my_data$ym <- (my_data$y - 1) * 1.8
+#     my_data$t  <- year
+#
+#     my_data <- my_data %>%
+#         select(x, y, xm, ym, t, r, n) %>%
+#         arrange(x, y, t)
+#
+#     my_data
+# }
+#
+# year_1996 <- c("data-raw/Pethybridge_apple_A_1996.csv",
+#                "data-raw/Pethybridge_apple_B_1996.csv",
+#                "data-raw/Pethybridge_apple_C_1996.csv")
+# year_1997 <- c("data-raw/Pethybridge_apple_A_1997_subsequent.csv",
+#                "data-raw/Pethybridge_apple_B_1997_subsequent.csv",
+#                "data-raw/Pethybridge_apple_C_1997_subsequent.csv")
+# viruses   <- c("HpLV", "HpMV", "ApMV")
+#
+# for (i in 1:3) {
+#     my_data_1 <- read.csv2(year_1996[i], header = TRUE)
+#     my_data_2 <- read.csv2(year_1997[i], header = TRUE)
+#     my_data_2 <- bind_rows(my_data_1, my_data_2)
+#     my_data_3 <- bind_rows(reorg(my_data_1, 1996),
+#                            reorg(my_data_2, 1997))
+#
+#     #with(my_data_3 %>% filter(r == 1, t == 1997),
+#     #     plot(xm, ym, pch = 19, col = rgb(0,0,0,1), yaxt = "n"))
+#     #axis(2, at = seq(0, 90, by = 10), las = 2)
+#
+#     write.csv(my_data_3, file = paste0("data-raw/hop_", i, "_", viruses[i], ".csv"),
+#               quote = FALSE, row.names = FALSE)
+# }
 
+hop_viruses <- list("HpLV" = read.csv("data-raw/hop_1_HpLV.csv", header = TRUE),
+                    "HpMV" = read.csv("data-raw/hop_2_HpMV.csv", header = TRUE),
+                    "ApMV" = read.csv("data-raw/hop_3_ApMV.csv", header = TRUE))
+use_data(hop_viruses)
 
+#------------------------------------------------------------------------------#
 

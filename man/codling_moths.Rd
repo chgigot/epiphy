@@ -7,13 +7,13 @@
 \format{A data frame with 30 rows and 3 variables:
 \tabular{lll}{
     [, 1:2] \tab x,y \tab Spatial coordonates. \cr
-    [, 3]   \tab d   \tab Counts. \cr
+    [, 3]   \tab r   \tab Counts. \cr
 }}
 \source{
 Lavigne C, Ricci B, Franck P, Senoussi R. 2010. Spatial analyses of
     ecological count data: A density map comparison approach. Basic and
     Applied Ecology 11: 734-42.
-    \href{http://dx.doi.org/10.1016/j.baae.2010.08.011}{10.1016/j.baae.2010.08.011}
+    \href{http://dx.doi.org/10.1016/j.baae.2010.08.011}{doi:10.1016/j.baae.2010.08.011}
 }
 \usage{
 codling_moths

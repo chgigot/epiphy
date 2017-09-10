@@ -9,7 +9,7 @@
     [, 1]   \tab pattern \tab Either clumped (i.e. aggregated), random or regular. \cr
     [, 2]   \tab mu \tab Median spore dispersal parameter. \cr
     [, 3:4] \tab x,y \tab Spatial coordinates. \cr
-    [, 5]   \tab d   \tab Diseased individuals (from 0 to 100). \cr
+    [, 5]   \tab r   \tab Diseased individuals (from 0 to 100). \cr
     [, 6]   \tab n   \tab Sampling unit size. Here, n = 100 individuals per sampling unit. \cr
 }}
 \source{

@@ -6,7 +6,7 @@
 \title{Ray blight disease of pyrethrum.}
 \format{A data frame with 62 rows and 2 variables:
 \tabular{rll}{
-    [, 1] \tab d \tab Number of diseased samples in the quadrat (i.e., 0, 1, 2, 3, 4, 5, or 6). \cr
+    [, 1] \tab r \tab Number of diseased samples in the quadrat (i.e., 0, 1, 2, 3, 4, 5, or 6). \cr
     [, 2] \tab n \tab Sampling unit size. Number of samples assessed per quadrat, n = 6. \cr
 }}
 \source{

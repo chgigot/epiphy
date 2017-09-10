@@ -46,7 +46,7 @@
 #'     [, 2]   \tab irrigation \tab \cr
 #'     [, 3:4] \tab x,y \tab Spatial coordinates. \cr
 #'     [, 5]   \tab t   \tab Time of the disease assessments. \cr
-#'     [, 6]   \tab d   \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
+#'     [, 6]   \tab r   \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
 #'     [, 7]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
 #' }
 #'
@@ -54,7 +54,7 @@
 #' \tabular{rll}{
 #'     [, 1:2] \tab x,y \tab Spatial coordinates. \cr
 #'     [, 3]   \tab t   \tab Time of the disease assessments. 1: 18 December 1929, 2: 31 December 1929, 3: 22 January 1930. \cr
-#'     [, 4]   \tab d   \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
+#'     [, 4]   \tab r   \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
 #'     [, 5]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
 #' }
 #'
@@ -159,7 +159,7 @@
 #'     [, 1]   \tab pattern \tab Either clumped (i.e. aggregated), random or regular. \cr
 #'     [, 2]   \tab mu \tab Median spore dispersal parameter. \cr
 #'     [, 3:4] \tab x,y \tab Spatial coordinates. \cr
-#'     [, 5]   \tab d   \tab Diseased individuals (from 0 to 100). \cr
+#'     [, 5]   \tab r   \tab Diseased individuals (from 0 to 100). \cr
 #'     [, 6]   \tab n   \tab Sampling unit size. Here, n = 100 individuals per sampling unit. \cr
 #' }
 #'
@@ -176,7 +176,7 @@
 #'
 #' @format A data frame with 75 rows and 2 variables:
 #' \tabular{rll}{
-#'     [, 1] \tab d \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
+#'     [, 1] \tab r \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
 #'     [, 2] \tab n \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
 #' }
 #'
@@ -205,7 +205,7 @@
 #'
 #' @format A data frame with 62 rows and 2 variables:
 #' \tabular{rll}{
-#'     [, 1] \tab d \tab Number of diseased samples in the quadrat (i.e., 0, 1, 2, 3, 4, 5, or 6). \cr
+#'     [, 1] \tab r \tab Number of diseased samples in the quadrat (i.e., 0, 1, 2, 3, 4, 5, or 6). \cr
 #'     [, 2] \tab n \tab Sampling unit size. Number of samples assessed per quadrat, n = 6. \cr
 #' }
 #'
@@ -228,7 +228,7 @@
 #' @format A data frame with 32 rows and 3 variables:
 #' \tabular{rll}{
 #'     [, 1]   \tab group \tab Either control or treated group. \cr
-#'     [, 2]   \tab d   \tab Pups weaned. \cr
+#'     [, 2]   \tab r   \tab Pups weaned. \cr
 #'     [, 3]   \tab n   \tab Pups alive at 4 days. \cr
 #' }
 #'
@@ -247,12 +247,12 @@
 #' @format A data frame with 63 rows and 3 variables:
 #' \tabular{lll}{
 #'     [, 1:2] \tab x,y \tab Spatial coordonates. \cr
-#'     [, 3]   \tab d   \tab Counts. \cr
+#'     [, 3]   \tab r   \tab Counts. \cr
 #' }
 #'
 #' @source Perry JN, Winder L, Holland JM, Alston RD. 1999. Red-blue plots for
 #'     detecting clusters in count data. Ecology Letters 2, 106-13.
-#'     \href{http://dx.doi.org/10.1046/j.1461-0248.1999.22057.x}{10.1046/j.1461-0248.1999.22057.x}
+#'     \href{http://dx.doi.org/10.1046/j.1461-0248.1999.22057.x}{doi:10.1046/j.1461-0248.1999.22057.x}
 #------------------------------------------------------------------------------#
 "aphids"
 
@@ -265,7 +265,7 @@
 #' \tabular{lll}{
 #'     [, 1]   \tab set \tab Grid id. \cr
 #'     [, 2:3] \tab x,y \tab Spatial coordonates. \cr
-#'     [, 4]   \tab d   \tab Counts. \cr
+#'     [, 4]   \tab r   \tab Counts. \cr
 #' }
 #'
 #' @source Holland JM, Winder L, Perry JN. 1999. Arthropod prey of farmland
@@ -282,16 +282,44 @@
 #' @format A data frame with 30 rows and 3 variables:
 #' \tabular{lll}{
 #'     [, 1:2] \tab x,y \tab Spatial coordonates. \cr
-#'     [, 3]   \tab d   \tab Counts. \cr
+#'     [, 3]   \tab r   \tab Counts. \cr
 #' }
 #'
 #' @source Lavigne C, Ricci B, Franck P, Senoussi R. 2010. Spatial analyses of
 #'     ecological count data: A density map comparison approach. Basic and
 #'     Applied Ecology 11: 734-42.
-#'     \href{http://dx.doi.org/10.1016/j.baae.2010.08.011}{10.1016/j.baae.2010.08.011}
+#'     \href{http://dx.doi.org/10.1016/j.baae.2010.08.011}{doi:10.1016/j.baae.2010.08.011}
 #------------------------------------------------------------------------------#
 "codling_moths"
 
+#------------------------------------------------------------------------------#
+#' Incidence of three viruses in an Australian hop garden
+#'
+#' TODO. Three viruses: Hop latent virus (HpLV), Hop mosaic virus (HpMV), and Apple mosaic virus (ApMV).
+#' Hop (Humulus lupulus) cv. Victoria, in a commercial hop farm at Bushy Park, Tasmania, Australia.
+#' Established in 1989. An Australian hop garden.
+#' 51 plants within each roaw and 25 rows (total number of plants = 1,275 plants).
+#' 1.8 m within rows, and 2.1 m between rows.
+#'
+#' @format Three data sets, one for each virus. The structure is the same for each virus:
+#' List elements are "HpLV", "HpMV", and "ApMV".
+#'
+#' A data frame with ... rows and ... variables:
+#' \tabular{lll}{
+#'     [, 1:2] \tab x,y   \tab Grid coordonates. \cr
+#'     [, 3:4] \tab xm,ym \tab Metric coordinates. \cr
+#'     [, 5]   \tab t     \tab Year of assays for viruses. \cr
+#'     [, 6]   \tab r     \tab Incidence. 1 = infected, 0 = uninfected. \cr
+#'     [, 7]   \tab n     \tab Sampling unit size. n = 1 means that the sampling
+#'                             unit size is the plant. \cr
+#' }
+#'
+#' @source Pethybridge SJ, Madden LV. 2003. Analysis of spatiotemporal dynamics
+#'     of virus spread in an Australian hop garden by stochastic modeling. Plant
+#'     Disease 87:56-62.
+#'     \href{http://dx.doi.org/10.1094/PDIS.2003.87.1.56}{doi:10.1094/PDIS.2003.87.1.56}
+#------------------------------------------------------------------------------#
+"hop_viruses"
 
 
 
