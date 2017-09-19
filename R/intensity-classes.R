@@ -4,10 +4,65 @@
 #------------------------------------------------------------------------------#
 NULL
 
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+mapping <- function(...) {
+    map <- as.list(match.call()[-1])
+    map <- lapply(map, function(x) ifelse(is.name(x), x, as.name(x)))
+    structure(map, class = "mapping")
+}
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+mapping_ <- function(x) {
+    trim       <- function(x) gsub("^[[:space:]]+|[[:space:]]+$", "", x)
+    splitted   <- lapply(strsplit(x, "="), trim)
+    map        <- lapply(splitted, tail, n = 1L)
+    names(map) <- vapply(splitted, head, n = 1L, FUN.VALUE = character(1))
+    map        <- lapply(map, as.name)
+    structure(map, class = "mapping")
+}
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+print.mapping <- function(x, ...) {
+    values <- vapply(x, deparse, character(1))
+    bullets <- paste0("* ", names(x), " -> ", values, "\n")
+    cat(bullets, sep = "")
+}
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+str.mapping <- function(object, ...) utils::str(unclass(object), ...)
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+"[.mapping" <- function(x, i, ...) structure(unclass(x)[i], class = "mapping")
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+as.character.mapping <- function(x, ...) {
+    char <- as.character(unclass(x))
+    names(char) <- names(x)
+    char
+}
+
+map_data <- function(x) {
+    stopifnot("intensity" %in% class(x))
+    lapply(x$mapping, eval, envir = x$data, enclos = NULL)
+}
+
+
 #==============================================================================#
 # Validity of intensity objects
 #==============================================================================#
-validIntensity <- function(object) {
+valid_intensity <- function(object) {
 
     ## intensity
     if (!any(class(object) == "intensity"))
@@ -21,21 +76,21 @@ validIntensity <- function(object) {
     ## count
     if (any(class(object) == "count")) {
         if (ncol(object$obs) != 1)
-            stop("Each record must have only one observation ('d').")
-        if (!all(names(object$obs) %in% "d"))
-            stop("Name of observation column must be 'd'.")
+            stop("Each record must have only one observation ('r').")
+        if (!all(names(object$obs) %in% "r"))
+            stop("Name of observation column must be 'r'.")
         if (!all(is.wholenumber(object$obs)))
             stop("Observation values must be integers.")
-        if (!all(object$obs$d >= 0))
+        if (!all(object$obs$r >= 0))
             stop("Observation values must be >= 0")
     }
 
     ## incidence
     if (any(class(object) == "incidence")) {
         if (ncol(object$obs) != 2)
-            stop("Each record must have two observations ('d' and 'n').")
-        if (!all(names(object$obs) %in% c("d", "n")))
-            stop("Names of observation columns must be 'd' and 'n'.")
+            stop("Each record must have two observations ('r' and 'n').")
+        if (!all(names(object$obs) %in% c("r", "n")))
+            stop("Names of observation columns must be 'r' and 'n'.")
         if (!all(is.wholenumber(object$obs)))
             stop("Observation values must be integers.")
     }
@@ -43,9 +98,9 @@ validIntensity <- function(object) {
     ## severity
     if (any(class(object) == "severity")) {
         if (ncol(object$obs) != 1)
-            stop("Each record must have only one observation ('d').")
-        if (!all(names(object$obs) %in% "d"))
-            stop("Name of observation column must be 'd'.")
+            stop("Each record must have only one observation ('r').")
+        if (!all(names(object$obs) %in% "r"))
+            stop("Name of observation column must be 'r'.")
         if (!all((object$obs >= 0) & (object$obs <= 1)))
             stop("Observation values must between 0 and 1.")
     }
@@ -56,11 +111,88 @@ validIntensity <- function(object) {
 #==============================================================================#
 # Initial checking and building of intensity object
 #==============================================================================#
+init_intensity <- function(data, mapping, type) {
+
+    std_header <- c("x", "y", "z", # up to 3 dim for space
+                    "t",           # up to 1 dim for time
+                    "r", "n")      # up to 2 "dim" for observations:
+                                   # - r = record
+                                   # - n = number of individuals
+
+    #--------------------------------------------------------------------------#
+    # Initial checks and attribution of a given code for each class (and struct?)
+    # * type
+    if (missing(type)) stop("Missing 'type'.")
+    # * data
+    if (missing(data)) stop("Missing 'data'.")
+    if (!(is.data.frame(data))) stop("'data' must be a data frame.")
+    # Subsequent verifications should be done in 'validity' function for each
+    # object.
+    # * mapping
+    if (missing(mapping)) {
+        data_header     <- colnames(data)
+        data_std_header <- data_header[data_header %in% std_header]
+        mapping <- mapping_(paste0(data_std_header, "=", data_std_header))
+        # checkings!!!
+    } else {
+        if (class(mapping) != "mapping") stop("'mapping' must be a mapping object.")
+        names_mapping <- names(mapping)
+        if (!all(i_std <- names_mapping %in% std_header)) {
+            #warning("Dropping unrelevant names in mapping.") # NOT CLEAR
+            mapping <- mapping[i_std]
+            # checkings!!!!
+        }
+    }
+    # build obj
+    #std_data <- std[std$header %in% names(mapping), ]
+
+    # slice <- function(data, std_data, subdf) {
+    #     subset(data, select = std_data[std_data$slot == subdf, "header"])
+    # }
+    #
+    # res <- lapply(c("label", "space", "time", "obs"), function(subdf) {
+    #     if (subdf == "label") {
+    #         `%out%` <- function(x, table) match(x, table, nomatch = 0L) == 0L
+    #         res <- subset(data, select = colnames(data)[colnames(data) %out% std_data$header])
+    #     } else {
+    #         res <- slice(data, std_data, subdf)
+    #     }
+    #     # In case of empty data frame
+    #     if (any(dim(res) == 0)) res <- NULL
+    #     res
+    # })
+
+    object <- structure(list(data    = data,
+                             mapping = mapping),
+                        class = c(type, "intensity"))
+
+    #####valid_intensity(object)
+
+    object
+    # my_data <- intensity(mtcars, mapping(x = mpg, y = disp))
+
+
+}
+
+plot.intensity <- function(x, y, ...) {
+    #if (!missing(y)) ...
+    #mapping <- attr(x, "mapping")
+    mapped_data   <- lapply(x$mapping, eval, envir = x$data, enclos = NULL)
+    label <- lapply(x$mapping, deparse)
+    plot(x    = mapped_data$x,
+         y    = mapped_data$y,
+         xlab = label$x,
+         ylab = label$y)
+}
+
+# plot(my_data)
+
+
 initIntensity <- function(data, struct = NULL, type) { # Find something else that data???????
 
     ### Split and reshape input data to fit classes input form
     convention <- data.frame(slots   = c(rep("space", 3), "time", rep("obs", 2)), # Find something else that slot???
-                             headers = c("x", "y", "z", "t", "d", "n"),
+                             headers = c("x", "y", "z", "t", "r", "n"),
                              stringsAsFactors = FALSE)
 
     #--------------------------------------------------------------------------#
@@ -201,7 +333,7 @@ initIntensity <- function(data, struct = NULL, type) { # Find something else tha
                              obs    = obs),
                         class = c(type, "intensity", "list"))
 
-    validIntensity(object)
+    valid_intensity(object)
 
     object
 }
@@ -251,10 +383,10 @@ initIntensity <- function(data, struct = NULL, type) { # Find something else tha
 #' \code{obs} slot. In the case of \code{\link{count}}, the data expected for
 #' each record are positive integers (N+). For \code{\link{incidence}}, the data
 #' sets are supposed to be two information set per records, the number of
-#' diseased unit per sampling unit (d) and the total number of units per
+#' diseased unit per sampling unit (r) and the total number of units per
 #' sampling unit (n). Note that in its current implementation, n is supposed to
 #' be the same for a whole data set. Unequal sampling units are not implemented
-#' yet. Finally, for \code{\link{severity}}, d is positive real ranging from 0
+#' yet. Finally, for \code{\link{severity}}, r is positive real ranging from 0
 #' to 1 and depecting a percentage.
 #'
 #' space A data frame containing only spatial information. Each row
@@ -272,7 +404,7 @@ initIntensity <- function(data, struct = NULL, type) { # Find something else tha
 #' @param struct A vector with all the corresponding variables. The different
 #'   elements can be named (names of the elements) of the data frame in the
 #'   incidence object), or unamed. In the latter case, elements must be
-#'   correctly ordered, i.e. x, y, z, t, d and then n. If variables in NULL,
+#'   correctly ordered, i.e. x, y, z, t, r and then n. If variables in NULL,
 #'   then only the 6 first ... will be take into account in the following (1, 2,
 #'   ...), i.e. the id of the value. All the 'parameters' need to be specified.
 #'
@@ -297,21 +429,26 @@ initIntensity <- function(data, struct = NULL, type) { # Find something else tha
 #' @examples
 #' # Implicite call: The parameter struct does not need to be specified if
 #' # the column names of the input data frame respect the convention.
-#' colnames(Cochran1936) # Returns c("x", "y", "t", "d", "n")
+#' colnames(Cochran1936) # Returns c("x", "y", "t", "r", "n")
 #' incidence(Cochran1936)
 #'
 #' # Explicit call: Otherwise, struct must be present:
-#' incidence(Cochran1936, c(d = "d", n = "n", t = "t", x = "x", y = "y"))
-#' incidence(Cochran1936, c(d = 4, n = 5, t = 3, x = 1, y = 2))
+#' incidence(Cochran1936, c(r = "r", n = "n", t = "t", x = "x", y = "y"))
+#' incidence(Cochran1936, c(r = 4, n = 5, t = 3, x = 1, y = 2))
 #' incidence(Cochran1936, list(space = 1:2, time = 3, obs = 4:5))
 #'
 #' ## If a variable is not specified, this means it does not exist in the
 #' ## input data frame.
 #' subData <- subset(Cochran1936, t == 1,
-#'                   select = c("x", "y", "d", "n"))
+#'                   select = c("x", "y", "r", "n"))
 #' # The two following instructions work:
 #' incidence(subData)
-#' incidence(subData, c(x = 1, y = 2, d = 4, n = 5))
+#' incidence(subData, c(x = 1, y = 2, r = 4, n = 5))
+#'
+#' records <- incidence(tomato_tswv$field2)
+#' records
+#' summary(records)
+#' plot(records, type = "map_2d", t = 1)
 #'
 #' @name intensity
 #------------------------------------------------------------------------------#
@@ -321,23 +458,23 @@ NULL
 #' @rdname intensity
 #' @export
 #------------------------------------------------------------------------------#
-count <- function(data, struct = NULL) { # Pas nécessairement besoin de x,y,z,t,d,n nécessaiere seuelment d et n ici pour incidence
-    initIntensity(data, struct, type = "count")
+count <- function(data, mapping) { # Pas nécessairement besoin de x,y,z,t,r,n nécessaiere seuelment r et n ici pour incidence
+    init_intensity(data, mapping, type = "count")
 }
 
 #------------------------------------------------------------------------------#
 #' @rdname intensity
 #' @export
 #------------------------------------------------------------------------------#
-incidence <- function(data, struct = NULL) { # Pas nécessairement besoin de x,y,z,t,d,n nécessaiere seuelment d et n ici pour incidence
-    initIntensity(data, struct, type = "incidence")
+incidence <- function(data, mapping) { # Pas nécessairement besoin de x,y,z,t,r,n nécessaiere seuelment r et n ici pour incidence
+    init_intensity(data, mapping, type = "incidence")
 }
 
 #------------------------------------------------------------------------------#
 #' @rdname intensity
 #' @export
 #------------------------------------------------------------------------------#
-severity <- function(data, struct = NULL) { # Pas nécessairement besoin de x,y,z,t,d,n nécessaiere seuelment d et n ici pour incidence
+severity <- function(data, struct = NULL) { # Pas nécessairement besoin de x,y,z,t,r,n nécessaiere seuelment r et n ici pour incidence
     initIntensity(data, struct, type = "incidence")
 }
 
@@ -476,10 +613,10 @@ as.incidence <- function(object, ...) UseMethod("as.incidence")
 #' @export
 #------------------------------------------------------------------------------#
 as.incidence.count <- function(object, ...) {
-    d <- as.numeric(object$obs$d > 0)
+    r <- as.numeric(object$obs$r > 0)
     n <- 1
     tmp <- data.frame(as.data.frame(object, fields = c("space", "time")),
-                      d = d, n = n)
+                      r = r, n = n)
     count(tmp)
 }
 
@@ -521,9 +658,9 @@ as.severity.count <- function(object, ...) {
 #' @export
 #------------------------------------------------------------------------------#
 as.severity.incidence <- function(object, ...) {
-    d <- object$obs$d / object$obs$n
+    r <- object$obs$r / object$obs$n
     tmp <- data.frame(as.data.frame(object, fields = c("space", "time")),
-                      d = d)
+                      r = r)
     severity(tmp)
 }
 
@@ -640,9 +777,9 @@ as.array.intensity <- function(x, dim, ...) {
     obj <- obj %>% dplyr::arrange_(.dots = rev(dim))
     maxis <- vapply(dim, function(i) length(unique(obj[, i])), numeric(1)) # integer(1)
     #maxis <- vapply(dim, function(i) max(obj[, i]), numeric(1))
-    res <- array(obj$d, dim = maxis)
+    res <- array(obj$r, dim = maxis)
     if (class(x)[[1]] == "incidence") {
-        res <- list(d = res, n = array(obj$n, dim = maxis))
+        res <- list(r = res, n = array(obj$n, dim = maxis))
     }
     return(res)
 }
@@ -683,47 +820,44 @@ as.character.severity <- function(x, ...) "<severity object>"
 #' @export
 #------------------------------------------------------------------------------#
 print.intensity <- function(x, ...) {
-    nRow <- nrow(x$obs)
-
-    # if class(a)[[1]] == "incidence"
-    #if (nrowSpace == 0) <- "no georeferenced data"
-    #if (nrowTime == 0) <- "1 time only"# case if length(unique(time)) == 1?
-
-    nTime <- length(unique(x$time$t))
-    #nTime <- ifelse(nTime == 0, 1, nTime)
-    if (nTime > 2) {
-        if (length(unique(diff(x$time$t)) == 1))
-            nat <- "regular"
-        else
-            nat <- "irregular"
+    mapped_data <- lapply(x$mapping, eval, envir = x$data, enclos = NULL)
+    n_row       <- nrow(x$data)
+    if ("t" %in% names(mapped_data)) {
+        n_time <- length(unique(mapped_data$t))
     }
+    # if (nTime > 2) {
+    #     if (length(unique(diff(x$time$t)) == 1))
+    #         nat <- "regular"
+    #     else
+    #         nat <- "irregular"
+    # }
 
-    xLen <- length(levels(as.factor(x$space$x))) ## Devrait déjà être un facteur !!!!
-    yLen <- length(levels(as.factor(x$space$y))) ## Devrait déjà être un facteur !!!!
+    # xLen <- length(levels(as.factor(x$space$x))) ## Devrait déjà être un facteur !!!!
+    # yLen <- length(levels(as.factor(x$space$y))) ## Devrait déjà être un facteur !!!!
     ### Et pour z ????????????
 
-    nSU    <- nrow(unique( data.frame(x = x$space$x,
-                                      y = x$space$y) )) # Trop specifique
-    if (nSU == 0) {
-        georeferenced <- FALSE
-        if (nTime == 1) {
-            nSU <- nRow
-        } else {
-            nSU <- "" # to complete
-        }
-    } else {
-        georeferenced <- TRUE
-    }
-    anyNA     <- ifelse(any(is.na(x$obs)), TRUE, FALSE) # traiter du cas des NA dans le validity de incidence
-    complete  <- is.completeArray(x)
-    anyLabels <- nrow(x$labels)
+    # nSU    <- nrow(unique( data.frame(x = x$space$x,
+    #                                   y = x$space$y) )) # Trop specifique
+    # if (nSU == 0) {
+    #     georeferenced <- FALSE
+    #     if (nTime == 1) {
+    #         nSU <- nRow
+    #     } else {
+    #         nSU <- "" # to complete
+    #     }
+    # } else {
+    #     georeferenced <- TRUE
+    # }
+    # anyNA     <- ifelse(any(is.na(x$obs)), TRUE, FALSE) # traiter du cas des NA dans le validity de incidence
+    # complete  <- is.completeArray(x)
+    # anyLabels <- nrow(x$labels)
 
-    word <- function(x) {if(x) "Yes" else "No"}
+    # word <- function(x) {if(x) "Yes" else "No"}
 
-    georeferenced <- word(georeferenced)
-    noNA          <- word(!anyNA)
-    complete      <- word(complete)
-    anyLabels     <- word(anyLabels)
+    # georeferenced <- word(georeferenced)
+    # noNA          <- word(!anyNA)
+    # complete      <- word(complete)
+    # anyLabels     <- word(anyLabels)
 
     # More fancy display
     #chars <- nchar(c(nSU, nTime, georeferenced, noNA, complete))
@@ -743,17 +877,26 @@ print.intensity <- function(x, ...) {
     #     ltab[5], complete, " a complete array\n",
     #     sep = "")
 
+    nSU <- 2
+    xLen <- 2
+    yLen <- 2
+    nat <- "TODO"
+    anyLabels <- "TODO"
+    georeferenced <- "TODO"
+    noNA <- complete <- "TODO"
+
+
     cat("<", class(x)[[1]], " object>\n",
         "\u2022 number of sampling unit", ifelse(nSU > 1, "s: ", ": "),
         nSU, " (", xLen, " × ", yLen, ")\n",
-        "\u2022 number of snapshot", ifelse(nTime > 1, "s: ", ": "),
+        "\u2022 number of snapshot", ifelse(n_time > 1, "s: ", ": "),
         sep = "")
-    if      (nTime == 0) cat("1 (implicit)\n")
-    else if (nTime <= 2) cat(nTime, "\n", sep = "")
-    else                  cat(nTime, " (", nat, " time-step)\n", sep ="")
+    if      (n_time == 0) cat("1 (implicit)\n")
+    else if (n_time <= 2) cat(n_time, "\n", sep = "")
+    else                  cat(n_time, " (", nat, " time-step)\n", sep ="")
     cat("\u2022 any labels: ", anyLabels, "\n", sep = "")
     cat("\u2022 explicitly spatialized: ", georeferenced,
-        " (", ncol(x$space), " dim(s))\n",
+        " (", "ncol(x$space)", " dim(s))\n",
         "\u2022 NA-free: ", noNA, "\n",
         "\u2022 complete array: ", complete, "\n", sep = "")
 
@@ -817,24 +960,34 @@ is.completeArray <- function(object) {
 # plot
 #==============================================================================#
 
+#------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-plot.intensity <- function(x, y, type = c("map2D", "progressCurve"), t = NULL,
+plot.count <- function(x, y, ...) {
+    # if time ???
+    mapped_data <- map_data(x)
+    with(mapped_data, plot(x, y, bg = gray(1 - (r / max(r))), cex = 4, pch = 21))
+}
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+plot.intensity <- function(x, y, type = c("map_2D", "progress_curve"), t = NULL,
                            nRibbon = 2, ...) {
     g <- list()
     if (!is.null(t)) {
-        if ("map2D" %in% type)
-            g[[length(g) + 1]] <- plotMap2D(x, t, nRibbon)
-        if ("progressCurve" %in% type)
-            g[[length(g) + 1]] <- plotProgressCurve(x, t)
+        if ("map_2D" %in% type)
+            g[[length(g) + 1]] <- plotmap_2D(x, t, nRibbon)
+        if ("progress_curve" %in% type)
+            g[[length(g) + 1]] <- plotprogress_curve(x, t)
         ### to correct when t only 1 value
         #geom_path: Each group consist of only one observation. Do you need to adjust the group aesthetic?
     } else {
         timeSteps <- unique(x$time$t)
-        if ("map2D" %in% type)
-            g[[length(g) + 1]] <- plotMap2D(x, timeSteps, nRibbon)
-        if ("progressCurve" %in% type)
-            g[[length(g) + 1]] <- plotProgressCurve(x, timeSteps) # to generaliser
+        if ("map_2D" %in% type)
+            g[[length(g) + 1]] <- plotmap_2D(x, timeSteps, nRibbon)
+        if ("progress_curve" %in% type)
+            g[[length(g) + 1]] <- plotprogress_curve(x, timeSteps) # to generaliser
     }
     for (i in seq_len(length(g)))
         print(ggplot() + g[[i]])
@@ -843,7 +996,7 @@ plot.intensity <- function(x, y, type = c("map2D", "progressCurve"), t = NULL,
 #------------------------------------------------------------------------------#
 #' @keywords internal
 #------------------------------------------------------------------------------#
-plotMap2D <- function(object, time, nRibbon = 2) { # Proposer l'inversion visuelle x <-> y
+plotmap_2D <- function(object, time, nRibbon = 2) { # Proposer l'inversion visuelle x <-> y
     if (!is(object, "intensity")) stop("object must be an intensity object.")
 
     data <- subset(as.data.frame(object), t %in% time)
@@ -853,12 +1006,12 @@ plotMap2D <- function(object, time, nRibbon = 2) { # Proposer l'inversion visuel
     if (class(object)[[1]] == "incidence")
         maxScale <- max(data$n) # Gérer le cas différents n dans même jeu de données ; marche seulement pour incidence !!!
     else
-        maxScale <- max(data$d)
+        maxScale <- max(data$r)
 
     #library("ggplot2")
     #Cochran1936$texp <- with(Cochran1936, factor(t, labels = c("18 December 1929",
     #                                                           "31 December 1929")))
-    #g <- ggplot(Cochran1936, aes(x = x, y = y, colour = as.factor(d)))
+    #g <- ggplot(Cochran1936, aes(x = x, y = y, colour = as.factor(r)))
     #g <- g + geom_point()
     #g <- g + scale_colour_manual(values = c("white", "red"))
     #g <- g + facet_grid(. ~ texp) + theme(legend.position="none")
@@ -866,8 +1019,8 @@ plotMap2D <- function(object, time, nRibbon = 2) { # Proposer l'inversion visuel
     #print(g)
 
     g <- list(
-        #----geom_point(data = data, aes(x = x, y = y, color = d), size = 10, shape = 15),
-        geom_tile(data = data, aes(x = x, y = y, fill = d)),
+        #----geom_point(data = data, aes(x = x, y = y, color = r), size = 10, shape = 15),
+        geom_tile(data = data, aes(x = x, y = y, fill = r)),
         ## Valeurs fixées à généraliser ci-après !!!!!!!!
         #scale_colour_gradient(name = "Disease\nintensity",
         #                      low = "white", high = "red", breaks = seq(0, maxScale),
@@ -921,15 +1074,15 @@ plotMap2D <- function(object, time, nRibbon = 2) { # Proposer l'inversion visuel
 #------------------------------------------------------------------------------#
 #' @keywords internal
 #------------------------------------------------------------------------------#
-plotProgressCurve <- function(object, time, col = "red", visuRecap = "all") {
+plotprogress_curve <- function(object, time, col = "red", visuRecap = "all") {
     if (!is(object, "intensity")) stop("object must be an intensity object.")
     #i <- max(sub.data$scoring)
     data  <- subset(as.data.frame(object), t %in% time)
     recap <- data %>%
         dplyr::group_by(t) %>%
         dplyr::summarise(
-            meanD = mean(d),
-            sdD = sd(d))
+            meanD = mean(r),
+            sdD = sd(r))
     #g <- ggplot(data = recap, aes(x = t, y = meanD))
     #g <- ggplot()
     g <- list(
@@ -937,7 +1090,7 @@ plotProgressCurve <- function(object, time, col = "red", visuRecap = "all") {
         ######### De plus attention, warning quand on combine les graphs
         #### Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
         #g <- g + scale_x_continuous("date", breaks=seq(1,i))
-        geom_point(data = data, aes(x = t, y = d),
+        geom_point(data = data, aes(x = t, y = r),
                    alpha = 0.2, size = 3, colour = col,
                    position = position_jitter(w = 0.2, h = 0.2)),
         geom_line(data = recap, aes(x = t, y = meanD),
@@ -981,9 +1134,9 @@ plotProgressCurve <- function(object, time, col = "red", visuRecap = "all") {
 #
 # # To reverse x and y values:
 # myData <- incidence(Cochran1936)
-# plot(myData, type = "map2D")
+# plot(myData, type = "map_2D")
 # str(myData) <- c(x = 2, y = 1)
-# plot(myData, type = "map2D")
+# plot(myData, type = "map_2D")
 # }
 #
 # @name str
@@ -1125,7 +1278,7 @@ unsplit.list <- function(value, f, drop) { # S'occuper du drop !!! Se transmet-i
     #    res <- cbind.data.frame(f = f[i], res) # continue de faire des factors en th'eorie (v'erifier comment contre-carrer cela)
     #    return(res)}))
     #return(new(class(value[[1]]), df, struct = c(
-    #    x = "x", y = "y", z = "z", t = "f", d = "d", n = "n"
+    #    x = "x", y = "y", z = "z", t = "f", r = "r", n = "n"
     #)))#, struct = headers)) ### SUPER TMP !!!!!!!!!!!!!!!!!!!!!11
 }
 
@@ -1156,10 +1309,10 @@ unsplit.list <- function(value, f, drop) { # S'occuper du drop !!! Se transmet-i
 #' myData <- incidence(Cochran1936)
 #' myData <- regroup(myData, unitDim = c(3, 3, 1))
 #' ## With dplyr library:
-#' as.data.frame(myData) %>% dplyr::summarise(mean = d / n)
+#' as.data.frame(myData) %>% dplyr::summarise(mean = r / n)
 #' ## Or with a vanilla synthax:
 #' myData <- as.data.frame(myData)
-#' myData$mean <- myData$d / myData$n
+#' myData$mean <- myData$r / myData$n
 #' @export
 #------------------------------------------------------------------------------#
 regroup <- function(object, ...) UseMethod("regroup")
@@ -1196,7 +1349,7 @@ regroup.intensity <- function(object, unitDim, groupBy, fun = sum,
 
         obsNames <- str(object)$obs$name
 
-        dots <- list(~fun(d), ~fun(n))
+        dots <- list(~fun(r), ~fun(n))
 
         newObject <- as.data.frame(object) %>%
             dplyr::group_by(x, y, t) %>% ## Tous les noms des labels + space + time
@@ -1219,7 +1372,7 @@ regroup.intensity <- function(object, unitDim, groupBy, fun = sum,
             dots1 <- lapply(groupBy, as.symbol)
 
         obsNames <- str(object, simplify = FALSE)$obs$name
-        dots <- list(~fun(d), ~fun(n))
+        dots <- list(~fun(r), ~fun(n))
 
         newObject <- as.data.frame(object) %>%
             dplyr::group_by_(.dots = dots1) %>%

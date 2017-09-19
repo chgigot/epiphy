@@ -65,8 +65,8 @@ tomato_tswv_1929_1plot <- read.csv("data-raw/tomato_tswv_1929_1plot.csv", header
 # 6 = 12 December 1928
 tomato_tswv_1928_4plots <- read.csv("data-raw/tomato_tswv_1928_4plots.csv", header = TRUE)
 
-tomato_tswv <- list("1928_4plots" = tomato_tswv_1928_4plots,
-                    "1929_1plot"  = tomato_tswv_1929_1plot)
+tomato_tswv <- list("field_1928" = tomato_tswv_1928_4plots,
+                    "field_1929" = tomato_tswv_1929_1plot)
 use_data(tomato_tswv)
 
 
@@ -74,9 +74,9 @@ use_data(tomato_tswv)
 #------------------------------------------------------------------------------#
 # Dataset: citrus_ctv (ex. dataGottwald1996)
 #------------------------------------------------------------------------------#
-citrus_ctv <- list("IVI3&4"      = read.csv("data-raw/citrus_ctv_IVIA3and4.csv", header = TRUE),
-                   "IVI6&7"      = read.csv("data-raw/citrus_ctv_IVIA6and7.csv", header = TRUE),
-                   "El-Realengo" = read.csv("data-raw/citrus_ctv_El-Realengo.csv", header = TRUE))
+citrus_ctv <- list("IVI3and4"      = read.csv("data-raw/citrus_ctv_IVIA3and4.csv", header = TRUE),
+                   "IVI6and7"      = read.csv("data-raw/citrus_ctv_IVIA6and7.csv", header = TRUE),
+                   "El_Realengo" = read.csv("data-raw/citrus_ctv_El-Realengo.csv", header = TRUE))
 use_data(citrus_ctv)
 
 #------------------------------------------------------------------------------#

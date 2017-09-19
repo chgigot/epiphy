@@ -38,8 +38,8 @@ myData <- regroup(myData, unitDim = c(3, 3, 1), fun = mean)
 myData <- incidence(Cochran1936)
 myData <- regroup(myData, unitDim = c(3, 3, 1))
 ## With dplyr library:
-as.data.frame(myData) \%>\% dplyr::summarise(mean = d / n)
+as.data.frame(myData) \%>\% dplyr::summarise(mean = r / n)
 ## Or with a vanilla synthax:
 myData <- as.data.frame(myData)
-myData$mean <- myData$d / myData$n
+myData$mean <- myData$r / myData$n
 }

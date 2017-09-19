@@ -80,7 +80,7 @@ sadie.data.frame <- function(data, index = c("perry", "LMX", "all"), # needed to
     if (!rseed) set.seed(seed)
 
     # A faire plus propre / generic ci-dessous
-    count <- tidyr::spread(data, y, d) # Ne plus utiliser tidyr
+    count <- tidyr::spread(data, y, r) # Ne plus utiliser tidyr
     row.names(count) <- count$x
     count <- as.matrix(dplyr::select(count, -x)) # Ne plus utiliser dplyr
 

@@ -7,9 +7,9 @@
 \alias{severity}
 \title{count, incidence and severity objects}
 \usage{
-count(data, struct = NULL)
+count(data, mapping)
 
-incidence(data, struct = NULL)
+incidence(data, mapping)
 
 severity(data, struct = NULL)
 }
@@ -19,7 +19,7 @@ severity(data, struct = NULL)
 \item{struct}{A vector with all the corresponding variables. The different
 elements can be named (names of the elements) of the data frame in the
 incidence object), or unamed. In the latter case, elements must be
-correctly ordered, i.e. x, y, z, t, d and then n. If variables in NULL,
+correctly ordered, i.e. x, y, z, t, r and then n. If variables in NULL,
 then only the 6 first ... will be take into account in the following (1, 2,
 ...), i.e. the id of the value. All the 'parameters' need to be specified.}
 }
@@ -79,10 +79,10 @@ The differences between the different inherited classes regard only the
 \code{obs} slot. In the case of \code{\link{count}}, the data expected for
 each record are positive integers (N+). For \code{\link{incidence}}, the data
 sets are supposed to be two information set per records, the number of
-diseased unit per sampling unit (d) and the total number of units per
+diseased unit per sampling unit (r) and the total number of units per
 sampling unit (n). Note that in its current implementation, n is supposed to
 be the same for a whole data set. Unequal sampling units are not implemented
-yet. Finally, for \code{\link{severity}}, d is positive real ranging from 0
+yet. Finally, for \code{\link{severity}}, r is positive real ranging from 0
 to 1 and depecting a percentage.
 
 space A data frame containing only spatial information. Each row
@@ -98,21 +98,26 @@ obs A data frame containing disease observations themselves. The name
 \examples{
 # Implicite call: The parameter struct does not need to be specified if
 # the column names of the input data frame respect the convention.
-colnames(Cochran1936) # Returns c("x", "y", "t", "d", "n")
+colnames(Cochran1936) # Returns c("x", "y", "t", "r", "n")
 incidence(Cochran1936)
 
 # Explicit call: Otherwise, struct must be present:
-incidence(Cochran1936, c(d = "d", n = "n", t = "t", x = "x", y = "y"))
-incidence(Cochran1936, c(d = 4, n = 5, t = 3, x = 1, y = 2))
+incidence(Cochran1936, c(r = "r", n = "n", t = "t", x = "x", y = "y"))
+incidence(Cochran1936, c(r = 4, n = 5, t = 3, x = 1, y = 2))
 incidence(Cochran1936, list(space = 1:2, time = 3, obs = 4:5))
 
 ## If a variable is not specified, this means it does not exist in the
 ## input data frame.
 subData <- subset(Cochran1936, t == 1,
-                  select = c("x", "y", "d", "n"))
+                  select = c("x", "y", "r", "n"))
 # The two following instructions work:
 incidence(subData)
-incidence(subData, c(x = 1, y = 2, d = 4, n = 5))
+incidence(subData, c(x = 1, y = 2, r = 4, n = 5))
+
+records <- incidence(tomato_tswv$field2)
+records
+summary(records)
+plot(records, type = "map_2d", t = 1)
 
 }
 \seealso{
