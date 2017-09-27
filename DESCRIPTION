@@ -20,4 +20,5 @@ Collate:
     'epiphy.R'
     'utils.R'
     'intensity-classes.R'
+    'indices.R'
     'sadie.R'
