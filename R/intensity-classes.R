@@ -646,15 +646,14 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
 #' @export
 #------------------------------------------------------------------------------#
 split.intensity <- function(x, f, drop = FALSE, ..., by) {
+    mapped_data <- map_data(x)
     if (!missing(by)) {
-        if (!missing(f)) stop("'f' and 'by' cannot be given at the same time.")
+        if (!missing(f)) stop("f and by cannot be given at the same time.")
         stopifnot(all(by %in% names(x$mapping)))
-        f <- lapply(by, function(var) getElement(x$data, var))
+        f <- lapply(by, function(var) getElement(mapped_data, var))
     }
-    res <- split(x$data, f, drop, ...)
-    lapply(res, function(subx) {
-        init_intensity(subx, mapping = x$mapping, type = class(x)[1L])
-    })
+    res <- split(mapped_data, f, drop, ...)
+    lapply(res, function(subx) unmap_data(subx, x))
 }
 
 # TODO: unsplit
