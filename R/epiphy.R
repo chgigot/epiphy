@@ -7,5 +7,6 @@
 #' @name epiphy
 #' @useDynLib epiphy
 #' @importFrom Rcpp sourceCpp
+#' @import ggplot2
 #------------------------------------------------------------------------------#
 NULL

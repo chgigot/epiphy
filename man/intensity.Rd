@@ -5,18 +5,20 @@
 \alias{count}
 \alias{incidence}
 \alias{severity}
-\title{count, incidence and severity objects}
+\title{Construct count, incidence and severity objects.}
 \usage{
 count(data, mapping)
 
 incidence(data, mapping)
 
-severity(data, struct = NULL)
+severity(data, mapping)
 }
 \arguments{
-\item{data}{A data frame containing all the data. Each line corresponding to a records.}
+\item{data}{A data frame. Each line corresponds to a record (or case, or
+entry).}
 
-\item{struct}{A vector with all the corresponding variables. The different
+\item{mapping}{A \code{mapping} object, created with \code{mapping()} or
+  \code{mapping_()} functions. ... A vector with all the corresponding variables. The different
 elements can be named (names of the elements) of the data frame in the
 incidence object), or unamed. In the latter case, elements must be
 correctly ordered, i.e. x, y, z, t, r and then n. If variables in NULL,
@@ -41,9 +43,9 @@ When printed, difference information are available:
 }
 }
 \description{
-Constructs an object of one of the three classes inheriting from
-\code{intensity} class. The choice of the class depends on the nature of the
-data sets.
+\code{count()}, \code{incidence()} and \code{severity()} create eponym
+objects. All of these classes inherit from the base class \code{intensity}.
+The choice of the class depends on the nature of the data set.
 }
 \details{
 \code{incidence} reads disease incidence data from a data frame and return an
@@ -94,6 +96,20 @@ time A data frame containing temporal information. By convention, the
 
 obs A data frame containing disease observations themselves. The name
   of the columns may differ between the sub-class chosed to record the data.
+
+Note that it is possible to create a "severity" object but no statistical
+tools are currently implemented to deal with such an object.
+
+An \code{intensity} object contains at very least the "pure" intensity
+records (column \code{r}) which is a so-called observational variable.
+Another observational variable, the number of individuals in a sampling unit
+(\code{n}), is present in the case of a \code{incidence} object. Very often
+in addition to observational variables, there are spatial (columns \code{x},
+\code{y} and/or \code{z}) and/or temporal (column \code{t}) variables.
+
+Note that the \code{severity} class and the \code{z} variable (the 3rd
+spatial dimension) are implemented but no statistical methods use them at
+this point.
 }
 \examples{
 # Implicite call: The parameter struct does not need to be specified if
@@ -118,6 +134,20 @@ records <- incidence(tomato_tswv$field2)
 records
 summary(records)
 plot(records, type = "map_2d", t = 1)
+
+##--
+my_raw_data <- tomato_tswv$field_1929
+names(my_raw_data)
+# Automatic mapping because the name of ...
+my_data <- incidence(my_raw_data)
+# To make it less trivial, let's change the column names:
+colnames(my_raw_data) <- c("coord1", "coord2", "time", "scoring", "tot_plants")
+my_mapping <- mapping(x = coord1, y = coord2, t = time, r = scoring, n = tot_plants)
+my_mapping
+my_data <- incidence(my_raw_data, my_mapping)
+my_data
+summary(my_data)
+plot(my_data)
 
 }
 \seealso{

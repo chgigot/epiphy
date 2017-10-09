@@ -11,9 +11,14 @@ LazyData: true
 RoxygenNote: 6.0.1
 LinkingTo: Rcpp
 Imports:
+    ggplot2,
     transport,
-    emdist,
     Rcpp
+Suggests:
+    magrittr,
+    dplyr,
+    tidyr,
+    emdist
 Collate: 
     'RcppExports.R'
     'data.R'
