@@ -21,9 +21,13 @@ Suggests:
     emdist
 Collate: 
     'RcppExports.R'
+    'betabinom.R'
     'data.R'
-    'epiphy.R'
     'utils.R'
+    'epiphy.R'
     'intensity-classes.R'
+    'distr-fitting.R'
     'indices.R'
+    'power-law.R'
     'sadie.R'
+    'spatial-hier.R'
