@@ -37,6 +37,7 @@ NULL
 #' # my_data is a list of incidence object, each one corresponding to a given
 #' # given time at a given location.
 #' my_power_law <- power_law(my_data)
+#' my_power_law
 #' summary(my_power_law)
 #' plot(my_power_law)
 #'
@@ -54,89 +55,72 @@ NULL
 #'
 #' @export
 #------------------------------------------------------------------------------#
-power_law <- function(x, log_base = exp(1), ...) {
+power_law <- function(list, log_base = exp(1), na.rm = FALSE, ...) { # S'OCCUPER DES NA
 
-    if (missing(x)) stop("x must be specified.")
+    # Checks:
+    stopifnot(is.list(list))
+    if (length(list) < 2) {
+        stop("Less than 2 points is not enough to perform linear regressions.")
+    }
+    object_class <- unique(vapply(list, function(x) class(x)[[1]], character(1)))
+    stopifnot(length(object_class) == 1)
+    stopifnot(object_class %in% c("count", "incidence"))
 
-    n       <- unique(x[[1]]$n) ### TRES TRES SAL !!! En particulier si on travaille avec du Poisson !!!
+    # Perform power law analysis:
+    switch(object_class,
+           "count" = {
+               data <- lapply(list, function(obj) map_data(obj)$r)
+               x    <- vapply(data, function(obj) mean(obj, na.rm = na.rm), numeric(1L))
+               y    <- vapply(data, function(obj) var(obj, na.rm = na.rm), numeric(1L))
+           },
+           "incidence" = {
+               data <- lapply(list, function(obj) {
+                   mapped_data <- map_data(obj)
+                   data.frame(p = (mapped_data$r / mapped_data$n),
+                              n = mapped_data$n)
+               })
+               # For incidence data as proportions:
+               # v_t = p(1 - p)/n (Madden & Hughes, 1995)
+               x    <- vapply(data, function(obj) {
+                   with(obj, (mean(p, na.rm = na.rm) * (1 - mean(p, na.rm = na.rm))) / mean(n, na.rm = na.rm))
+               }, numeric(1L))
+               y    <- vapply(data, function(obj) var(obj$p, na.rm = na.rm), numeric(1L))
+           }
+    )
+    coord_obs <- data.frame(x = x, y = y)
+    model_formula <- as.formula(bquote(
+        log(y, base = .(log_base)) ~ log(x, base = .(log_base))
+    ))
+    model     <- lm(model_formula, ...)
+    y_the     <- predict(model, type = "response")
+    coord_the <- data.frame(x = x, y = log_base^(y_the))
 
-    # if(!is.list(x)) => error
-    # len <- length(x)
-    # if(len == 0) => error
-    # if(len == 1) => warning
-    # type <- is(x[[1]])
-    # switch(type,
-    #        Incidence = {}, type Incidence à checher pour tous éléments de la liste
-    #        Count = {}, type Count à checher pour tous éléments de la liste
-    #        error("Aie"))
-    #### Attention, aucune protection ici !!!!!
-    #if (!is.IncidenceGroup(x) && !is.CountGroup(x)) {
-    #stop("x must be a valid IncidenceGroup or CountGroup object.")
-    #} else {
-
-    classObjs <- class(x[[1]])
-
-    powerLawFn <- function(list, type, log_base, ...) {
-        if (length(list) == 1) {
-            stop("Only 1 point is not enough to perform a linear regression.")
+    # Retrieve summary matrice of coefficients, and eventually add some extra
+    # estimates:
+    par <- coef(summary(model))
+    switch (object_class,
+        "count" = {
+            # Nothing to do.
+        },
+        "incidence" = {
+            n  <- mean(vapply(data, function(obj) mean(obj$n, na.rm = na.rm), numeric(1L)), na.rm = na.rm) ### PAS TOP
+            Ar <- estimateCoef(model, bquote(.(log_base)^x1))
+            ar <- estimateCoef(model, bquote(.(log_base)^x1 * .(n)^(-x2)))
+            AR <- estimateCoef(model, bquote(.(log_base)^x1 * .(n)^(2 * (1 - x2))))
+            aR <- estimateCoef(model, bquote(.(log_base)^x1 * .(n)^(2 - x2)))
+            par <- rbind(par, unlist(Ar), unlist(ar), unlist(AR), unlist(aR))
+            rownames(par) <- c("log_base(Ar)", "b", "Ar", "ar", "AR", "aR")
         }
-        switch(type,
-               "incidence" = {
-                   datas <- lapply(list, function(x) data.frame(freq = (x@obs$d / x@obs$n), n = x@obs$n))
-                   y     <- vapply(datas, function(x) var(x$freq), numeric(1)) # y before x to avoid to crach x too early... find another name rather than x for the argument (object)
-                   x     <- vapply(datas, function(x) (mean(x$freq) * (1 - mean(x$freq))) / x$n[1], numeric(1)) # Work only if n the same everywheerer
-               },
-               "count" = {
-                   datas <- lapply(list, function(x) x@obs$d) # Peut ^etre choisir autre chose que x, dans x@obs$d ?
-                   y     <- vapply(datas, function(x) var(x), numeric(1))
-                   x     <- vapply(datas, function(x) mean(x), numeric(1))
-               }
-        )
+    )
 
-        modelFormula <- as.formula(substitute(
-            log(y, base = log_base) ~ log(x, base = log_base),
-            list(log_base = log_base)))
-        model    <- lm(modelFormula, ...)
-        coordObs <- data.frame(x = x, y = y)
-        yThe     <- predict(model, data.frame(log10(x)), type="response")
-        coordThe <- data.frame(x = x, y = log_base^(yThe))
-        return(list(model = model,
-                    coordObs = coordObs,
-                    coordThe = coordThe))
-    }
-
-    x <- powerLawFn(x, classObjs, log_base, ...) # x[[1]] car une liste d'objet de meme type (a verifier avant)
-
-    # Warning message:
-    # 'newdata' had 2 rows but variables found have 6 rows
-    #return(.Object)
-
-    baseLogAd <- b <- list()
-    baseLogAd$est  <- coefficients(x[[1]])[[1]]
-    b$est          <- coefficients(x[[1]])[[2]]
-
-    # Retrieve result matrice (to which we will add extra estimates)
-    param <- coef(summary(x$model))
-
-    if (classObjs == "incidence") {
-
-        Ad <- estimateCoef(x$model, bquote(.(log_base)^x1))
-        ad <- estimateCoef(x$model, bquote(.(log_base)^x1 * .(n)^(-x2)))
-        AD <- estimateCoef(x$model, bquote(.(log_base)^x1 * .(n)^(2 * (1 - x2))))
-        aD <- estimateCoef(x$model, bquote(.(log_base)^x1 * .(n)^(2 - x2)))
-
-        param <- rbind(param, unlist(Ad), unlist(ad), unlist(AD), unlist(aD))
-        rownames(param) <- c("log_base(Ap)", "b", "Ap", "ap", "An", "an")
-
-    }
-
-    structure(list(call = match.call(),
-                   model = x[[1]],
-                   par = param,
-                   n = n,
-                   log_base = log_base,
-                   coordObs = x[[2]],
-                   coordThe = x[[3]]),
+    # Return the following object:
+    structure(list(call      = match.call(),
+                   data      = data,
+                   model     = model,
+                   par       = par,
+                   log_base  = log_base,
+                   coord_obs = coord_obs,
+                   coord_the = coord_the),
               class = "power_law")
 }
 
@@ -201,7 +185,7 @@ plot.power_law <- function(x, y, col = "black", size = 2, observed = TRUE,
 #' @export
 #------------------------------------------------------------------------------#
 print.power_law <- function(x, ...) {
-    cat("\nPower Law Analysis:\n")
+    cat("# Power law analysis:\n")
     printCoefmat(x$par)
 }
 
@@ -209,20 +193,20 @@ print.power_law <- function(x, ...) {
 
 
 #------------------------------------------------------------------------------#
-#' aaaaa: A wAy to pAinlessly switch between different power LAw formulAtions
+#' a2a: A wAy to pAinlessly switch between different power LAw formulAtions
 #'
-#' \code{aaaaa} was designed to avoid headaches that are likely to occur when
+#' \code{a2a} was designed to avoid headaches that are likely to occur when
 #' working with different formulations of the binomial power law analysis.
 #'
 #' The binomial power law can be expressed as: \eqn{s_y^2 = (intercept)(s_{bin}^2)^b}.
 #' But different forms of (intercept) are possible depending on the formulation of the
 #' binomial power law.
 #' \tabular{ccccc}{
-#'       \tab Ad         \tab ad      \tab AD         \tab aD      \cr
-#'    Ad \tab 1          \tab n^b     \tab n^{2(b-1)} \tab n^{b-2} \cr
-#'    ad \tab n^{-b}     \tab 1       \tab n^{b-2}    \tab n^{-2}  \cr
-#'    AD \tab n^{2(1-b)} \tab n^{2-b} \tab 1          \tab n^{-b}  \cr
-#'    aD \tab n^{2-b}    \tab n^2     \tab n^b        \tab 1       \cr
+#'       \tab Ar         \tab ar      \tab AR         \tab aR      \cr
+#'    Ar \tab 1          \tab n^b     \tab n^{2(b-1)} \tab n^{b-2} \cr
+#'    ar \tab n^{-b}     \tab 1       \tab n^{b-2}    \tab n^{-2}  \cr
+#'    AR \tab n^{2(1-b)} \tab n^{2-b} \tab 1          \tab n^{-b}  \cr
+#'    aR \tab n^{2-b}    \tab n^2     \tab n^b        \tab 1       \cr
 #' }
 #'
 #' @param intercept Intercept parameter to be converted.
@@ -233,30 +217,40 @@ print.power_law <- function(x, ...) {
 #'
 #' @examples
 #'
-#' aaaaa(from = , to = , n = , b = )
-#' aaaaa(to = , data = <powerLaw object>)
+#' a2a(from = , to = , n = , b = )
+#' a2a(to = , data = <powerLaw object>)
 #'
 #' @export
 #------------------------------------------------------------------------------#
-aaaaa <- function(intercept, from = c("Ad", "ad", "AD", "aD"),
-                  to = c("Ad", "ad", "AD", "aD"), slope, n) {
+a2a <- function(intercept, from = c("Ar", "ar", "AR", "aR"),
+                  to = c("Ar", "ar", "AR", "aR"), slope, n) {
     from <- match.arg(from)
     to   <- match.arg(to)
     b    <- slope
-    dico <- expand.grid(from = c("Ad", "ad", "AD", "aD"),
-                        to = c("Ad", "ad", "AD", "aD"),
+    dico <- expand.grid(from = c("Ar", "ar", "AR", "aR"),
+                        to = c("Ar", "ar", "AR", "aR"),
                         KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE)
-    #             | col Ad     |col ad  | col AD     | col aD
-    dico$coef <- c(1,           n^b,     n^(2*(b-1)), n^(b-2), # row Ad
-                   n^(-b),      1,       n^(b-2),     n^(-2),  # row ad
-                   n^(2*(1-b)), n^(2-b), 1,           n^(-b),  # row AD
-                   n^(2-b),     n^2,     n^b,         1)       # row aD
+    #-----------------------------------------------------------------#
+    #             | col Ar     |col ar  | col AR     | col aR
+    dico$coef <- c(1,           n^b,     n^(2*(b-1)), n^(b-2), # row Ar
+                   n^(-b),      1,       n^(b-2),     n^(-2),  # row ar
+                   n^(2*(1-b)), n^(2-b), 1,           n^(-b),  # row AR
+                   n^(2-b),     n^2,     n^b,         1)       # row aR
+    #-----------------------------------------------------------------#
     item <- dico[which(dico$from == from & dico$to == to), ]
-    res <- intercept * item[["coef"]]
-    attr(res, "params") <- c(intercept = intercept, coef = item[["coef"]],
-                             slope = b, n = n)
+    res  <- intercept * item[["coef"]]
+    attr(res, "par") <- c(intercept = intercept,
+                          coef      = item[["coef"]],
+                          slope     = b,
+                          n         = n)
+    attr(res, "class") <- c("a2a", "numeric")
     res
 }
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+print.a2a <- function(x, ...) cat(x, "\n", sep = "")
 
 #------------------------------------------------------------------------------#
 # @export

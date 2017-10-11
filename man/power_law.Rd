@@ -4,15 +4,15 @@
 \alias{power_law}
 \title{Taylor\'s and binary power laws}
 \usage{
-power_law(x, log_base = exp(1), ...)
+power_law(list, log_base = exp(1), na.rm = FALSE, ...)
 }
 \arguments{
-\item{x}{A list of \code{intensity} objects (\code{count} or
-\code{incidence} objects).}
-
 \item{log_base}{Logarithm base to be used.}
 
 \item{...}{Not yet implemented.}
+
+\item{x}{A list of \code{intensity} objects (\code{count} or
+\code{incidence} objects).}
 }
 \value{
 A \code{power_law} object.
@@ -43,6 +43,7 @@ my_data <- do.call(c, lapply(citrus_ctv, function(citrus_field) {
 # my_data is a list of incidence object, each one corresponding to a given
 # given time at a given location.
 my_power_law <- power_law(my_data)
+my_power_law
 summary(my_power_law)
 plot(my_power_law)
 

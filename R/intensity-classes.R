@@ -25,7 +25,7 @@ NULL
 #' @param ... One or more unquoted expressions separated by commas.
 #' @param x Vector of one or more character strings.
 #'
-#' @seealso \code{\link{mapv}}
+#' @seealso \code{\link{mapped_var}}
 #'
 #' @examples
 #' mapping(x = col1, y = col2)
@@ -475,24 +475,24 @@ as.data.frame.intensity <- function(x, row.names = NULL, optional = FALSE, ...,
 #' my_data
 #' #... TODO
 #' # x, y, X, Y
-#' mapv(my_data)
-#' mapv(my_data) <- mapping(x = X, y = Y)
-#' mapv(my_data)
-#' mapv(my_data) <- mapping(x = x, r = r, keep = FALSE)
-#' mapv(my_data)
+#' mapped_var(my_data)
+#' mapped_var(my_data) <- mapping(x = X, y = Y)
+#' mapped_var(my_data)
+#' mapped_var(my_data) <- mapping(x = x, r = r, keep = FALSE)
+#' mapped_var(my_data)
 #'
 #' @export
 #------------------------------------------------------------------------------#
-mapv <- function(x) {
+mapped_var <- function(x) {
     stopifnot(is.intensity(x))
     x$mapping
 }
 
 #------------------------------------------------------------------------------#
-#' @rdname mapv
+#' @rdname mapped_var
 #' @export
 #------------------------------------------------------------------------------#
-"mapv<-" <- function(x, value, keep = TRUE) {
+"mapped_var<-" <- function(x, value, keep = TRUE) {
     stopifnot(is.intensity(x))
     if (keep) {
         idx_to_keep <- !(names(x$mapping) %in% names(value))

@@ -33,5 +33,5 @@ mapping_(c("x = col1", "y = col2"))
 
 }
 \seealso{
-\code{\link{mapv}}
+\code{\link{mapped_var}}
 }
