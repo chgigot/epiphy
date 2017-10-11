@@ -43,61 +43,6 @@ cloglog <- function(x, rev = FALSE) {
 #------------------------------------------------------------------------------#
 
 #------------------------------------------------------------------------------#
-#' aaaaa: A wAy to pAinlessly switch between different power LAw formulAtions
-#'
-#' \code{aaaaa} was designed to avoid headaches that are likely to occur when
-#' working with different formulations of the binomial power law analysis.
-#'
-#' The binomial power law can be expressed as: \eqn{s_y^2 = (intercept)(s_{bin}^2)^b}.
-#' But different forms of (intercept) are possible depending on the formulation of the
-#' binomial power law.
-#' \tabular{ccccc}{
-#'       \tab Ad         \tab ad      \tab AD         \tab aD      \cr
-#'    Ad \tab 1          \tab n^b     \tab n^{2(b-1)} \tab n^{b-2} \cr
-#'    ad \tab n^{-b}     \tab 1       \tab n^{b-2}    \tab n^{-2}  \cr
-#'    AD \tab n^{2(1-b)} \tab n^{2-b} \tab 1          \tab n^{-b}  \cr
-#'    aD \tab n^{2-b}    \tab n^2     \tab n^b        \tab 1       \cr
-#' }
-#'
-#' @param intercept Intercept parameter to be converted.
-#' @param from Kind of the input intercept parameter.
-#' @param to Desired kind for the ouput intercept parameter.
-#' @param slope Slope parameter.
-#' @param n Number of individuals per sampling unit.
-#'
-#' @examples
-#'
-#' aaaaa(from = , to = , n = , b = )
-#' aaaaa(to = , data = <powerLaw object>)
-#'
-#' @export
-#------------------------------------------------------------------------------#
-aaaaa <- function(intercept, from = c("Ad", "ad", "AD", "aD"),
-                  to = c("Ad", "ad", "AD", "aD"), slope, n) {
-    from <- match.arg(from)
-    to   <- match.arg(to)
-    b    <- slope
-    dico <- expand.grid(from = c("Ad", "ad", "AD", "aD"),
-                        to = c("Ad", "ad", "AD", "aD"),
-                        KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE)
-    #             | col Ad     |col ad  | col AD     | col aD
-    dico$coef <- c(1,           n^b,     n^(2*(b-1)), n^(b-2), # row Ad
-                   n^(-b),      1,       n^(b-2),     n^(-2),  # row ad
-                   n^(2*(1-b)), n^(2-b), 1,           n^(-b),  # row AD
-                   n^(2-b),     n^2,     n^b,         1)       # row aD
-    item <- dico[which(dico$from == from & dico$to == to), ]
-    res <- intercept * item[["coef"]]
-    attr(res, "params") <- c(intercept = intercept, coef = item[["coef"]],
-                             slope = b, n = n)
-    res
-}
-
-#------------------------------------------------------------------------------#
-# @export
-#------------------------------------------------------------------------------#
-#aaaaa.powerLaw <- function(obj, to)
-
-#------------------------------------------------------------------------------#
 # Log-likelihood ratio test / likelihood ratio test statistic (LRS)
 #
 # idea from  lmtest::lrtest()

@@ -1,22 +1,60 @@
 #------------------------------------------------------------------------------#
-#' @include utils.R
+#' @include intensity-classes.R
 #------------------------------------------------------------------------------#
 NULL
 
-#==============================================================================#
-#' Taylor's and Binomial Power Laws
+#------------------------------------------------------------------------------#
+#' Taylor\'s and binary power laws
 #'
-#' These functions allow to...
+#' Assesses the overall degree of heterogeneity in a collection of data sets at
+#' the sampling-unit scale.
 #'
-#' \deqn{log_{10}(s_y^{2}) = log_{10}(a) + b log_{10}(Y)}
-#' with \eqn{Y} is equivalent to \eqn{\bar{y}(1 - \bar{y})} in case of incidence
-#' data, and \eqn{\bar{y}} in case of count data. \eqn{y} correspond to the
-#' proportion of diseased plants or plant parts in each sampling unit, whereas
-#' \eqn{y} corresponds to the absolute value in case of data count.
+#' The power law describes the relationship between the observed variance of
+#' individuals within a data set (\code{s^2}) and the corresponding variance
+#' under the assumption of no aggregation (\code{s\'^2}). It can be expressed
+#' under its logarithmic form as: \code{log(s^2) = log(a) + b log(Y)}, with:
+#' \itemize{
+#'     \item \code{Y = p} in the case of count data (Taylor\'s power law).
+#'     \item \code{Y = p(1 - p)} in the case of incidence data (binary power law).
+#' }
+#' \code{p} corresponds to the mean proportion of recorded individuals in case
+#' of incidence data, and the absolute value in case of count data.
+#'
+#' @param x A list of \code{intensity} objects (\code{count} or
+#'     \code{incidence} objects).
+#' @param log_base Logarithm base to be used.
+#' @param ... Not yet implemented.
+#'
+#' @return A \code{power_law} object.
+#'
+#' @examples
+#' require(magrittr)
+#' my_data <- do.call(c, lapply(citrus_ctv, function(citrus_field) {
+#'    incidence(citrus_field) %>%
+#'        clump(unit_size = c(x = 3, y = 3)) %>%
+#'        split(by = "t")
+#' }))
+#' # my_data is a list of incidence object, each one corresponding to a given
+#' # given time at a given location.
+#' my_power_law <- power_law(my_data)
+#' summary(my_power_law)
+#' plot(my_power_law)
+#'
+#' @references
+#'
+#' Taylor LR. 1961. Aggregation, variance and the mean. Nature 189: 732–35.
+#'
+#' Hughes G, Madden LV. 1992. Aggregation and incidence of disease. Plant
+#' Pathology 41 (6): 657–660.
+#' \href{http://dx.doi.org/10.1111/j.1365-3059.1992.tb02549.x}{doi:10.1111/j.1365-3059.1992.tb02549.x}
+#'
+#' Madden LV, Hughes G, van den Bosch F. 2007. Spatial aspects of epidemics -
+#' III: Patterns of plant disease. In: The study of plant disease epidemics,
+#' 235–78. American Phytopathological Society, St Paul, MN.
 #'
 #' @export
 #------------------------------------------------------------------------------#
-powerLaw <- function(x, baseLog = 10,...) {
+power_law <- function(x, log_base = exp(1), ...) {
 
     if (missing(x)) stop("x must be specified.")
 
@@ -38,7 +76,7 @@ powerLaw <- function(x, baseLog = 10,...) {
 
     classObjs <- class(x[[1]])
 
-    powerLawFn <- function(list, type, baseLog, ...) {
+    powerLawFn <- function(list, type, log_base, ...) {
         if (length(list) == 1) {
             stop("Only 1 point is not enough to perform a linear regression.")
         }
@@ -56,18 +94,18 @@ powerLaw <- function(x, baseLog = 10,...) {
         )
 
         modelFormula <- as.formula(substitute(
-            log(y, base = baseLog) ~ log(x, base = baseLog),
-            list(baseLog = baseLog)))
+            log(y, base = log_base) ~ log(x, base = log_base),
+            list(log_base = log_base)))
         model    <- lm(modelFormula, ...)
         coordObs <- data.frame(x = x, y = y)
         yThe     <- predict(model, data.frame(log10(x)), type="response")
-        coordThe <- data.frame(x = x, y = baseLog^(yThe))
+        coordThe <- data.frame(x = x, y = log_base^(yThe))
         return(list(model = model,
                     coordObs = coordObs,
                     coordThe = coordThe))
     }
 
-    x <- powerLawFn(x, classObjs, baseLog, ...) # x[[1]] car une liste d'objet de meme type (a verifier avant)
+    x <- powerLawFn(x, classObjs, log_base, ...) # x[[1]] car une liste d'objet de meme type (a verifier avant)
 
     # Warning message:
     # 'newdata' had 2 rows but variables found have 6 rows
@@ -82,10 +120,10 @@ powerLaw <- function(x, baseLog = 10,...) {
 
     if (classObjs == "incidence") {
 
-        Ad <- estimateCoef(x$model, bquote(.(baseLog)^x1))
-        ad <- estimateCoef(x$model, bquote(.(baseLog)^x1 * .(n)^(-x2)))
-        AD <- estimateCoef(x$model, bquote(.(baseLog)^x1 * .(n)^(2 * (1 - x2))))
-        aD <- estimateCoef(x$model, bquote(.(baseLog)^x1 * .(n)^(2 - x2)))
+        Ad <- estimateCoef(x$model, bquote(.(log_base)^x1))
+        ad <- estimateCoef(x$model, bquote(.(log_base)^x1 * .(n)^(-x2)))
+        AD <- estimateCoef(x$model, bquote(.(log_base)^x1 * .(n)^(2 * (1 - x2))))
+        aD <- estimateCoef(x$model, bquote(.(log_base)^x1 * .(n)^(2 - x2)))
 
         param <- rbind(param, unlist(Ad), unlist(ad), unlist(AD), unlist(aD))
         rownames(param) <- c("log_base(Ap)", "b", "Ap", "ap", "An", "an")
@@ -96,10 +134,10 @@ powerLaw <- function(x, baseLog = 10,...) {
                    model = x[[1]],
                    par = param,
                    n = n,
-                   baseLog = baseLog,
+                   log_base = log_base,
                    coordObs = x[[2]],
                    coordThe = x[[3]]),
-              class = "powerLaw")
+              class = "power_law")
 }
 
 ### Restructuration à prévoir ici: Plus de IncidenceGroup ou CountGroup... berk!
@@ -115,10 +153,10 @@ powerLaw <- function(x, baseLog = 10,...) {
 #}
 ########## ETC
 
-#==============================================================================#
+#------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-plot.powerLaw <- function(x, y, col = "black", size = 2, observed = TRUE,
+plot.power_law <- function(x, y, col = "black", size = 2, observed = TRUE,
                           model = TRUE, bisector = TRUE, print = TRUE, type, ...) { # Pas très propre il me semble ?
 
     if (missing(type)) type <- "log"
@@ -159,15 +197,72 @@ plot.powerLaw <- function(x, y, col = "black", size = 2, observed = TRUE,
     } else stop("type must be 'regular' or 'log'.")
 }
 
-#==============================================================================#
+#------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-print.powerLaw <- function(x, ...) {
+print.power_law <- function(x, ...) {
     cat("\nPower Law Analysis:\n")
     printCoefmat(x$par)
 }
 
 # For count
+
+
+#------------------------------------------------------------------------------#
+#' aaaaa: A wAy to pAinlessly switch between different power LAw formulAtions
+#'
+#' \code{aaaaa} was designed to avoid headaches that are likely to occur when
+#' working with different formulations of the binomial power law analysis.
+#'
+#' The binomial power law can be expressed as: \eqn{s_y^2 = (intercept)(s_{bin}^2)^b}.
+#' But different forms of (intercept) are possible depending on the formulation of the
+#' binomial power law.
+#' \tabular{ccccc}{
+#'       \tab Ad         \tab ad      \tab AD         \tab aD      \cr
+#'    Ad \tab 1          \tab n^b     \tab n^{2(b-1)} \tab n^{b-2} \cr
+#'    ad \tab n^{-b}     \tab 1       \tab n^{b-2}    \tab n^{-2}  \cr
+#'    AD \tab n^{2(1-b)} \tab n^{2-b} \tab 1          \tab n^{-b}  \cr
+#'    aD \tab n^{2-b}    \tab n^2     \tab n^b        \tab 1       \cr
+#' }
+#'
+#' @param intercept Intercept parameter to be converted.
+#' @param from Kind of the input intercept parameter.
+#' @param to Desired kind for the ouput intercept parameter.
+#' @param slope Slope parameter.
+#' @param n Number of individuals per sampling unit.
+#'
+#' @examples
+#'
+#' aaaaa(from = , to = , n = , b = )
+#' aaaaa(to = , data = <powerLaw object>)
+#'
+#' @export
+#------------------------------------------------------------------------------#
+aaaaa <- function(intercept, from = c("Ad", "ad", "AD", "aD"),
+                  to = c("Ad", "ad", "AD", "aD"), slope, n) {
+    from <- match.arg(from)
+    to   <- match.arg(to)
+    b    <- slope
+    dico <- expand.grid(from = c("Ad", "ad", "AD", "aD"),
+                        to = c("Ad", "ad", "AD", "aD"),
+                        KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE)
+    #             | col Ad     |col ad  | col AD     | col aD
+    dico$coef <- c(1,           n^b,     n^(2*(b-1)), n^(b-2), # row Ad
+                   n^(-b),      1,       n^(b-2),     n^(-2),  # row ad
+                   n^(2*(1-b)), n^(2-b), 1,           n^(-b),  # row AD
+                   n^(2-b),     n^2,     n^b,         1)       # row aD
+    item <- dico[which(dico$from == from & dico$to == to), ]
+    res <- intercept * item[["coef"]]
+    attr(res, "params") <- c(intercept = intercept, coef = item[["coef"]],
+                             slope = b, n = n)
+    res
+}
+
+#------------------------------------------------------------------------------#
+# @export
+#------------------------------------------------------------------------------#
+#aaaaa.powerLaw <- function(obj, to)
+
 
 
 
