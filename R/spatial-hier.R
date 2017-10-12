@@ -136,6 +136,7 @@ summary.spatialHier <- function(object, ...) {
 }
 
 #------------------------------------------------------------------------------#
+#' @method print summary.spatialHier
 #' @export
 #------------------------------------------------------------------------------#
 print.summary.spatialHier <- function(x, ...) {

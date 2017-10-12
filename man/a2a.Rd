@@ -2,21 +2,30 @@
 % Please edit documentation in R/power-law.R
 \name{a2a}
 \alias{a2a}
+\alias{a2a.numeric}
+\alias{a2a.list}
 \title{a2a: A wAy to pAinlessly switch between different power LAw formulAtions}
 \usage{
-a2a(intercept, from = c("Ar", "ar", "AR", "aR"), to = c("Ar", "ar", "AR",
-  "aR"), slope, n)
+a2a(x, ...)
+
+\method{a2a}{numeric}(x, slope, n, from = c("Ar", "ar", "AR", "aR"),
+  to = c("Ar", "ar", "AR", "aR"))
+
+\method{a2a}{list}(x, to = c("Ar", "ar", "AR", "aR"))
 }
 \arguments{
-\item{intercept}{Intercept parameter to be converted.}
-
-\item{from}{Kind of the input intercept parameter.}
-
-\item{to}{Desired kind for the ouput intercept parameter.}
+\item{x}{Intercept parameter to be converted or a named list with the
+parameter to be converted ("Ar", "ar", "AR" or "aR"), the slope
+("slope"), and the number of individual per sampling unit ("n").}
 
 \item{slope}{Slope parameter.}
 
 \item{n}{Number of individuals per sampling unit.}
+
+\item{from}{Kind of the input intercept parameter ("Ar", "ar", "AR" or "aR").}
+
+\item{to}{Desired kind for the ouput intercept parameter ("Ar", "ar", "AR" or
+"aR").}
 }
 \description{
 \code{a2a} was designed to avoid headaches that are likely to occur when
@@ -35,8 +44,18 @@ binomial power law.
 }
 }
 \examples{
+# Values from the power_law() example:
+Ar    <- 38.6245
+slope <- 1.9356
+n     <- 9
 
-a2a(from = , to = , n = , b = )
-a2a(to = , data = <powerLaw object>)
+# Usual function call syntax:
+a2a(Ar, slope, n, from = "Ar", to = "ar")
+
+# Other syntaxes:
+inputs <- list(Ar = Ar, slope = slope, n = n)
+a2a(inputs, "ar")
+require(magrittr)
+inputs \%>\% a2a("ar")
 
 }

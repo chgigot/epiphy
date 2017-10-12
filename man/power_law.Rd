@@ -2,7 +2,7 @@
 % Please edit documentation in R/power-law.R
 \name{power_law}
 \alias{power_law}
-\title{Taylor\'s and binary power laws}
+\title{Taylor's and binary power laws}
 \usage{
 power_law(list, log_base = exp(1), ...)
 }
@@ -27,7 +27,7 @@ individuals within a data set (\code{s^2}) and the corresponding variance
 under the assumption of no aggregation (\code{s\'^2}). It can be expressed
 under its logarithmic form as: \code{log(s^2) = log(a) + b log(Y)}, with:
 \itemize{
-    \item \code{Y = p} in the case of count data (Taylor\'s power law).
+    \item \code{Y = p} in the case of count data (Taylor's power law).
     \item \code{Y = p(1 - p)} in the case of incidence data (binary power law).
 }
 \code{p} corresponds to the mean proportion of recorded individuals in case

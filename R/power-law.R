@@ -4,7 +4,7 @@
 NULL
 
 #------------------------------------------------------------------------------#
-#' Taylor\'s and binary power laws
+#' Taylor's and binary power laws
 #'
 #' Assesses the overall degree of heterogeneity in a collection of data sets at
 #' the sampling-unit scale.
@@ -14,7 +14,7 @@ NULL
 #' under the assumption of no aggregation (\code{s\'^2}). It can be expressed
 #' under its logarithmic form as: \code{log(s^2) = log(a) + b log(Y)}, with:
 #' \itemize{
-#'     \item \code{Y = p} in the case of count data (Taylor\'s power law).
+#'     \item \code{Y = p} in the case of count data (Taylor's power law).
 #'     \item \code{Y = p(1 - p)} in the case of incidence data (binary power law).
 #' }
 #' \code{p} corresponds to the mean proportion of recorded individuals in case
@@ -55,14 +55,15 @@ NULL
 #'
 #' @export
 #------------------------------------------------------------------------------#
-power_law <- function(list, log_base = exp(1), ...) { # S'OCCUPER DES NA
+power_law <- function(list, log_base = exp(1), ...) {
 
     # Checks:
     stopifnot(is.list(list))
     if (length(list) < 2) {
         stop("Less than 2 points is not enough to perform linear regressions.")
     }
-    object_class <- unique(vapply(list, function(x) class(x)[[1]], character(1)))
+    object_class <- unique(vapply(list, function(x) class(x)[[1L]],
+                                  character(1L)))
     stopifnot(length(object_class) == 1)
     stopifnot(object_class %in% c("count", "incidence"))
 
@@ -200,25 +201,32 @@ plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"), observed 
 #' @export
 #------------------------------------------------------------------------------#
 print.power_law <- function(x, ...) {
-    cat("# Power law analysis:\n",
-        "Call:\n", sep = "")
+    cat("# Power law analysis:\n")
+    cat("\nCall:\n")
     print(x$call)
-    cat("Coefficients:\n", sep = "")
+    cat("\nCoefficients:\n")
     print(coef(x$model))
+    cat("\n")
 }
 
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
 summary.power_law <- function(object, ...) {
+    # TODO: Bien regarder la structure d'un summary.lm pour bien comprendre
+    # tous ses éléments.
     summary_model <- summary(object$model)
-    # ... TODO : A class summary.power_law
-    cat("Call:\n", sep = "")
-    print(object$call)
-    summary_model <- summary(object$model)
-    cat("Coefficients:\n", sep = "")
-    printCoefmat(object$par)
+    summary_model$call <- object$call
+    summary_model$coefficients <- object$par
+    structure(summary_model, class = "summary.power_law")
 }
+
+#------------------------------------------------------------------------------#
+#' @method print summary.power_law
+#' @export
+#------------------------------------------------------------------------------#
+print.summary.power_law <- function(x, ...) stats:::print.summary.lm(x, ...)
+
 
 #==============================================================================#
 # a2a
@@ -241,24 +249,38 @@ summary.power_law <- function(object, ...) {
 #'    aR \tab n^{2-b}    \tab n^2     \tab n^b        \tab 1       \cr
 #' }
 #'
-#' @param intercept Intercept parameter to be converted.
-#' @param from Kind of the input intercept parameter.
-#' @param to Desired kind for the ouput intercept parameter.
+#' @param x Intercept parameter to be converted or a named list with the
+#'     parameter to be converted ("Ar", "ar", "AR" or "aR"), the slope
+#'     ("slope"), and the number of individual per sampling unit ("n").
+#' @param from Kind of the input intercept parameter ("Ar", "ar", "AR" or "aR").
+#' @param to Desired kind for the ouput intercept parameter ("Ar", "ar", "AR" or
+#'     "aR").
 #' @param slope Slope parameter.
 #' @param n Number of individuals per sampling unit.
 #'
 #' @examples
+#' # Values from the power_law() example:
+#' Ar    <- 38.6245
+#' slope <- 1.9356
+#' n     <- 9
 #'
-#' a2a(from = , to = , n = , b = )
-#' a2a(to = , data = <powerLaw object>)
+#' # Usual function call syntax:
+#' a2a(Ar, slope, n, from = "Ar", to = "ar")
+#'
+#' # Other syntaxes:
+#' inputs <- list(Ar = Ar, slope = slope, n = n)
+#' a2a(inputs, "ar")
+#' require(magrittr)
+#' inputs %>% a2a("ar")
 #'
 #' @export
 #------------------------------------------------------------------------------#
-a2a <- function(intercept, from = c("Ar", "ar", "AR", "aR"),
-                  to = c("Ar", "ar", "AR", "aR"), slope, n) {
-    from <- match.arg(from)
-    to   <- match.arg(to)
-    b    <- slope
+a2a <- function(x, ...) UseMethod("a2a")
+
+#------------------------------------------------------------------------------#
+#' @keywords internal
+#------------------------------------------------------------------------------#
+a2a_internal <- function(intercept, b, n, from, to) {
     dico <- expand.grid(from = c("Ar", "ar", "AR", "aR"),
                         to = c("Ar", "ar", "AR", "aR"),
                         KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE)
@@ -280,15 +302,47 @@ a2a <- function(intercept, from = c("Ar", "ar", "AR", "aR"),
 }
 
 #------------------------------------------------------------------------------#
+#' @rdname a2a
+#' @export
+#------------------------------------------------------------------------------#
+a2a.numeric <- function(x, slope, n, # Here, x = intercept
+                        from = c("Ar", "ar", "AR", "aR"),
+                        to   = c("Ar", "ar", "AR", "aR")) {
+
+    # Checks and variable allocation:
+    from      <- match.arg(from)
+    to        <- match.arg(to)
+    intercept <- x
+    b         <- slope
+
+    # Perform the conversion:
+    a2a_internal(intercept, b, n, from, to)
+}
+
+#------------------------------------------------------------------------------#
+#' @rdname a2a
+#' @export
+#------------------------------------------------------------------------------#
+a2a.list <- function(x, # Here, x: list with 3 elements: intercept, slope and n.
+                     to   = c("Ar", "ar", "AR", "aR")) {
+
+    # Checks and variable allocation:
+    stopifnot(length(x) == 3)
+    stopifnot(all(c("slope", "n") %in% names(x)))
+    cases <- c("Ar", "ar", "AR", "aR")
+    from  <- cases[cases %in% names(x)]
+    stopifnot(length(from) == 1)
+    to    <- match.arg(to)
+    intercept <- x[[from]]
+    b     <- x[["slope"]]
+    n     <- x[["n"]]
+
+    # Perform the conversion:
+    a2a_internal(intercept, b, n, from, to)
+}
+
+#------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
 print.a2a <- function(x, ...) cat(x, "\n", sep = "")
-
-#------------------------------------------------------------------------------#
-# @export
-#------------------------------------------------------------------------------#
-#aaaaa.powerLaw <- function(obj, to)
-
-
-
 
