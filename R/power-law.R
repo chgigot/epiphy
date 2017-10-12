@@ -55,7 +55,7 @@ NULL
 #'
 #' @export
 #------------------------------------------------------------------------------#
-power_law <- function(list, log_base = exp(1), na.rm = FALSE, ...) { # S'OCCUPER DES NA
+power_law <- function(list, log_base = exp(1), ...) { # S'OCCUPER DES NA
 
     # Checks:
     stopifnot(is.list(list))
@@ -69,22 +69,34 @@ power_law <- function(list, log_base = exp(1), na.rm = FALSE, ...) { # S'OCCUPER
     # Perform power law analysis:
     switch(object_class,
            "count" = {
-               data <- lapply(list, function(obj) map_data(obj)$r)
-               x    <- vapply(data, function(obj) mean(obj, na.rm = na.rm), numeric(1L))
-               y    <- vapply(data, function(obj) var(obj, na.rm = na.rm), numeric(1L))
+               data <- lapply(list, function(obj) {
+                   data_all  <- map_data(obj)$r
+                   data_noNA <- data_all[complete.cases(data_all)]
+                   if (length(data_noNA) < length(data_all)) {
+                       warning("Missing cases were dropped.")
+                   }
+                   data_noNA
+               })
+               x    <- vapply(data, function(obj) mean(obj), numeric(1L))
+               y    <- vapply(data, function(obj) var(obj), numeric(1L))
            },
            "incidence" = {
                data <- lapply(list, function(obj) {
                    mapped_data <- map_data(obj)
-                   data.frame(p = (mapped_data$r / mapped_data$n),
-                              n = mapped_data$n)
+                   data_all  <- data.frame(p = (mapped_data$r / mapped_data$n),
+                                           n = mapped_data$n)
+                   data_noNA <- data_all[complete.cases(data_all), ]
+                   if (nrow(data_noNA) < nrow(data_all)) {
+                       warning("Missing cases were dropped.")
+                   }
+                   data_noNA
                })
                # For incidence data as proportions:
                # v_t = p(1 - p)/n (Madden & Hughes, 1995)
                x    <- vapply(data, function(obj) {
-                   with(obj, (mean(p, na.rm = na.rm) * (1 - mean(p, na.rm = na.rm))) / mean(n, na.rm = na.rm))
+                   with(obj, (mean(p) * (1 - mean(p))) / mean(n))
                }, numeric(1L))
-               y    <- vapply(data, function(obj) var(obj$p, na.rm = na.rm), numeric(1L))
+               y    <- vapply(data, function(obj) var(obj$p), numeric(1L))
            }
     )
     coord_obs <- data.frame(x = x, y = y)
@@ -103,7 +115,7 @@ power_law <- function(list, log_base = exp(1), na.rm = FALSE, ...) { # S'OCCUPER
             # Nothing to do.
         },
         "incidence" = {
-            n  <- mean(vapply(data, function(obj) mean(obj$n, na.rm = na.rm), numeric(1L)), na.rm = na.rm) ### PAS TOP
+            n  <- mean(vapply(data, function(obj) mean(obj$n), numeric(1L))) ### PAS TOP
             Ar <- estimateCoef(model, bquote(.(log_base)^x1))
             ar <- estimateCoef(model, bquote(.(log_base)^x1 * .(n)^(-x2)))
             AR <- estimateCoef(model, bquote(.(log_base)^x1 * .(n)^(2 * (1 - x2))))
@@ -124,73 +136,93 @@ power_law <- function(list, log_base = exp(1), na.rm = FALSE, ...) { # S'OCCUPER
               class = "power_law")
 }
 
-### Restructuration à prévoir ici: Plus de IncidenceGroup ou CountGroup... berk!
-### Un truc du genre :
-#verif <- function(list) {
-#    if(!is.list(list)) stop("Err:/")
-#    switch(is(list[[1]]),
-#           Incidence={type <- "Incidence"},
-#           Count={type <- "Count"},
-#           stop("Err:/")
-#    )
-#    if (!any(sapply(a, is.Incidence))) stop("Err:/")
-#}
-########## ETC
-
 #------------------------------------------------------------------------------#
+#' Plot results of a power law analysis
+#'
+#' Plot results of a power law analysis.
+#'
+#' @param x A \code{\link{power_law}} object.
+#' @param scale Logarithmic or standard linear scale to display the results?
+#' @param observed Logical.
+#' @param model Logical.
+#' @param random Logical. Theoretical Random distribution.
+#' Dashed lines indicate the cases where both variances are equal, which suggests an absence of aggregation.
+#' Points should lie on this line if ...
+#'
+#' @examples
+#'
+#' plot(my_power_law, scale = "log")
+#' plot(my_power_law, scale = "lin")
+#'
 #' @export
 #------------------------------------------------------------------------------#
-plot.power_law <- function(x, y, col = "black", size = 2, observed = TRUE,
-                          model = TRUE, bisector = TRUE, print = TRUE, type, ...) { # Pas très propre il me semble ?
+plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"), observed = TRUE,
+                           model = TRUE, random = TRUE) {
+    scale <- match.arg(scale)
+    data_obs <- x$coord_obs
+    data_the <- x$coord_the
+    log_base <- x$log_base
 
-    if (missing(type)) type <- "log"
-
-    if (type == "log") {
-
-        baseLog <- x$baseLog
-        if (baseLog == exp(1)) nameBaseLog <- "e" else nameBaseLog <- baseLog
-        g <- ggplot(data = log(x$coordObs, base = baseLog), aes(x = x, y = y))
-        minxy <- log(min(min(x$coordObs$x), min(x$coordObs$y)), base = baseLog)
-        maxxy <- log(max(max(x$coordObs$x), max(x$coordObs$y)), base = baseLog)
-        g <- g + scale_x_continuous(limits = c(minxy, maxxy))
-        g <- g + scale_y_continuous(limits = c(minxy, maxxy))
-        g <- g + labs(x = bquote(log[.(nameBaseLog)] ~ "(binomial variance)"),
-                      y = bquote(log[.(nameBaseLog)] ~ "(observed variance)"))
-        if (observed) g <- g + geom_point(color=col, size=size)
-        if (model)    g <- g + geom_line(data = log(x$coordThe, base = baseLog), aes(x = x, y = y), color=col) ## Not necessary aes
-        if (bisector) g <- g + geom_abline(intercept = 0, slope = 1, linetype=2, color=col)
-
-        ## Offrir cette possibilité dans les options
-        g <- g + theme_bw()
-        return(g) # can only print apparently .... I did not succeed in return a ggplot object !!
-        ## SI SI maintenant ća marche, il faut retourner g, en non print(g) !!!!
-
-    } else if (type == "regular") {
-
-        g <- ggplot(data = x$coordObs, aes(x=x, y=y))
-        #minxy <- min(min(x@coordObs$x), min(x@coordObs$y))
-        #maxxy <- max(max(x@coordObs$x), max(x@coordObs$y))
-        #g <- g + scale_x_continuous(limits = c(minxy, maxxy))
-        #g <- g + scale_y_continuous(limits = c(minxy, maxxy))
-        g <- g + labs(x = expression(s[bin]^2), y = expression(s[obs]^2))
-        if (observed) g <- g + geom_point(color=col, size=size)
-        if (model)    g <- g + geom_line(data = x$coordThe, aes(x = x, y = y), color=col) ## Not necessary aes
-        #if (bisector) g <- g + geom_abline(intercept = 0, slope = 1, linetype = 2, color = col)
-        return(g) # can only print apparently .... I did not succeed in return a ggplot object !!
-
-    } else stop("type must be 'regular' or 'log'.")
+    switch (scale,
+        "logarithmic" = {
+            log_base_name <- ifelse(log_base == exp(1), "e", as.character(log_base))
+            gg <- list(
+                labs(x = bquote(log[.(log_base_name)] * "(binomial variance)"),
+                     y = bquote(log[.(log_base_name)] * "(observed variance)")),
+                # Below, switch is a quick & convenient way to say that if
+                # requirement is TRUE (i.e. = 1), then return the following
+                # instruction. Otherwise if requirement is FALSE (i.e. = 0),
+                # return NULL.
+                switch(observed, geom_point(data = log(data_obs, base = log_base),
+                                            aes(x, y), ...)),
+                switch(model,    geom_line(data  = log(data_the, base = log_base),
+                                           aes(x, y), ...)),
+                switch(random,   geom_line(data  = log(data_the, base = log_base),
+                                           aes(x, x), linetype = "dashed", ...)),
+                theme_bw()
+            )
+        },
+        "linear" = {
+            gg <- list(
+                labs(x = "Binomial variance", y = "Observed variance"),
+                switch(observed, geom_point(data = data_obs, aes(x, y), ...)),
+                switch(model,    geom_line(data  = data_the, aes(x, y), ...)),
+                switch(random,   geom_line(data  = data_the, aes(x, x),
+                                           linetype = "dashed", ...)),
+                theme_bw()
+            )
+        }
+    )
+    ggplot() + gg
 }
 
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
 print.power_law <- function(x, ...) {
-    cat("# Power law analysis:\n")
-    printCoefmat(x$par)
+    cat("# Power law analysis:\n",
+        "Call:\n", sep = "")
+    print(x$call)
+    cat("Coefficients:\n", sep = "")
+    print(coef(x$model))
 }
 
-# For count
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+summary.power_law <- function(object, ...) {
+    summary_model <- summary(object$model)
+    # ... TODO : A class summary.power_law
+    cat("Call:\n", sep = "")
+    print(object$call)
+    summary_model <- summary(object$model)
+    cat("Coefficients:\n", sep = "")
+    printCoefmat(object$par)
+}
 
+#==============================================================================#
+# a2a
+#==============================================================================#
 
 #------------------------------------------------------------------------------#
 #' a2a: A wAy to pAinlessly switch between different power LAw formulAtions

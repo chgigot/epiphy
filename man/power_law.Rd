@@ -4,7 +4,7 @@
 \alias{power_law}
 \title{Taylor\'s and binary power laws}
 \usage{
-power_law(list, log_base = exp(1), na.rm = FALSE, ...)
+power_law(list, log_base = exp(1), ...)
 }
 \arguments{
 \item{log_base}{Logarithm base to be used.}
