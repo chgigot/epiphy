@@ -17,6 +17,8 @@
     (if \code{f} is a \code{factor} or a list).}
 
 \item{...}{further potential arguments passed to methods.}
+
+\item{by}{The name(s) of the variable(s) which define(s) the grouping.}
 }
 \description{
 TODO

@@ -6,7 +6,7 @@
 #' \code{theta}, \code{shape1}, \code{shape2}. It corresponds to as an
 #' overdispersed binomial distribution.
 #'
-#' Be careful, in this implementation, theta = 1 / (shape1 + shape2).
+#' Be careful, in this implementation, \code{theta} = 1 / (\code{shape1} + \code{shape2}).
 #' \code{prob} and \code{theta}, or \code{shape1} and \code{shape2} must be specified.
 #' if \code{theta} = 0, use *binom family instead.
 #'
@@ -115,7 +115,9 @@ rbetabinom <- function(n, size, prob, theta, shape1, shape2) {
 # pbetabinom... en fonction de dbetabinom (cf. VGAM, family.binomial.R)
 #------------------------------------------------------------------------------#
 
+#------------------------------------------------------------------------------#
 #' @keywords internal
+#------------------------------------------------------------------------------#
 checkBetaBinom <- function(prob, theta, shape1, shape2) {#, env) {
     pair1 <- pair2 <- FALSE
     if (!missing(prob) && !missing(theta)) pair1 <- TRUE

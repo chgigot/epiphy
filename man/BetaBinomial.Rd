@@ -49,7 +49,7 @@ the beta-binomial distribution with parameters \code{size}, \code{prob},
 overdispersed binomial distribution.
 }
 \details{
-Be careful, in this implementation, theta = 1 / (shape1 + shape2).
+Be careful, in this implementation, \code{theta} = 1 / (\code{shape1} + \code{shape2}).
 \code{prob} and \code{theta}, or \code{shape1} and \code{shape2} must be specified.
 if \code{theta} = 0, use *binom family instead.
 }

@@ -1,4 +1,5 @@
 #------------------------------------------------------------------------------#
+#' @include utils.R
 #' @include intensity-classes.R
 #------------------------------------------------------------------------------#
 NULL
@@ -70,28 +71,12 @@ power_law <- function(list, log_base = exp(1), ...) {
     # Perform power law analysis:
     switch(object_class,
            "count" = {
-               data <- lapply(list, function(obj) {
-                   data_all  <- map_data(obj)$r
-                   data_noNA <- data_all[complete.cases(data_all)]
-                   if (length(data_noNA) < length(data_all)) {
-                       warning("Missing cases were dropped.")
-                   }
-                   data_noNA
-               })
-               x    <- vapply(data, function(obj) mean(obj), numeric(1L))
-               y    <- vapply(data, function(obj) var(obj), numeric(1L))
+               data <- get_fmt_obs(data, type = object_class)
+               x    <- vapply(data, mean, numeric(1L))
+               y    <- vapply(data, var, numeric(1L))
            },
            "incidence" = {
-               data <- lapply(list, function(obj) {
-                   mapped_data <- map_data(obj)
-                   data_all  <- data.frame(p = (mapped_data$r / mapped_data$n),
-                                           n = mapped_data$n)
-                   data_noNA <- data_all[complete.cases(data_all), ]
-                   if (nrow(data_noNA) < nrow(data_all)) {
-                       warning("Missing cases were dropped.")
-                   }
-                   data_noNA
-               })
+               data <- get_fmt_obs(list, type = object_class)
                # For incidence data as proportions:
                # v_t = p(1 - p)/n (Madden & Hughes, 1995)
                x    <- vapply(data, function(obj) {
@@ -128,7 +113,7 @@ power_law <- function(list, log_base = exp(1), ...) {
 
     # Return the following object:
     structure(list(call      = match.call(),
-                   data      = data,
+                   data      = data, # TODO: Useful ??? (not in spatial_hier)
                    model     = model,
                    par       = par,
                    log_base  = log_base,
@@ -157,16 +142,15 @@ power_law <- function(list, log_base = exp(1), ...) {
 #'
 #' @export
 #------------------------------------------------------------------------------#
-plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"), observed = TRUE,
-                           model = TRUE, random = TRUE) {
+plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"),
+                           observed = TRUE, model = TRUE, random = TRUE) {
     scale <- match.arg(scale)
-    data_obs <- x$coord_obs
-    data_the <- x$coord_the
     log_base <- x$log_base
 
     switch (scale,
         "logarithmic" = {
-            log_base_name <- ifelse(log_base == exp(1), "e", as.character(log_base))
+            log_base_name <- ifelse(log_base == exp(1), "e",
+                                    as.character(log_base))
             gg <- list(
                 labs(x = bquote(log[.(log_base_name)] * "(binomial variance)"),
                      y = bquote(log[.(log_base_name)] * "(observed variance)")),
@@ -174,21 +158,27 @@ plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"), observed 
                 # requirement is TRUE (i.e. = 1), then return the following
                 # instruction. Otherwise if requirement is FALSE (i.e. = 0),
                 # return NULL.
-                switch(observed, geom_point(data = log(data_obs, base = log_base),
-                                            aes(x, y), ...)),
-                switch(model,    geom_line(data  = log(data_the, base = log_base),
-                                           aes(x, y), ...)),
-                switch(random,   geom_line(data  = log(data_the, base = log_base),
-                                           aes(x, x), linetype = "dashed", ...)),
+                switch(observed, {
+                       geom_point(data = log(x$coord_obs, base = log_base),
+                                  aes(x, y), ...)
+                }),
+                switch(model, {
+                       geom_line(data  = log(x$coord_the, base = log_base),
+                                 aes(x, y), ...)
+                }),
+                switch(random, {
+                       geom_line(data  = log(x$coord_the, base = log_base),
+                                 aes(x, x), linetype = "dashed", ...)
+                }),
                 theme_bw()
             )
         },
         "linear" = {
             gg <- list(
                 labs(x = "Binomial variance", y = "Observed variance"),
-                switch(observed, geom_point(data = data_obs, aes(x, y), ...)),
-                switch(model,    geom_line(data  = data_the, aes(x, y), ...)),
-                switch(random,   geom_line(data  = data_the, aes(x, x),
+                switch(observed, geom_point(data = x$coord_obs, aes(x, y), ...)),
+                switch(model,    geom_line(data  = x$coord_the, aes(x, y), ...)),
+                switch(random,   geom_line(data  = x$coord_the, aes(x, x),
                                            linetype = "dashed", ...)),
                 theme_bw()
             )

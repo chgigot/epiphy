@@ -134,3 +134,35 @@ extraCoef <- function(model) {
     rbind(coefs, newCoefs)
 }
 
+#------------------------------------------------------------------------------#
+# Following function used in power_law and spatial-hier
+# Get formatted observational variables
+get_fmt_obs <- function(list, type = c("count", "incidence")) {
+    type <- match.arg(type)
+    switch (type,
+        "count" = {
+            lapply(list, function(obj) {
+                data_all  <- map_data(obj)$r
+                data_noNA <- data_all[complete.cases(data_all)]
+                if (length(data_noNA) < length(data_all)) {
+                    warning("Missing cases were dropped.")
+                }
+                data_noNA
+            })
+        },
+        "incidence" = {
+            lapply(list, function(obj) {
+                mapped_data <- map_data(obj)
+                data_all    <- data.frame(p = mapped_data$r / mapped_data$n,
+                                          n = mapped_data$n)
+                data_noNA   <- data_all[complete.cases(data_all), ]
+                if (nrow(data_noNA) < nrow(data_all)) {
+                    warning("Missing cases were dropped.")
+                }
+                data_noNA
+            })
+        }
+    )
+}
+
+

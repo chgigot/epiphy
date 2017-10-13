@@ -642,6 +642,7 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
 #' TODO
 #'
 #' @inheritParams base::split
+#' @param by The name(s) of the variable(s) which define(s) the grouping.
 #'
 #' @export
 #------------------------------------------------------------------------------#
