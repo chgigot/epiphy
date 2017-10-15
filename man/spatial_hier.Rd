@@ -14,6 +14,40 @@ spatial_hier(low, high)
 \description{
 TODO
 }
+\details{
+The manner in which the data are collected provides information about
+aggregation of disease at different levels in a spatial hierarchy (Hughes et
+al. 1997). For example, a sampling unit (upper level) can be reported as
+"healthy", if no diseased leaves (lower level) were found within the sampling
+unit.
+
+In a pairwise comparison between levels, the probability that an individual
+at the lower hierarchical level is diseased is denoted plow, and phigh refers
+to the probability of disease at the higher level. The relationship between
+these two probabilities can be written as
+
+phigh = 1 - (1 - plow)^nu
+
+where n is a parameter ranging from 0 to the corresponding number of
+individuals at the hierarchical level referenced by plow. If the value of n
+is equal to the number of individuals at the lower hierarchical level
+contained in a unit of the higher level (n low ), this suggests that there is
+no aggregation of disease incidence at the lower level. Conversely, a value
+of n less than n low is indicative of aggregation at that level. The value of
+n can be interpreted as an effective sample size (Hughes and Gottwald 1999;
+Madden and Hughes 1999) in the statistical sense that its value indicates the
+number of independent pieces of information at the lower level. Here, the
+effective sample size concerns the equating of the zero-term of the binomial
+distribution with the zero-term of an overdispersed distribution, as
+described in Madden and Hughes (1999). Using the complementary log-log
+transformation, CLL(x) = ln(-ln(1-x)), one can rewrite the Equation 5 as
+follows (Madden et al. 2007):
+
+CLL(phigh) = ln(nu) + CLL(plow)
+
+from which the value of ln(n) can be obtained as the intercept of a linear
+regression when the slope is constrained to 1.
+}
 \examples{
 my_data_low  <- incidence(tomato_tswv$field_1928)
 # TODO: 2 bugs to correct here (before)

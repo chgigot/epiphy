@@ -58,6 +58,7 @@ NULL
 #------------------------------------------------------------------------------#
 power_law <- function(list, log_base = exp(1), ...) {
 
+    call <- match.call()
     # Checks:
     stopifnot(is.list(list))
     if (length(list) < 2) {
@@ -95,7 +96,7 @@ power_law <- function(list, log_base = exp(1), ...) {
 
     # Retrieve summary matrice of coefficients, and eventually add some extra
     # estimates:
-    par <- coef(summary(model))
+    param <- coef(summary(model))
     switch (object_class,
         "count" = {
             # Nothing to do.
@@ -106,21 +107,51 @@ power_law <- function(list, log_base = exp(1), ...) {
             ar <- estimateCoef(model, bquote(.(log_base)^x1 * .(n)^(-x2)))
             AR <- estimateCoef(model, bquote(.(log_base)^x1 * .(n)^(2 * (1 - x2))))
             aR <- estimateCoef(model, bquote(.(log_base)^x1 * .(n)^(2 - x2)))
-            par <- rbind(par, unlist(Ar), unlist(ar), unlist(AR), unlist(aR))
-            rownames(par) <- c("log_base(Ar)", "b", "Ar", "ar", "AR", "aR")
+            param <- rbind(param, unlist(Ar), unlist(ar), unlist(AR), unlist(aR))
+            rownames(param) <- c("log_base(Ar)", "b", "Ar", "ar", "AR", "aR")
         }
     )
 
     # Return the following object:
-    structure(list(call      = match.call(),
+    structure(list(call      = call, # TODO: Add more information about the transformation?
                    data      = data, # TODO: Useful ??? (not in spatial_hier)
                    model     = model,
-                   par       = par,
+                   param     = param, # TODO: Where in n????
                    log_base  = log_base,
                    coord_obs = coord_obs,
                    coord_the = coord_the),
               class = "power_law")
 }
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+print.power_law <- function(x, ...) {
+    cat("# Power law analysis:\n")
+    cat("\nCall:\n")
+    print(x$call)
+    cat("\nCoefficients:\n")
+    print(coef(x$model))
+    cat("\n")
+}
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+summary.power_law <- function(object, ...) {
+    # TODO: Bien regarder la structure d'un summary.lm pour bien comprendre
+    # tous ses éléments.
+    summary_model <- summary(object$model)
+    summary_model$call <- object$call
+    summary_model$coefficients <- object$param
+    structure(summary_model, class = "summary.power_law")
+}
+
+#------------------------------------------------------------------------------#
+#' @method print summary.power_law
+#' @export
+#------------------------------------------------------------------------------#
+print.summary.power_law <- function(x, ...) stats:::print.summary.lm(x, ...)
 
 #------------------------------------------------------------------------------#
 #' Plot results of a power law analysis
@@ -186,36 +217,6 @@ plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"),
     )
     ggplot() + gg
 }
-
-#------------------------------------------------------------------------------#
-#' @export
-#------------------------------------------------------------------------------#
-print.power_law <- function(x, ...) {
-    cat("# Power law analysis:\n")
-    cat("\nCall:\n")
-    print(x$call)
-    cat("\nCoefficients:\n")
-    print(coef(x$model))
-    cat("\n")
-}
-
-#------------------------------------------------------------------------------#
-#' @export
-#------------------------------------------------------------------------------#
-summary.power_law <- function(object, ...) {
-    # TODO: Bien regarder la structure d'un summary.lm pour bien comprendre
-    # tous ses éléments.
-    summary_model <- summary(object$model)
-    summary_model$call <- object$call
-    summary_model$coefficients <- object$par
-    structure(summary_model, class = "summary.power_law")
-}
-
-#------------------------------------------------------------------------------#
-#' @method print summary.power_law
-#' @export
-#------------------------------------------------------------------------------#
-print.summary.power_law <- function(x, ...) stats:::print.summary.lm(x, ...)
 
 
 #==============================================================================#
@@ -283,10 +284,10 @@ a2a_internal <- function(intercept, b, n, from, to) {
     #-----------------------------------------------------------------#
     item <- dico[which(dico$from == from & dico$to == to), ]
     res  <- intercept * item[["coef"]]
-    attr(res, "par") <- c(intercept = intercept,
-                          coef      = item[["coef"]],
-                          slope     = b,
-                          n         = n)
+    attr(res, "param") <- c(intercept = intercept,
+                            coef      = item[["coef"]],
+                            slope     = b,
+                            n         = n)
     attr(res, "class") <- c("a2a", "numeric")
     res
 }

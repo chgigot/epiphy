@@ -9,6 +9,39 @@ NULL
 #'
 #' TODO
 #'
+#' The manner in which the data are collected provides information about
+#' aggregation of disease at different levels in a spatial hierarchy (Hughes et
+#' al. 1997). For example, a sampling unit (upper level) can be reported as
+#' "healthy", if no diseased leaves (lower level) were found within the sampling
+#' unit.
+#'
+#' In a pairwise comparison between levels, the probability that an individual
+#' at the lower hierarchical level is diseased is denoted plow, and phigh refers
+#' to the probability of disease at the higher level. The relationship between
+#' these two probabilities can be written as
+#'
+#' phigh = 1 - (1 - plow)^nu
+#'
+#' where n is a parameter ranging from 0 to the corresponding number of
+#' individuals at the hierarchical level referenced by plow. If the value of n
+#' is equal to the number of individuals at the lower hierarchical level
+#' contained in a unit of the higher level (n low ), this suggests that there is
+#' no aggregation of disease incidence at the lower level. Conversely, a value
+#' of n less than n low is indicative of aggregation at that level. The value of
+#' n can be interpreted as an effective sample size (Hughes and Gottwald 1999;
+#' Madden and Hughes 1999) in the statistical sense that its value indicates the
+#' number of independent pieces of information at the lower level. Here, the
+#' effective sample size concerns the equating of the zero-term of the binomial
+#' distribution with the zero-term of an overdispersed distribution, as
+#' described in Madden and Hughes (1999). Using the complementary log-log
+#' transformation, CLL(x) = ln(-ln(1-x)), one can rewrite the Equation 5 as
+#' follows (Madden et al. 2007):
+#'
+#' CLL(phigh) = ln(nu) + CLL(plow)
+#'
+#' from which the value of ln(n) can be obtained as the intercept of a linear
+#' regression when the slope is constrained to 1.
+#'
 #' @param low An list of \code{intensity} objects.
 #' @param high An list of \code{intensity} objects.
 #'
@@ -35,6 +68,7 @@ NULL
 #------------------------------------------------------------------------------#
 spatial_hier <- function(low, high) {
 
+    call   <- match.call()
     # Checks and variable allocation:
     if (missing(low) || missing(high)) {
         stop("Both 'low' and 'high' must be provided.")
@@ -67,7 +101,7 @@ spatial_hier <- function(low, high) {
 
     # Perform the analysis
     coord_obs <- data.frame(x = p_low, y = p_high)
-    data      <- cloglog(coord_obs)
+    data      <- cloglog(coord_obs) # TODO: Offer the possibility to use other log base
     data      <- data[with(data, is.finite(x) & is.finite(y)), ]
     model     <- lm(y ~ offset(x), data = data)
     # ^ is the same as lm((y - x) ~ 1, ...), i.e. we just look for an intercept.
@@ -75,10 +109,10 @@ spatial_hier <- function(low, high) {
     coord_the <- data.frame(x = p_low, y = 1 - (1 - p_low)^nu)
 
     # Return a spatial_hier object
-    structure(list(call      = match.call(),
+    structure(list(call      = call, # TODO: Add more information about the transformation?
                    model     = model,
-                   nu        = nu,
-                   n         = n_low,
+                   nu        = nu,    # TODO: create a param element like in power_law?
+                   n         = n_low, # TODO: Where to put n???
                    coord_obs = coord_obs,
                    coord_the = coord_the),
               class = "spatial_hier")
@@ -87,36 +121,37 @@ spatial_hier <- function(low, high) {
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-print.spatial_hier <- function(x, ...) {
-    cat("hello :)\n")
+print.spatial_hier <- function(x, ...) { # TODO
+    cat("# Spatial hierarchy analysis:\n")
+    cat("nu = ", x$nu, "\n", sep = "")
 }
 
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
 summary.spatial_hier <- function(object, ...) {
-    # Retrieve result matrice (to which we will add extra estimates)
-    param <- coef(summary(object$model))
+    # TODO: Bien regarder la structure d'un summary.lm pour bien comprendre
+    # tous ses éléments.
+    summary_model <- summary(object$model)
+    summary_model$call <- object$call
 
+    # TODO: Below, move to main function (like in power_law)??
+    param   <- coef(summary(object$model))
     baseLog <- exp(1)
-    nu <- estimateCoef(object$model, bquote(.(baseLog)^x1))
-
-    param <- rbind(param, unlist(nu))
+    nu      <- estimateCoef(object$model, bquote(.(baseLog)^x1))
+    param   <- rbind(param, unlist(nu))
     rownames(param) <- c("log_base(nu)", "nu")
+    summary_model$coefficients <- param
+    # ---
 
-    structure(list(coefficients = param),
-              class = "summary.spatial_hier")
+    structure(summary_model, class = "summary.spatial_hier")
 }
 
 #------------------------------------------------------------------------------#
 #' @method print summary.spatial_hier
 #' @export
 #------------------------------------------------------------------------------#
-print.summary.spatial_hier <- function(x, ...) {
-    cat("Coefficients:\n")
-    printCoefmat(x$coefficients)
-}
-
+print.summary.spatial_hier <- function(x, ...) stats:::print.summary.lm(x, ...)
 
 #------------------------------------------------------------------------------#
 #' @export
