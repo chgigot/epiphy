@@ -13,6 +13,7 @@ LinkingTo: Rcpp
 Imports:
     ggplot2,
     transport,
+    msm,
     Rcpp
 Suggests:
     magrittr,
@@ -25,6 +26,7 @@ Collate:
     'betabinom.R'
     'data.R'
     'utils.R'
+    'mle-factory.R'
     'epiphy.R'
     'intensity-classes.R'
     'distr-fitting.R'

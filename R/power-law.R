@@ -87,9 +87,14 @@ power_law <- function(list, log_base = exp(1), ...) {
            }
     )
     coord_obs <- data.frame(x = x, y = y)
-    model_formula <- as.formula(bquote(
-        log(y, base = .(log_base)) ~ log(x, base = .(log_base))
-    ))
+    if (log_base == exp(1)) {
+        # To get a nice display with print and summary
+        model_formula <- as.formula(log(y) ~ log(x))
+    } else {
+        model_formula <- as.formula(bquote(
+            log(y, base = .(log_base)) ~ log(x, base = .(log_base))
+        ))
+    }
     model     <- lm(model_formula, ...)
     y_the     <- predict(model, type = "response")
     coord_the <- data.frame(x = x, y = log_base^(y_the))
@@ -97,18 +102,20 @@ power_law <- function(list, log_base = exp(1), ...) {
     # Retrieve summary matrice of coefficients, and eventually add some extra
     # estimates:
     param <- coef(summary(model))
+    rownames(param) <- paste0(rownames(param), ": ", c("log_base(Ar)", "b"))
     switch (object_class,
         "count" = {
             # Nothing to do.
         },
         "incidence" = {
             n  <- mean(vapply(data, function(obj) mean(obj$n), numeric(1L))) ### PAS TOP
-            Ar <- estimateCoef(model, bquote(.(log_base)^x1))
-            ar <- estimateCoef(model, bquote(.(log_base)^x1 * .(n)^(-x2)))
-            AR <- estimateCoef(model, bquote(.(log_base)^x1 * .(n)^(2 * (1 - x2))))
-            aR <- estimateCoef(model, bquote(.(log_base)^x1 * .(n)^(2 - x2)))
-            param <- rbind(param, unlist(Ar), unlist(ar), unlist(AR), unlist(aR))
-            rownames(param) <- c("log_base(Ar)", "b", "Ar", "ar", "AR", "aR")
+            new_param <- list(
+                Ar = estimate_param(model, bquote(.(log_base)^x1)),
+                ar = estimate_param(model, bquote(.(log_base)^x1 * .(n)^(-x2))),
+                AR = estimate_param(model, bquote(.(log_base)^x1 * .(n)^(2 * (1 - x2)))),
+                aR = estimate_param(model, bquote(.(log_base)^x1 * .(n)^(2 - x2)))
+            )
+            param <- rbind(param, do.call(rbind, lapply(new_param, unlist))) # TODO: Not clean
         }
     )
 

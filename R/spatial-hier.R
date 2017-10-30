@@ -138,7 +138,7 @@ summary.spatial_hier <- function(object, ...) {
     # TODO: Below, move to main function (like in power_law)??
     param   <- coef(summary(object$model))
     baseLog <- exp(1)
-    nu      <- estimateCoef(object$model, bquote(.(baseLog)^x1))
+    nu      <- estimate_param(object$model, bquote(.(baseLog)^x1))
     param   <- rbind(param, unlist(nu))
     rownames(param) <- c("log_base(nu)", "nu")
     summary_model$coefficients <- param
