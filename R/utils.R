@@ -247,5 +247,9 @@ fmt_init <- function(data, name, ..., bounds) {
     as.data.frame(res)
 }
 
+tocamel <- function(x) {
+    # source: https://stackoverflow.com/questions/6364783/capitalize-the-first-letter-of-both-words-in-a-two-word-string
+    gsub("(^|[[:space:]])([[:alpha:]])", "\\1\\U\\2", x, perl=TRUE)
+}
 
 

@@ -273,12 +273,12 @@ summary.smle <- function(object, ...) {
 #' @method print summary.smle
 #' @export
 #------------------------------------------------------------------------------#
-print.summary.smle <- function(object, ...) {
+print.summary.smle <- function(x, ...) {
     cat("Maximum likelihood estimation\n\nCall:\n")
-    print(object$call)
+    print(x$call)
     cat("\nCoefficients:\n")
-    printCoefmat(object$cmat)
-    # cat("\n-2 log L:", object@m2logL, "\n")
+    printCoefmat(x$cmat)
+    # cat("\n-2 log L:", x@m2logL, "\n")
 }
 
 #------------------------------------------------------------------------------#

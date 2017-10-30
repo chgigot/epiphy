@@ -78,6 +78,15 @@ my_res2
 summary(res2)
 plot(res2)
 
+#==========
+
+data <- tomato_tswv$field_1929[tomato_tswv$field_1929$t == 1, ]
+data <- clump(incidence(data), unit_size = c(x = 3, y = 3))
+res <- fit_distr(data)
+res
+summary(res)
+plot(res)
+
 }
 \references{
 

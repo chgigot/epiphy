@@ -1,4 +1,5 @@
 #------------------------------------------------------------------------------#
+#' @include utils.R
 #' @include intensity-classes.R
 #' @include betabinom.R
 #' @include mle-factory.R
@@ -68,6 +69,15 @@ NULL
 #' my_res2
 #' summary(res2)
 #' plot(res2)
+#'
+#' #==========
+#'
+#' data <- tomato_tswv$field_1929[tomato_tswv$field_1929$t == 1, ]
+#' data <- clump(incidence(data), unit_size = c(x = 3, y = 3))
+#' res <- fit_distr(data)
+#' res
+#' summary(res)
+#' plot(res)
 #'
 #' @export
 #------------------------------------------------------------------------------#
@@ -191,20 +201,80 @@ fit_distr.incidence <- function(data, ..., random = smle_binom,
     #rand$model <- glm(d/n ~ 1, family = binomial, weights = rep(n, N))
 }
 
+#==============================================================================#
 # Print, summary and plot
-#print.fit_distr   <- function(x, ...)
-#summary.fit_distr <- function(object, ...)
-#plot.fit_distr    <- function(x, ...)
-
-
+#==============================================================================#
 
 #------------------------------------------------------------------------------#
-# @describeIn fit_distr
-# For incidence data, the two distributions fitted are binomial and beta-binomial
-# distributions.
-#
-# @export
+#' @export
 #------------------------------------------------------------------------------#
+print.fit_distr <- function(x, ...) {
+    cat_snse <- function(name, x) {
+        cat("- ", name, " = ", formatC(x[[1]]), " (\u00b1 ", formatC(x[[2]]),
+            ")\n", sep = "")
+    }
+    cat("Fitting of two distributions\n\nCall:\n")
+    print(x$call)
+    cat("\nParameter estimates:\nRandom:\n")
+    cat_snse("p", x$param$random["prob", 1:2])
+    cat("Aggregated:\n")
+    cat_snse("theta", x$param$aggregated["prob", 1:2])
+    cat_snse("theta", x$param$aggregated["theta", 1:2])
+    cat_snse("rho",   x$param$aggregated["rho", 1:2])
+    cat_snse("alpha", x$param$aggregated["alpha", 1:2])
+    cat_snse("beta",  x$param$aggregated["beta", 1:2])
+}
+
+#------------------------------------------------------------------------------
+#' @export
+#------------------------------------------------------------------------------
+summary.fit_distr <- function(object, ...) {
+    res <- list(call_orig       = object$call,
+                cmat_random     = object$param$random,
+                cmat_aggregated = object$param$aggregated)
+    structure(res, class = "summary.fit_distr")
+}
+
+#------------------------------------------------------------------------------
+#' @method print summary.fit_distr
+#' @export
+#------------------------------------------------------------------------------
+print.summary.fit_distr <- function(x, ...) {
+    cat("Fitting of two distributions\n\nCall:\n")
+    print(x$call)
+    cat("\nCoefficients:\nRandom:\n")
+    printCoefmat(x$cmat_random)
+    cat("\nAggregated:\n")
+    printCoefmat(x$cmat_aggregated)
+}
+
+#------------------------------------------------------------------------------
+#' @export
+#------------------------------------------------------------------------------
+plot.fit_distr <- function(x, ...) {
+
+    rownames(x$freq) <- x$freq$category
+    freq_long <- setNames(as.data.frame.table(as.matrix(x$freq[-1])),
+                          c("Number per sampling unit", "key", "Frequency"))
+    freq_long$key <- factor(tocamel(freq_long$key),
+                            levels = c("Observed", "Aggregated", "Random"))
+
+    gg <- list(
+        geom_bar(data = freq_long, aes(x = `Number per sampling unit`,
+                                       y = Frequency, fill = key),
+                 stat = "identity", position = "dodge", color = "black",
+                 size = 0.5),
+        scale_fill_manual(values = c(Observed = "black", Aggregated = "grey",
+                                     Random = "white")),
+        theme_bw(),
+        theme(legend.justification = c(0.98, 0.98), legend.position = c(0.98, 0.98),
+              legend.background = element_rect(size=.5, linetype="solid", color = "black"),
+              legend.title=element_blank())
+    )
+    ggplot() + gg
+}
+
+
 # fit_distr.incidence <- function(data, ..., progress = TRUE, simulatePValue) { # Extra arguments useful?
     # Add a parameter? gof = c("Chisq", "LLR", "no") ???
     #
@@ -218,129 +288,8 @@ fit_distr.incidence <- function(data, ..., random = smle_binom,
     # ...
     #
 
-    # Initial checks and data preparation
-    # d <- data$obs$d # All the raw data
-    # N <- length(d)
-    # n <- unique(data$obs$n)
-    # if (length(n) != 1) stop(paste0("Current implementation only deals ",
-    #                                 "with equal size sampling units."))
-
-
-
-
-
-    # lp <- predict(rand$model, type = "link", se.fit = TRUE)
-    # ## Ci-dessous, on utilise le fait que lp a retourné une liste
-    # ## pourrait faire : lp[[residual.scale]] <- NULL
-    # ## Et aussi modifyList(...)
-    # lp$fit    <- lp$fit[[1]]
-    # lp$se     <- lp$se.fit[[1]]
-    # lp$zvalue <- lp$fit / lp$se
-    # lp$pvalue <- 2 * pnorm(-abs(lp$zvalue))
-    #
-    # p <- predict(rand$model, type = "response", se.fit = TRUE)
-    # p$fit    <- p$fit[[1]] #equivalent to former: pBinom <- fitted(modelBinom)[[1]]
-    # p$se     <- p$se.fit[[1]] ## Vérifier la pertinence de cela
-    # p$zvalue <- p$fit / p$se
-    # p$pvalue <- 2 * pnorm(-abs(p$zvalue))
-    #
-    # mat <- cbind(c(lp$fit, p$fit),
-    #              c(lp$se, p$se),
-    #              c(lp$zvalue, p$zvalue),
-    #              c(lp$pvalue, p$pvalue))
-    # rownames(mat) <- c("logit(p)", "p")
-    # colnames(mat) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
-    # rand$par <- mat
-
-    # z value (Pr(>|z|)
-    # 2*pnorm(Estimate / Std. Error) = Pr(>|z|)
-    # Pourquoi pas t-value??? (contrairement à lm??)
-    #pvalue <- 2 * pt(-abs(tvalue), df.r)
-    #coef.table <- cbind(coef.p, s.err, tvalue, pvalue)
-    #dimnames(coef.table) <- list(names(coef.p), c(dn, "t value", "Pr(>|t|)"))
-
-
-    # # Beta-binomial distribution
-    # inits <- c(p$fit, 1 - p$fit)
-    # modelBBD <- optimBetaBinom(inits, d, n) # !!!!! si retour NULL, pas d'assignement list possible # optimBetaBinom n'existe plus
-    # # use stats4::mle() instead
-    # agg <- list()
-
-    # #------------------------------------------------------------------------------#
-    #
-    # if (!is.null(modelBBD)) { # If the optimization procedure has been successful
-    #     agg$model <- modelBBD
-    #     alpha <- beta <- p <- theta <- rho <- list()
-    #     alpha$fit <- agg$model$par[1]
-    #     beta$fit  <- agg$model$par[2]
-    #     #varcov <- solve(model$hessian) # var-cov matrix
-    #     #se     <- sqrt(diag(varcov))   # standard errors
-    #     p$fit     <- alpha$fit / (alpha$fit + beta$fit)
-    #     theta$fit <- 1 / (alpha$fit + beta$fit)
-    #     rho$fit <- 1 / (alpha$fit + beta$fit + 1)
-    #     # theta: index of aggregation.
-    #     # Aggregation increases with increasing theta
-    #
-    #     # Work with the hessian
-    #     estVcov  <- solve(agg$model$hessian) # estimator of the asymptotic covariance matrix
-    #     estSe    <- sqrt(diag(estVcov))       # solve(mat): compute the inverse of the matrix mat
-    #     alpha$se <- estSe[[1]]
-    #     beta$se  <- estSe[[2]]
-    #     p$se     <- msm::deltamethod(~ x1 / (x1 + x2), agg$model$par, estVcov)
-    #     theta$se <- msm::deltamethod(~ 1 / (x1 + x2), agg$model$par, estVcov)
-    #     rho$se   <- msm::deltamethod(~ 1 / (x1 + x2 + 1), agg$model$par, estVcov)
-    #
-    #     #------------------------------------------------------------------------------#
-    #
-    #     p$zvalue <- p$fit / p$se
-    #     p$pvalue <- 2 * pnorm(-abs(p$zvalue))
-    #
-    #     theta$zvalue <- theta$fit / theta$se
-    #     theta$pvalue <- 2 * pnorm(-abs(theta$zvalue))
-    #
-    #     alpha$zvalue <- alpha$fit / alpha$se
-    #     alpha$pvalue <- 2 * pnorm(-abs(alpha$zvalue))
-    #
-    #     beta$zvalue <- beta$fit / beta$se
-    #     beta$pvalue <- 2 * pnorm(-abs(beta$zvalue))
-    #
-    #     rho$zvalue <- rho$fit / rho$se
-    #     rho$pvalue <- 2 * pnorm(-abs(rho$zvalue))
-
-
-
-        # # Below should work with bbmle::mle2
-        # # Retrieve result matrice (to which we will add extra estimates)
-        # param <- coef(summary(modelBBD)) # alpha and beta
-        # #mylist <- list(x1 = coef(modelBBD)[[1]], # alpha
-        # #               x2 = coef(modelBBD)[[2]]) # beta
-        #
-        # p     <- estimate_param(modelBBD, quote(x1 / (x1 + x2)), student = FALSE)
-        # theta <- estimate_param(modelBBD, quote(1  / (x1 + x2)), student = FALSE)
-        # rho   <- estimate_param(modelBBD, quote(1  / (x1 + x2 + 1)), student = FALSE)
-        #
-        # param <- rbind(param, unlist(p), unlist(theta), unlist(rho))
-        # rownames(param) <- c("alpha", "beta", "p", "theta", "rho")
-
-
-
-
-        ## cf. emdbook for 1 specific function
-        ## emdbook::dbetabinom(x, prob, size,  theta, shape1, shape2, log = FALSE)
-        # mat <- cbind(c(NA, p$fit, theta$fit, rho$fit, alpha$fit, beta$fit),
-        #              c(NA, p$se, theta$se, rho$se, alpha$se, beta$se),
-        #              c(NA, p$zvalue, theta$zvalue, rho$zvalue, alpha$zvalue, beta$zvalue),
-        #              c(NA, p$pvalue, theta$pvalue, rho$pvalue, alpha$pvalue, beta$pvalue))
-        # rownames(mat) <- c("logit(p)", "p", "theta", "rho", "alpha", "beta")
-        # colnames(mat) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
-        # agg$par <- mat
-
-    # } else {
-    #     agg$model <- list(NULL)
-    #     freq$betaBinomial <- NA
-    #     agg$par <- list(NULL)
-    #     agg$test <- list(NULL)
-    # }
+    ## cf. emdbook for 1 specific function
+    ## emdbook::dbetabinom(x, prob, size,  theta, shape1, shape2, log = FALSE)
 
     # Et si optim n'a pas convergé ? Gérer ce cas ci-dessous.
     # Et puis, plein de warnings!!!
@@ -351,90 +300,6 @@ fit_distr.incidence <- function(data, ..., random = smle_binom,
 
     ####### Apply the Cochran rule regarding using Xchi2
     # Cochran : 80 % des classes doivent satisfaire la règle des cinq éléments tandis que les autres doivent être non vides.
-
-    # Returns:
-
-    # structure(list(call = match.call(),
-    #                random = list(model = rand$model,
-    #                              par = rand$par,
-    #                              test = NULL),
-    #                aggregated = list(model = agg$model,
-    #                                  par = agg$par,
-    #                                  test = NULL),
-    #                frequency = freq,
-    #                test = llrtest(rand$model, agg$model)),
-    #           class = "fit_distr") # "cmpDistr" should be better
-
-# }
-
-#------------------------------------------------------------------------------
-#' @export
-summary.fit_distr <- function(object, ...) {
-    cat("\nCall:\n")
-    print(object$call)
-    cat("\n----------\nRandom:\n")
-    printCoefmat(res$random$par)
-    cat("\n----------\nAggregated:\n")
-    printCoefmat(res$aggregated$par)
-    cat("\n----------\n")
-    print(object$test)
-}
-
-#' @export
-print.fit_distr <- function(x, ...) {
-    cat("\nCall:\n")
-    print(x$call)
-    #cat("\nSource: <", x, ">\n", sep = "")
-    cat("\nParameters:\n")
-    cat("Random (BD distr.):\n")
-    cat("  p     = ", formatC(x$random$par["p", 1]),
-        " (\u00b1 ", formatC(x$random$par["p", 2]), ")\n", sep = "" )
-    cat("Aggregated (BBD distr.):\n")
-    cat("  p     = ", formatC(x$aggregated$par["p", 1]),
-        " (\u00b1 ", formatC(x$aggregated$par["p", 2]), ")\n", sep = "")
-    cat("  theta = ", formatC(x$aggregated$par["theta", 1]),
-        " (\u00b1 ", formatC(x$aggregated$par["theta", 2]), ")\n", sep = "")
-    cat("  rho   = ", formatC(x$aggregated$par["rho", 1]),
-        " (\u00b1 ", formatC(x$aggregated$par["rho", 2]), ")\n", sep = "")
-    cat("  alpha = ", formatC(x$aggregated$par["alpha", 1]),
-        " (\u00b1 ", formatC(x$aggregated$par["alpha", 2]), ")\n", sep = "")
-    cat("  beta  = ", formatC(x$aggregated$par["beta", 1]),
-        " (\u00b1 ", formatC(x$aggregated$par["beta", 2]), ")\n", sep = "")
-}
-
-#' @export
-plot.fit_distr <- function(x, y, ..., plot = TRUE) {
-    g <- list(
-        #geom_bar(data = (x$frequency %>% tidyr::gather("key", "value", -category)),
-        #         aes(x = category, y = value, fill = key),
-        #         stat = "identity", position = "dodge")
-        geom_bar(data = (x$frequency %>% tidyr::gather("key", "value", -category)),
-                 aes(x = category, y = value, fill = key),
-                 stat = "identity", position = "dodge", colour = "black", size = 0.5),
-        scale_fill_manual(breaks = c("observed", "betaBinomial", "binomial"),
-                          values = c(observed = "black", betaBinomial = "grey", binomial = "white"))#,
-        #                          guide = FALSE)
-        #scale_fill_discrete(guide = FALSE)
-
-        #    ggplot(data = (x$freqTable %>% tidyr::gather("key", "value", -category)),
-        #           aes(x = category, y = value, fill = key)) +
-        #        geom_bar(stat = "identity", position = "dodge", colour = "black", size = 0.5) +
-        #        scale_fill_manual(breaks = c("observed", "betaBinomial", "binomial"),
-        #                          values = c(observed = "black", betaBinomial = "grey", binomial = "white"),
-        #                          guide = FALSE)
-        #scale_fill_discrete(guide = FALSE)
-    )
-    if (!plot) g else ggplot() + g
-}
-
-
-#plot.fit_distr <- function(x, y, ...,
-#                          type = c("all", "distribution", "parameters"),
-#                          parameters = c("p-theta", "p-rho", "alpha-beta"),
-#                          trend = TRUE) {}
-
-
-
 
 
 
