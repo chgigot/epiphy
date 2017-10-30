@@ -20,8 +20,10 @@ Suggests:
     dplyr,
     tidyr,
     spdep,
-    emdist
-Collate: 
+    emdist,
+    knitr,
+    rmarkdown
+Collate:
     'RcppExports.R'
     'betabinom.R'
     'data.R'
@@ -34,3 +36,4 @@ Collate:
     'power-law.R'
     'sadie.R'
     'spatial-hier.R'
+VignetteBuilder: knitr
