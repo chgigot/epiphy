@@ -5,9 +5,9 @@
 \alias{sadie.data.frame}
 \title{Spatial Analysis by Distance IndicEs (SADIE)}
 \usage{
-sadie(data, index, nperm, rseed, seed, cost)
+sadie(data, ...)
 
-\method{sadie}{data.frame}(data, index = c("perry", "LMX", "all"),
+\method{sadie}{data.frame}(data, index = c("Perry", "LMX", "all"),
   nperm = 100, rseed = TRUE, seed = 12345, cost)
 }
 \arguments{
@@ -16,7 +16,7 @@ set must decribe a complete (no missing data) squared or rectangular
 data set.
 or a matrix (x-y)}
 
-\item{index}{The name of the index to use: "perry", "li-madden-xu (LMX)" or "all".
+\item{index}{The name of the index to use: "Perry", "LMX" (Li-Madden-Xu) or "all".
 By default, only Perry's index is computed.}
 
 \item{nperm}{Number of permutations for each sampling unit.}

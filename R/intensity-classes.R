@@ -347,6 +347,7 @@ NULL
 
 #------------------------------------------------------------------------------#
 #' @rdname intensity
+#' @aliases count_data
 #' @export
 #------------------------------------------------------------------------------#
 count <- function(data, mapping) {
@@ -355,6 +356,7 @@ count <- function(data, mapping) {
 
 #------------------------------------------------------------------------------#
 #' @rdname intensity
+#' @aliases incidence_data
 #' @export
 #------------------------------------------------------------------------------#
 incidence <- function(data, mapping) {
@@ -363,11 +365,30 @@ incidence <- function(data, mapping) {
 
 #------------------------------------------------------------------------------#
 #' @rdname intensity
+#' @aliases severity_data
 #' @export
 #------------------------------------------------------------------------------#
 severity <- function(data, mapping) {
     init_intensity(data, mapping, type = "severity")
 }
+
+# The three following function (*_data) are alternative way to create
+# intensity objects. They just are aliases.
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+count_data <- function(data, mapping) count(data, mapping)
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+incidence_data <- function(data, mapping) incidence(data, mapping)
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+severity_data <- function(data, mapping) severity(data, mapping)
 
 
 #==============================================================================#

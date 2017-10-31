@@ -17,7 +17,7 @@
 #'     destination sampling unit. If not specified, the distance between each
 #'     couple of adjacent sampling units (rook's sense) is assumed to be equal
 #'     to 1.
-#' @param index The name of the index to use: "perry", "li-madden-xu (LMX)" or "all".
+#' @param index The name of the index to use: "Perry", "LMX" (Li-Madden-Xu) or "all".
 #'     By default, only Perry's index is computed.
 #' @param nperm Number of permutations for each sampling unit.
 #' @param rseed Randomisation seed. Unseful for checking pursposes.
@@ -54,8 +54,7 @@
 #' @name sadie
 #' @export
 #------------------------------------------------------------------------------#
-sadie <- function(data, index, nperm,
-                  rseed, seed, cost) {
+sadie <- function(data, ...) {
     UseMethod("sadie")
 }
 
@@ -64,8 +63,8 @@ sadie <- function(data, index, nperm,
 #' @method sadie data.frame
 #' @export
 #------------------------------------------------------------------------------#
-sadie.data.frame <- function(data, index = c("perry", "LMX", "all"), # needed to specify possible indices here cause of match.arg
-                             nperm = 100, rseed = TRUE, seed = 12345, cost) { # Apparement en S3, il faut spécifier les arg par défaut ici, à verfier
+sadie.data.frame <- function(data, index = c("Perry", "LMX", "all"),
+                             nperm = 100, rseed = TRUE, seed = 12345, cost) {
 
     index <- match.arg(index)
     if (missing(cost)) {
@@ -99,11 +98,11 @@ sadie.data.frame <- function(data, index = c("perry", "LMX", "all"), # needed to
 
     cost_of_flow <- sapply(1:n, function(x) costToti(x, optTransport, cost, type = "both"))
 
-    if (index == "all") index <- c("perry", "LMX")
+    if (index == "all") index <- c("Perry", "LMX")
     perry_ <- list(clustering = NA_real_, Ea = NA_real_)
     li_madden_xu <- list(clustering = NA_real_, Dis_all = matrix(NA_real_))
     new_prob <- NA_real_
-    if (any(index == "perry")) {
+    if (any(index == "Perry")) {
         perry_ <- clusteringIdx(optTransport, cost, n, nperm,
                                 dataBeg = count, dataEnd = fcount,
                                 method = "shortsimplex", cost_of_flow)

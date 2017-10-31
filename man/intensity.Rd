@@ -3,8 +3,11 @@
 \name{intensity}
 \alias{intensity}
 \alias{count}
+\alias{count_data}
 \alias{incidence}
+\alias{incidence_data}
 \alias{severity}
+\alias{severity_data}
 \title{Construct count, incidence and severity objects.}
 \usage{
 count(data, mapping)
