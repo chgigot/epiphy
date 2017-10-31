@@ -74,6 +74,13 @@ str.mapping <- function(object, ...) utils::str(unclass(object), ...)
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
+c.mapping <- function(..., recursive = FALSE) { # To catch and "jail" recursive arg
+    structure(c(unlist(lapply(list(...), unclass))), class = "mapping")
+}
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
 as.character.mapping <- function(x, ...) {
     char <- as.character(unclass(x))
     names(char) <- names(x)
@@ -159,7 +166,7 @@ valid_intensity <- function(object) {
 #------------------------------------------------------------------------------#
 # Initial checking and building of intensity object
 #------------------------------------------------------------------------------#
-init_intensity <- function(data, mapping, type) {
+init_intensity <- function(data, mapping, keep_std, type) {
 
     std_names <- list(space = c("x", "y", "z"), # up to 3 dim for space
                       time = "t",               # up to 1 dim for time
@@ -178,21 +185,35 @@ init_intensity <- function(data, mapping, type) {
     # object.
     # * mapping
     if (missing(mapping)) {
-        data_header     <- colnames(data)
+        data_header    <- colnames(data)
         data_std_names <- data_header[data_header %in% unlist(std_names)]
         mapping <- mapping_(paste0(data_std_names, "=", data_std_names))
         # checkings!!!
     } else {
         if (class(mapping) != "mapping") stop("'mapping' must be a mapping object.")
-        names_mapping <- names(mapping)
-        if (!all(i_std <- names_mapping %in% unlist(std_names))) {
+        names_mapping <- names(mapping) ## Redondant avec plus bas
+        if (!all(i_std <- names_mapping %in% unlist(std_names)) && keep_std) {
             #warning("Dropping unrelevant names in mapping.") # NOT CLEAR
             mapping <- mapping[i_std]
             # checkings!!!!
         }
+        # Then, Check if there are some standard names in colnames that need to be
+        # auto-mapped:
+        # TODO: faire en sorte que si
+        data_header   <- colnames(data) ## Redondant avec plus haut
+        mapped_header <- as.character(mapping)
+        unmapped_data_header <- data_header[!(data_header %in% mapped_header)]
+        unmapped_data_std_names <- unmapped_data_header[
+            (unmapped_data_header %in% unlist(std_names)) & !(unmapped_data_header %in% names_mapping)
+            # ^ if it is a standard name ...                ^ and if it is not already mapped
+        ]
+        if (length(unmapped_data_std_names) > 0) {
+            extra_mapping <- mapping_(paste0(unmapped_data_std_names, "=", unmapped_data_std_names))
+            mapping <- c(mapping, extra_mapping)
+        }
     }
 
-    mapping_names <- names(mapping)
+    mapping_names <- names(mapping) ## Redondant avec plus haut
     struct <- lapply(std_names, function(type) {
         mapping_names[mapping_names %in% type]
     })
@@ -284,6 +305,9 @@ init_intensity <- function(data, mapping, type) {
 #'   correctly ordered, i.e. x, y, z, t, r and then n. If variables in NULL,
 #'   then only the 6 first ... will be take into account in the following (1, 2,
 #'   ...), i.e. the id of the value. All the 'parameters' need to be specified.
+#' @param keep_std Are only standard names kept when proceeding to mapping?
+#'   Setting \code{keep_std} to TRUE may be useful for subsequent data splitting
+#'   using extra labels.
 #'
 #' @return An \code{incidence} object.
 #'
@@ -350,8 +374,8 @@ NULL
 #' @aliases count_data
 #' @export
 #------------------------------------------------------------------------------#
-count <- function(data, mapping) {
-    init_intensity(data, mapping, type = "count")
+count <- function(data, mapping, keep_std = TRUE) {
+    init_intensity(data, mapping, keep_std, type = "count")
 }
 
 #------------------------------------------------------------------------------#
@@ -359,8 +383,8 @@ count <- function(data, mapping) {
 #' @aliases incidence_data
 #' @export
 #------------------------------------------------------------------------------#
-incidence <- function(data, mapping) {
-    init_intensity(data, mapping, type = "incidence")
+incidence <- function(data, mapping, keep_std = TRUE) {
+    init_intensity(data, mapping, keep_std, type = "incidence")
 }
 
 #------------------------------------------------------------------------------#
@@ -368,8 +392,8 @@ incidence <- function(data, mapping) {
 #' @aliases severity_data
 #' @export
 #------------------------------------------------------------------------------#
-severity <- function(data, mapping) {
-    init_intensity(data, mapping, type = "severity")
+severity <- function(data, mapping, keep_std = TRUE) {
+    init_intensity(data, mapping, keep_std, type = "severity")
 }
 
 # The three following function (*_data) are alternative way to create
@@ -378,17 +402,17 @@ severity <- function(data, mapping) {
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-count_data <- function(data, mapping) count(data, mapping)
+count_data <- function(data, mapping, keep_std) count(data, mapping, keep_std)
 
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-incidence_data <- function(data, mapping) incidence(data, mapping)
+incidence_data <- function(data, mapping, keep_std) incidence(data, mapping, keep_std)
 
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-severity_data <- function(data, mapping) severity(data, mapping)
+severity_data <- function(data, mapping, keep_std) severity(data, mapping, keep_std)
 
 
 #==============================================================================#
@@ -599,9 +623,11 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
     if (is.null(names(unit_size))) {
         stop("unit_size must be a named vector.")
     }
-    non_obs_names <- unname(unlist(object$struct[c("space", "time")]))
-    obs_names     <- object$struct[["obs"]]
     mapped_data   <- map_data(object)
+    colnames_mapped_data <- colnames(mapped_data)
+    obs_names     <- object$struct[["obs"]]
+    #non_obs_names <- unname(unlist(object$struct[c("space", "time")]))
+    non_obs_names <- colnames_mapped_data[!(colnames_mapped_data %in% obs_names)] # because of if keep_std = FALSE
     if (!all(names(unit_size) %in% non_obs_names)) {
         stop(paste0("All unit_size names must exist in mapped data ",
                     "(non-observational types)."))
@@ -609,6 +635,9 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
 
     #--------------------------------------------------------------------------#
     # Define groups
+
+    # TODO : Gérer aussi le cas du zér0 !!!
+    # exemple avec incidence(hop_viruses$HpLV, mapping(x=xm,y=ym))
     invisible(lapply(seq_len(length(unit_size)), function(i) {
         id  <- names(unit_size)[i]
         tmp <- ceiling(mapped_data[[id]] / unit_size[[id]])
@@ -651,7 +680,7 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
     # just in case we have different types of data (e.g. numeric and character).
     clumped_data <- setNames(lapply(seq_len(ncol(clumped_data)),
                                  function(i) unname(unlist(clumped_data[, i]))),
-                             colnames(mapped_data))
+                             colnames_mapped_data)
     #--------------------------------------------------------------------------#
     # Return an "intensity" object
     unmap_data(clumped_data, source_object = object)
@@ -679,6 +708,26 @@ split.intensity <- function(x, f, drop = FALSE, ..., by) {
 }
 
 # TODO: unsplit
+
+# TODO: Doc and clean below
+
+#------------------------------------------------------------------------------#
+#' To go to higher level in the hierarchy
+#'
+#' TODO
+#'
+#' @param data An \code{intensity} object.
+#'
+#' @export
+#------------------------------------------------------------------------------#
+level_up <- function(data) {
+    mapped_data <- map_data(data)
+    mapped_data[["r"]] <- ifelse(mapped_data[["r"]] > 0, 1, 0)
+    if ("n" %in% colnames(mapped_data)) {
+        mapped_data[["n"]] <- 1
+    }
+    unmap_data(mapped_data, data)
+}
 
 is.completeArray <- function(object) {
     dt <- as.data.frame(object, fields = c("space", "time"))

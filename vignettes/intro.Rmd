@@ -1,0 +1,327 @@
+---
+title: "Primer: Analyzing plant disease data with the `epiphy` package"
+author: "Christophe Gigot"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{Primer: Analyzing plant disease data with the `epiphy` package}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+![epiphy_logo](logo-epiphy-01.png)
+
+```r
+library(magrittr)
+library(epiphy)
+dataCochran1936 %>%
+    incidence %>%
+    regroup(unit = c(3, 3)) %>%
+    fitDiffDistr() %$%
+    test
+dataCochran1936 %>%
+    incidence %>%
+    regroup(unit = c(3, 3), fun = sum) %>%
+    plot(type = c("map", "progress"))
+dataCochran1936 %>%
+    incidence %>%
+    powerLaw() %>%
+    summary()
+dataCochran %>%
+    incidence %>%
+    sadie() -> results
+```
+
+## Structure
+
+This package consists of three components: a bundle of historical data sets in plant disease epidemiology, a set of relevant data classes to reliably and efficiently handle observational date sets, and finally, analysis methods developped over the last few decades. In addition to allow phytopathologists to analyse their data sets in an efficient way, while reducing the risks of mistakes while reimplementing a method describing in the scientific litterature but not available or easilly available. Another key advantage of such a package would be to allow students in phytopathology to familiarize themselves with such methods and data sets in order to be efficient as fast as possible without reinventing the wheel.
+
+### Historical data sets
+
+I will not get into the detail of the historical data sets because: (i) they are subject to be extended over time, and (ii) an extensive documentation is available in the package itself. To browser the available data sets in the current version of `epiphy`, just type `data(package = "epiphy")` and then use `help()` function to learn more about the data set you are interested in.
+
+### Classes
+
+Regarding the set of classes to deal with observationnal data sets, in other words the core of `epiphy`, this set was build using the S4 object system implemented in R in order to finely control and check the data provided. Indeed for each method implemented, the provided data need to respect some constraints, and instead leaving such boring task to the human (which is also subjet to be mistaken), it's the work of the package. And S4 approach is quite well designed to deal with that. Well so the internal structure is based on a main class (named `Intensity`) which allow to format disease data sets for further analyses and check is everything is fine. Three subclasses of `Intensity` are currently implemented: `Count` for count data, `Incidence` for incidence data, and `Severity` for severity data. As stated by @McRoberts_etal_2003, differences between these different ways of recording disease levels were sometimes not well used in the litterature. For more information about these different classes, just type `help("Intensity-class")` and `help("Count")`, `help("Incidence")` or `help("Severity")`. To represent that as a tree, this is what you get:
+
+```
+         Intensity
+             ^
+             |
+  ------------------------
+  |          |           | 
+Count    Incidence    Severity
+
+<--: Inherits from
+```
+
+**Note:** Note that "quadrat", "sampling unit", "sample unit" and "cluster" are different words to refer to the same entity, i.e. a location where assessments are carried out.
+
+### Analysis methods
+
+Different analysis methods have been implemented so far. We can mention distribution fitting to identify aggregation behavior and compute aggregation parameters (`fitDistr()`), power law (binomial power law and Taylor's power law, `powerLaw()`), SADIE which is the acronym for Spatial Analysis by Distance IndicEs (`sadie()`), and spatio-temporal autocorrelation (`stacor`). Most of these methods would not be implemented without the wonderful shared work from other contriburors. I think in particular of the updated transportation algorithm totally reimplemented in C++ to increase its speed (publised in the `transport` package from ...), the packages `spdep` and `starma` used under the hood of the function `stacor`, and other more generalist and time efficient package such as `ggplot2`, `dplyr`, `tidyr` and `magrittr`.
+
+A special attention was given to quote the most relevant scientific publications to make it easier to come back to the origin if you want to ignite your curiosity and/or need more information.
+
+Examples of analysis using these approaches are given hereinafter.
+
+### Make all of that working seamlessly
+
+Concretely, it is important to make the distinction between these different data structure. Indeed, if you want to apply fit distributions to your disease intensity data (using `fitDistr()`), the program need to know what kind of data you are working with (`Count` or `Incidence`). Indeed, in case of `Count` data, the distributions used will be Poisson and negative-binomial to deal with random and aggregated situations, respectively. But in case of `Incidence` data, the two replacement distributions are binomial and beta-binomial, respectively. The package is smart enough to apply the good distributions knwing the nature of the data sets. Of course, the output of the analysis will let you know what method was used.
+
+
+## Example 1: An usual workflow
+
+Let's start loading the package `epiphy` and have a look at the historical data set from @Cochran_1936 (`Cochran1936`) which contains monitoring epidemics of tomato spotted wilt virus (TSWV) disease in experimental crops of tomato near Adelaide in Australia in ....
+
+```{r, include=FALSE}
+suppressPackageStartupMessages(library(epiphy))
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(epiphy)
+# Epidemiological data published by Cochran in 1936:
+str(tomato_tswv$field_1929)
+# For more information, type: ?tomato_tswv
+```
+
+<!-- [Define "sampling unit"] -->
+
+Here, the pair (`x`, `y`) corresponds to the location of the sampling unit in a matrix, `x` being the row id, and `y`, the column id. `t` is the id of the date of assessment. There are two date of assessemnts here: 1 (...) and 2 (...). Finally, `d` and `n` correspond to the number of diseased plants in the sampling unit, and the size of the sampling unit. As `n` is equal to 1 everywhere, this mean that the sampling unit is of size 1, and consequently, the value of `d` can only be 0 (the plant is not diseased) or 1 (the plant is diseased). These data correspond definitly to incidence data, as we previously remind its definition. So go further and perform analysis, we need to embed this data frame into an `Incidence` object. To do so, we logically use the eponym function as follow.
+
+```{r create_intensity_obj}
+my_data <- incidence(tomato_tswv$field_1929)
+my_data
+# Note that we do not need to specify the variable correspondances here (using 
+# parameter 'idVars' because, the column names of the input data frame respect
+# the convention. To know more about this convention, refer to the documentation
+# of the Incidence() function: help("Incidence")
+df <- tomato_tswv$field_1929
+colnames(df) <- c("coord1", "coord2", "time", "score", "n")
+my_data2 <- incidence(df, mapping(t = time, r = score))
+my_data2 ### GERER LA VISU SI PAS DE COORD SPATIALE
+# Note that we did not need to specify something for 'n' because it a standard.
+# It would have been possible to add 'n = n' but it's not needed. This also mean
+# that you have to be careful, if a standrad name is used for something else.
+```
+
+Let's take some time to detail this output. You get this output when you want to display an `Incidence` object, typing its name. By the way, you get a similar output when typing the name of whatever kind of `Intensity` object.
+
+[...]
+
+```{r, fig.width = 7}
+plot(my_data)
+# proposer de "staker" les visu si d = 0 ou 1, et la valeur == t ?
+# et un nRibbon plus "smart"
+```
+
+To go further, and get some more nice stuff. `myData` is composed of two matrices (1 for each time id), that you can get by the way using such a command: `image(as.arraymyData$d[,,1])`. Anyway, a useful feature implemeted in `epiphy` is when dealing with such regular arrays or matrices to **regroup** the sampling units into regular and bigger ones. To do so, you need to use the following buch of code:
+
+```{r, message=FALSE, fig.width = 7}
+my_data_reg <- clump(my_data, unit_size = c(x = 3, y = 3))
+plot(my_data_reg)
+```
+
+We learn here several useful information. To have more informatio, you may want to use the following command:
+
+```r
+dispIndices(myData)
+```
+    ## Morisita's Index:
+    ## Lloyd's Index:
+    ## Iwao's Index:
+    ## Index of dispersion (D):
+    ## Index of dispersion revisited (Dng):
+
+```r
+dispIndices(myData)$Lloyd
+```
+    ## Lloyd's Index: ???
+    ## 
+    ## index > 1: aggregated pattern
+    ## index < 1: random pattern
+
+Here you have different indices: indices of Morisita (1962), indice of aggregation of Lloyd (1967), and indice of Iwao (1968).
+Lloyd's Index of Patchiness
+
+Then we may want to display these data sets.
+
+```r
+print(myData)
+```
+
+## Fitting distributions to see if there is a significant aggregation
+
+```{r fit_two_distributions}
+res <- fit_distr(my_data_reg)
+res
+summary(res)
+plot(res)
+```
+
+```r
+```
+
+    ## Call:
+    ## fitDist(myData); myData: Incidence
+    ##
+    ## Terms:
+    ## rand.p  agg.p  agg.theta
+    ## ???     ???    ???
+    ##
+    ## Chi2 test:
+    ## p.value: ????
+
+```r
+summary(res)
+```
+
+    ## Call:
+    ## fitDist(myData); myData: Incidence
+    ##
+    ## Terms:
+    ## binomial law:
+    ## - p: ???
+    ## beta-binomial law:
+    ## - p
+    ## - theta (phi)
+    ##
+    ## Chi2 test:
+    ## p.value: ????
+    ##
+    ## Frequence table:
+    ## category observed rand agg
+    ##
+    ##
+    ##
+
+
+## Power law analysis
+
+```r
+# data set 'pcw' from 'ade4'?
+# data set 'BCI' from 'vegan'?
+```
+```{r, eval=FALSE}
+my_data_bald <- tomato_tswv$field_1928 # The other field here!
+my_data_bald <- my_data_bald[with(my_data_bald, x <= 12 & y <= 30), ]
+## TMP BELOW
+my_data_bald$variety <- as.character(my_data_bald$variety) # Ne devrait pas être nécessaire
+my_data_bald$irrigation <- as.character(my_data_bald$irrigation) # Ne devrait pas être nécessaire
+## TMP ABOVE
+my_data_bald <- incidence(my_data_bald,
+                          #mapping(variety = variety, irrigation = irrigation), # Problème dans le data set : variety doit etre la col 2, il n'y a pas d'irrigation, l'identifiant est la col 1
+                          mapping(id = variety), ## TMP
+                          keep_std = FALSE)
+my_data_bald <- clump(my_data_bald, unit_size = c(x = 3, y = 3)) ## Probleme ici !!!... Plus vraiment maintenant (mais on peut nettoyer la fonction :))
+#my_data_bald <- split(my_data_bald, by = c("variety", "irrigation", "t"))
+my_data_bald <- split(my_data_bald, by = c("id", "t"))
+
+res <- power_law(my_data_bald)
+res
+summary(res)
+plot(res)
+```
+
+## SADIE
+
+Let's take back the regrouped data from @Cochran_1936, but only the first time.
+
+```r
+res <- sadie(myData2, cost(myData2, p = "reg-grid"), nperm = 100, index = "perry")
+res
+summary(res)
+plot(res)
+```
+
+## Spatio-temporal autocorrelation
+
+```r
+res <- stacor(...)
+res
+summary(res)
+plot(res)
+```
+
+## Taking a look at spatial hierarchies
+
+```{r spatial_hierarchies}
+my_data_low  <- my_data_reg
+my_data_high <- level_up(my_data_low)
+
+my_data_low  <- split(my_data_low, by = "t")
+my_data_high <- split(my_data_high, by = "t")
+
+res <- spatial_hier(my_data_low, my_data_high)
+
+res
+summary(res)
+plot(res)
+```
+
+
+```r
+myData <- Incidence(Cochran1936)
+myData <- myData[time == 1]
+# the same as: myData <- split(myData, myData@time$t)[[1]]
+myDataLow  <- rezise(myData, unitSize = c(3, 3))
+myDataHigh <- as.Incidence(myDataLow, n = 1)
+spatialHier(myDataHigh ~ myDataLow)
+```
+
+Here is an illustration of the interest of multi-dimensional (more than 3) spatial information. For instance, you have x, y, leaf id and leaflet id so 4 dimensions.
+
+```r
+myData <- Incidence(xf2014, idVars = list(time = 1, space = 2:5, obs = 6:7))
+myData <- myData[time == 1]
+myData <- space ~ x + y + z
+
+```
+
+## "Piping" your analyses
+
+Let's imagine we want to do that
+
+
+```r
+myData <- Incidence(Cochran1936)
+myData <- resize(myData, unitSize = c(3, 3))
+res1 <- fitDist(myData)
+res1
+plot(res1)
+res2 <- sadie(myData)
+res2
+summary(res2)
+```
+
+You can pipe all these analyses
+
+```r
+library(magrittr)
+Incidence(Cochran1936) %>%
+    resize(unit = c(3, 3)) %>%
+    fitDist() %T>% plot() %>%
+    sadie() %T>% plot() %>%
+    summary()
+```
+
+## Conclusion
+
+We hope that such a tool will be useful for the phytopathologist community. Note that so far this package implement most of the methods described in the chapter 9 of the book from @Madden_etal_2007.
+
+## Vocabulary:
+
+- clump
+- cluster
+- sampling unit (and sampling location)
+
+## References
+
+
+
+
+
+
+

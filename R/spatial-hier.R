@@ -103,6 +103,12 @@ spatial_hier <- function(low, high) {
     coord_obs <- data.frame(x = p_low, y = p_high)
     data      <- cloglog(coord_obs) # TODO: Offer the possibility to use other log base
     data      <- data[with(data, is.finite(x) & is.finite(y)), ]
+    if ((nr <- nrow(data)) < 1) {
+        stop("Too few finite cloglog data to perform a regression.")
+    } else if (nr < 5) {
+        warning(paste0("Only ", nr, " cloglog data points were used to ",
+                       "perform the regression."))
+    }
     model     <- lm(y ~ offset(x), data = data)
     # ^ is the same as lm((y - x) ~ 1, ...), i.e. we just look for an intercept.
     nu        <- unname(exp(coef(model)))
