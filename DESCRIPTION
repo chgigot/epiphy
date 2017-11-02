@@ -23,7 +23,7 @@ Suggests:
     emdist,
     knitr,
     rmarkdown
-Collate:
+Collate: 
     'RcppExports.R'
     'betabinom.R'
     'data.R'
@@ -35,5 +35,6 @@ Collate:
     'indices.R'
     'power-law.R'
     'sadie.R'
+    'simple-dispersal-model.R'
     'spatial-hier.R'
 VignetteBuilder: knitr
