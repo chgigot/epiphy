@@ -4,7 +4,7 @@
 \name{simple_model}
 \alias{simple_model}
 \title{Simple dispersal model}
-\format{An object of class \code{list} of length 3.}
+\format{An object of class \code{list} of length 5.}
 \usage{
 simple_model
 }
@@ -24,7 +24,7 @@ implemented in the \code{epiphy} package.
 }
 \examples{
 # To use the "hiden" functions of this simple model:
-list2env(epiphy:::simple_model, environment())
+invisible(list2env(epiphy:::simple_model, environment()))
 
 set.seed(12345)
 foci <- disperse(nfoci = 10, xrate = 30, ngen = 2, lambda = 50)
@@ -40,16 +40,20 @@ res
 summary(res)
 plot(res)
 
+lambdas <- c(5, 10, 20, 40, 80)
+
 # Multi-data set analyses
 set.seed(12345)
 quad <- quadrat(surf_dim = c(x = 1, y = 1), nint = c(x = 90, y = 90))
 my_data <- list()
-for (i in 1:30) {
+for (i in 1:100) {
     nfoci <- sample(1:100, 1)
-    foci <- disperse(nfoci = nfoci, xrate = 800, ngen = 1, lambda = 50)
+    xrate <- sample(5:15, 1)
+    print(paste0("set ", i, " to be done (nfoci = ", nfoci, "; xrate = ", xrate,")"))
+    foci <- disperse(nfoci = nfoci, xrate = xrate, ngen = 2, lambda = 20)
     my_data[[i]] <- collect(foci, quad)
-    print(paste0("set ", i, " done (nfoci = ", nfoci, ")"))
 }
+# saveRDS(my_data, "simple_model_data_final.rds")
 
 ## Power law
 my_data2 <- lapply(my_data, function(x) {
@@ -63,8 +67,14 @@ res
 summary(res)
 plot(res)
 
-
 ## Spatial hierarchy
+low <- my_data2
+high <- lapply(my_data2, level_up)
+
+res <- spatial_hier(low, high)
+res
+summary(res)
+plot(res)
 
 }
 \references{

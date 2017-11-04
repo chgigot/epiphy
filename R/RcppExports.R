@@ -13,3 +13,7 @@ insertCPP <- function(vect, i, value) {
     .Call('_epiphy_insertCPP', PACKAGE = 'epiphy', vect, i, value)
 }
 
+dispersalCPP <- function(nfoci, xrate, ngen, lambda) {
+    .Call('_epiphy_dispersalCPP', PACKAGE = 'epiphy', nfoci, xrate, ngen, lambda)
+}
+

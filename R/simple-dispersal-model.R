@@ -19,7 +19,7 @@
 #'
 #' @examples
 #' # To use the "hiden" functions of this simple model:
-#' list2env(epiphy:::simple_model, environment())
+#' invisible(list2env(epiphy:::simple_model, environment()))
 #'
 #' set.seed(12345)
 #' foci <- disperse(nfoci = 10, xrate = 30, ngen = 2, lambda = 50)
@@ -35,17 +35,20 @@
 #' summary(res)
 #' plot(res)
 #'
+#' lambdas <- c(5, 10, 20, 40, 80)
+#'
 #' # Multi-data set analyses
 #' set.seed(12345)
 #' quad <- quadrat(surf_dim = c(x = 1, y = 1), nint = c(x = 90, y = 90))
 #' my_data <- list()
-#' for (i in 1:30) {
+#' for (i in 1:100) {
 #'     nfoci <- sample(1:100, 1)
-#'     foci <- disperse(nfoci = nfoci, xrate = 800, ngen = 1, lambda = 50)
+#'     xrate <- sample(5:15, 1)
+#'     print(paste0("set ", i, " to be done (nfoci = ", nfoci, "; xrate = ", xrate,")"))
+#'     foci <- disperse(nfoci = nfoci, xrate = xrate, ngen = 2, lambda = 20)
 #'     my_data[[i]] <- collect(foci, quad)
-#'     print(paste0("set ", i, " done (nfoci = ", nfoci, ")"))
 #' }
-#' # saveRDS(my_data, "simple_model_data.rds")
+#' # saveRDS(my_data, "simple_model_data_final_5-15.rds")
 #'
 #' ## Power law
 #' my_data2 <- lapply(my_data, function(x) {
@@ -72,28 +75,18 @@
 #------------------------------------------------------------------------------#
 simple_model <- list()
 
-simple_model$disperse <- function(nfoci, xrate, ngen, lambda){
-    foci <- matrix(runif(n = 2*nfoci, min = 0, max = 1),
-                   nrow = nfoci, ncol = 2,
-                   dimnames = list(NULL, c("x", "y")))
-    foci <- cbind(foci, gen = 0)
-    lapply(seq_len(ngen), function(i1) {
-        lapply(seq_len(nfoci), function(i2) {
-            focus   <- foci[i2, ]
-            newdir  <- runif(n = xrate, min = 0, max = 2*pi)
-            newdist <- rexp(n = xrate, rate = lambda)
-            newfoci <- cbind(x   = focus[["x"]] + newdist * cos(newdir),
-                             y   = focus[["y"]] + newdist * sin(newdir),
-                             gen = i1)
-            foci <<- rbind(foci, newfoci)
-        })
-        nfoci <<- nrow(foci)
-    })
-    structure(as.data.frame(foci), class = c("disperse", "data.frame"))
+simple_model$disperse <- function(nfoci, xrate, ngen, lambda) {
+    res <- as.data.frame(dispersalCPP(nfoci, xrate, ngen, lambda))
+    colnames(res) <- c("x", "y", "gen")
+    structure(res, class = c("disperse", "data.frame"))
+}
+
+simple_model$plot.disperse <- function(x, ...) {
+    plot(x$x, x$y, pch = 19, col = "red", xlim = c(0, 1), ylim = c(0, 1), ...)
 }
 
 simple_model$quadrat <- function(surf_dim = c(x = 1, y = 1),
-                                    nint = c(x = 90, y = 90)) {
+                                 nint = c(x = 90, y = 90)) {
     xquad <- surf_dim[["x"]] / nint[["x"]]
     yquad <- surf_dim[["y"]] / nint[["y"]]
 
@@ -111,17 +104,51 @@ simple_model$quadrat <- function(surf_dim = c(x = 1, y = 1),
     structure(quad, class = c("quadrat", "data.frame"))
 }
 
+# simple_model$collect_ <- function(disperse, quadrat) {
+#     res <- as.data.frame(collectCPP(as.matrix(disperse), as.matrix(quadrat)))
+#     res <- setNames(res, c("x", "y", "x1", "y1", "x2", "y2",
+#                            "count", "incidence"))
+#     structure(res, class = c("collect", "quadrat", "data.frame"))
+# }
+
 simple_model$collect <- function(disperse, quadrat) {
-    quadrat <- do.call(rbind, lapply(seq_len(nrow(quadrat)), function(i1) {
-        quad <- quadrat[i1, ]
-        inx <- ((quad$x1 < disperse$x) & (disperse$x <= quad$x2))
-        iny <- ((quad$y1 < disperse$y) & (disperse$y <= quad$y2))
-        quad$count <- sum(inx * iny) # Nice trick!
-        quad$incidence <- ifelse(quad$count == 0, 0, 1)
-        quad
-    }))
+    quadrat$count     <- NA
+    quadrat$incidence <- NA
+    lapply(seq_len(nrow(quadrat)), function(i1) {
+        inx <- (quadrat[i1, "x1"] < disperse[, "x"]) & (disperse[, "x"] <= quadrat[i1, "x2"])
+        iny <- (quadrat[i1, "y1"] < disperse[, "y"]) & (disperse[, "y"] <= quadrat[i1, "y2"])
+        quadrat[i1, "count"]     <<- sum(inx * iny) # Nice trick!
+        quadrat[i1, "incidence"] <<- ifelse(quadrat[i1, "count"] == 0, 0, 1)
+    })
     structure(quadrat, class = c("collect", "quadrat", "data.frame"))
 }
+
+simple_model$print2.collect <- function(x, ..., type = c("incidence", "count")) {
+    type <- match.arg(type)
+    #if (!add) {
+    #plot(0, type = "n", xlim = xlim, ylim = ylim, xlab = "x", ylab = "y",
+    #     asp = asp, ...)
+    plot(0, type = "n", xlim = c(0, 1), ylim = xlim, ...)
+    #}
+    x$coord <- I(lapply(seq_len(nrow(x)), function(i1) {
+        coord <- rbind(unlist(unname(x[i1, c("x1", "y1")])),
+              unlist(unname(x[i1, c("x1", "y2")])),
+              unlist(unname(x[i1, c("x2", "y2")])),
+              unlist(unname(x[i1, c("x2", "y1")])))
+        dimnames(coord) <- list(NULL, c("x", "y"))
+        polygon(coord, border = "grey", col = x[i1, "incidence"])
+        # We do not need to close the box, it's supposed by "polygon"
+    }))
+    #x$col <- pal(length(0:round(maxi)))[round(x[[type]])]
+    lapply(x$coord, function(xxx) polygon(xxx, border = "grey"))
+    polygon(x$coord, border = "grey", col = x$incidence)# x$col)
+}
+
+
+
+
+
+
 
 # Figures
 #simple_model$plot.disperse <- function(x, ...) {
@@ -132,13 +159,8 @@ simple_model$collect <- function(disperse, quadrat) {
 
 # simple_model$plot.collect <- function(x, ..., xlim = c(0, 1), ylim = xlim,
 #                                       asp = 1) {
-#     #if (!add) {
-#         plot(0, type = "n", xlim = xlim, ylim = ylim, xlab = "x", ylab = "y",
-#              asp = asp, ...)
-#     #}
-#     x$coords <- rbind(x$coords , x$coords[1, ]) # to close the box
-#     x$col    <- pal(length(0:round(maxi)))[round(x[[type]])]
-#     polygon(x$coords, border = "grey", col = x$col)
+
+
 # }
 
 

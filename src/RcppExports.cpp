@@ -45,11 +45,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dispersalCPP
+NumericMatrix dispersalCPP(int nfoci, int xrate, int ngen, double lambda);
+RcppExport SEXP _epiphy_dispersalCPP(SEXP nfociSEXP, SEXP xrateSEXP, SEXP ngenSEXP, SEXP lambdaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type nfoci(nfociSEXP);
+    Rcpp::traits::input_parameter< int >::type xrate(xrateSEXP);
+    Rcpp::traits::input_parameter< int >::type ngen(ngenSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    rcpp_result_gen = Rcpp::wrap(dispersalCPP(nfoci, xrate, ngen, lambda));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_epiphy_costTotiCPP", (DL_FUNC) &_epiphy_costTotiCPP, 5},
     {"_epiphy_costTotCPP", (DL_FUNC) &_epiphy_costTotCPP, 2},
     {"_epiphy_insertCPP", (DL_FUNC) &_epiphy_insertCPP, 3},
+    {"_epiphy_dispersalCPP", (DL_FUNC) &_epiphy_dispersalCPP, 4},
     {NULL, NULL, 0}
 };
 
