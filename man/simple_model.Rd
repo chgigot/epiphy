@@ -4,7 +4,7 @@
 \name{simple_model}
 \alias{simple_model}
 \title{Simple dispersal model}
-\format{An object of class \code{list} of length 5.}
+\format{An object of class \code{list} of length 6.}
 \usage{
 simple_model
 }
@@ -27,7 +27,8 @@ implemented in the \code{epiphy} package.
 invisible(list2env(epiphy:::simple_model, environment()))
 
 set.seed(12345)
-foci <- disperse(nfoci = 10, xrate = 30, ngen = 2, lambda = 50)
+foci <- disperse(nfoci = 10, xrate = 20, ngen = 3, lambda = 50, ngen_active = 1)
+plot(foci, cex = 0.1)
 quad <- quadrat(surf_dim = c(x = 1, y = 1), nint = c(x = 90, y = 90))
 collection <- collect(foci, quad)
 
@@ -53,7 +54,7 @@ for (i in 1:100) {
     foci <- disperse(nfoci = nfoci, xrate = xrate, ngen = 2, lambda = 20)
     my_data[[i]] <- collect(foci, quad)
 }
-# saveRDS(my_data, "simple_model_data_final.rds")
+# saveRDS(my_data, "simple_model_data_final_5-15.rds")
 
 ## Power law
 my_data2 <- lapply(my_data, function(x) {

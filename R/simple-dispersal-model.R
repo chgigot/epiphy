@@ -22,7 +22,8 @@
 #' invisible(list2env(epiphy:::simple_model, environment()))
 #'
 #' set.seed(12345)
-#' foci <- disperse(nfoci = 10, xrate = 30, ngen = 2, lambda = 50)
+#' foci <- disperse(nfoci = 10, xrate = 20, ngen = 3, lambda = 50, ngen_active = 1)
+#' plot(foci, cex = 0.1)
 #' quad <- quadrat(surf_dim = c(x = 1, y = 1), nint = c(x = 90, y = 90))
 #' collection <- collect(foci, quad)
 #'
@@ -75,8 +76,8 @@
 #------------------------------------------------------------------------------#
 simple_model <- list()
 
-simple_model$disperse <- function(nfoci, xrate, ngen, lambda) {
-    res <- as.data.frame(dispersalCPP(nfoci, xrate, ngen, lambda))
+simple_model$disperse <- function(nfoci, xrate, lambda, ngen, ngen_active = 0) {
+    res <- as.data.frame(dispersalCPP(nfoci, xrate, lambda, ngen, ngen_active))
     colnames(res) <- c("x", "y", "gen")
     structure(res, class = c("disperse", "data.frame"))
 }
@@ -104,12 +105,12 @@ simple_model$quadrat <- function(surf_dim = c(x = 1, y = 1),
     structure(quad, class = c("quadrat", "data.frame"))
 }
 
-# simple_model$collect_ <- function(disperse, quadrat) {
-#     res <- as.data.frame(collectCPP(as.matrix(disperse), as.matrix(quadrat)))
-#     res <- setNames(res, c("x", "y", "x1", "y1", "x2", "y2",
-#                            "count", "incidence"))
-#     structure(res, class = c("collect", "quadrat", "data.frame"))
-# }
+simple_model$collect_ <- function(disperse, quadrat) {
+    res <- as.data.frame(collectCPP(as.matrix(disperse), as.matrix(quadrat)))
+    res <- setNames(res, c("x", "y", "x1", "y1", "x2", "y2",
+                           "count", "incidence"))
+    structure(res, class = c("collect", "quadrat", "data.frame"))
+}
 
 simple_model$collect <- function(disperse, quadrat) {
     quadrat$count     <- NA

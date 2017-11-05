@@ -223,6 +223,17 @@ res <- power_law(my_data_bald)
 res
 summary(res)
 plot(res)
+
+```
+
+With modelized data:
+
+```{r}
+raw_data <- readRDS("simple_model_data_final_5-15.rds")
+
+invisible(list2env(epiphy:::simple_model, environment()))
+
+
 ```
 
 ## SADIE
@@ -248,6 +259,24 @@ plot(res)
 ## Taking a look at spatial hierarchies
 
 ```{r spatial_hierarchies}
+my_data_low  <- my_data_reg
+my_data_high <- level_up(my_data_low)
+
+my_data_low  <- split(my_data_low, by = "t")
+my_data_high <- split(my_data_high, by = "t")
+
+res <- spatial_hier(my_data_low, my_data_high)
+
+res
+summary(res)
+plot(res)
+```
+
+
+
+```{r spatial_hierarchies_more_compl}
+raw_data <- readRDS("simple_model_data_final_5-15.rds")
+
 my_data_low  <- my_data_reg
 my_data_high <- level_up(my_data_low)
 
