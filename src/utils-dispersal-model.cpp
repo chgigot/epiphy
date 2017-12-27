@@ -64,7 +64,7 @@ NumericMatrix dispersalCPP(int nfoci, int xrate, double lambda, int ngen,
         for (int i2 = ibeg; i2 < i1; ++i2) {
             end += nfoci_new[i2];
         }
-        printf("[%d, %d[... beg = %d and end = %d\n", ibeg, i1, beg, end);
+        //printf("[%d, %d[... beg = %d and end = %d\n", ibeg, i1, beg, end);
         for (int i2 = beg; i2 < end; ++i2) {
             focus   = foci(i2, _);
             newdir  = runif(xrate, 0, 2*PI_);

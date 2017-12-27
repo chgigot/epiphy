@@ -9,7 +9,7 @@
 simple_model
 }
 \arguments{
-\item{nfoci}{The number of (initial) infections.}
+\item{nfoci}{The number of initial infections.}
 
 \item{xrate}{Multiplication rate, the number of new infections produced by
 each pre-existing infection at each generation.}
@@ -19,8 +19,14 @@ each pre-existing infection at each generation.}
 \item{lambda}{The rate parameter for the exponential distribution.}
 }
 \description{
-This model is used to perform some assessments and test statistical methods
-implemented in the \code{epiphy} package.
+Even if this model does not fall into the scope stricto sensu of the package
+\code{epiphy}, it is provided to perform some assessments and test
+tmplemented statistical methods.
+}
+\details{
+The model is not directly made available to the user. One may import all the
+utilities related to this simple dispersal model using:
+\code{invisible(list2env(epiphy:::simple_model, environment()))}.
 }
 \examples{
 # To use the "hiden" functions of this simple model:
@@ -55,6 +61,7 @@ for (i in 1:100) {
     my_data[[i]] <- collect(foci, quad)
 }
 # saveRDS(my_data, "simple_model_data_final_5-15.rds")
+# res <- readRDS("simple_model_data_final_5-15.rds")
 
 ## Power law
 my_data2 <- lapply(my_data, function(x) {

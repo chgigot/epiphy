@@ -1,10 +1,15 @@
 #------------------------------------------------------------------------------#
 #' Simple dispersal model
 #'
-#' This model is used to perform some assessments and test statistical methods
-#' implemented in the \code{epiphy} package.
+#' Even if this model does not fall into the scope stricto sensu of the package
+#' \code{epiphy}, it is provided to perform some assessments and test
+#' tmplemented statistical methods.
 #'
-#' @param nfoci The number of (initial) infections.
+#' The model is not directly made available to the user. One may import all the
+#' utilities related to this simple dispersal model using:
+#' \code{invisible(list2env(epiphy:::simple_model, environment()))}.
+#'
+#' @param nfoci The number of initial infections.
 #' @param xrate Multiplication rate, the number of new infections produced by
 #'     each pre-existing infection at each generation.
 #' @param ngen The number of generations.
@@ -22,7 +27,7 @@
 #' invisible(list2env(epiphy:::simple_model, environment()))
 #'
 #' set.seed(12345)
-#' foci <- disperse(nfoci = 10, xrate = 20, ngen = 3, lambda = 50, ngen_active = 1)
+#' foci <- disperse(nfoci = 1, xrate = 3, ngen = 10, lambda = 20, ngen_active = 1)
 #' plot(foci, cex = 0.1)
 #' quad <- quadrat(surf_dim = c(x = 1, y = 1), nint = c(x = 90, y = 90))
 #' collection <- collect(foci, quad)
@@ -50,6 +55,7 @@
 #'     my_data[[i]] <- collect(foci, quad)
 #' }
 #' # saveRDS(my_data, "simple_model_data_final_5-15.rds")
+#' # res <- readRDS("simple_model_data_final_5-15.rds")
 #'
 #' ## Power law
 #' my_data2 <- lapply(my_data, function(x) {
