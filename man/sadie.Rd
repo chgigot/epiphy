@@ -8,7 +8,8 @@
 sadie(data, ...)
 
 \method{sadie}{data.frame}(data, index = c("Perry", "LMX", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, cost)
+  nperm = 100, rseed = TRUE, seed = 12345, cost,
+  threads = parallel::detectCores())
 }
 \arguments{
 \item{data}{A data frame or a matrix with the counts for the different sampling units. The data

@@ -64,7 +64,8 @@ sadie <- function(data, ...) {
 #' @export
 #------------------------------------------------------------------------------#
 sadie.data.frame <- function(data, index = c("Perry", "LMX", "all"),
-                             nperm = 100, rseed = TRUE, seed = 12345, cost) {
+                             nperm = 100, rseed = TRUE, seed = 12345, cost,
+                             threads = parallel::detectCores()) {
 
     index <- match.arg(index)
     if (missing(cost)) {
@@ -105,12 +106,14 @@ sadie.data.frame <- function(data, index = c("Perry", "LMX", "all"),
     if (any(index == "Perry")) {
         perry_ <- clusteringIdx(optTransport, cost, n, nperm,
                                 dataBeg = count, dataEnd = fcount,
-                                method = "shortsimplex", cost_of_flow)
+                                method = "shortsimplex", cost_of_flow,
+                                threads = threads)
     }
     if (any(index == "LMX")) {
         li_madden_xu <- clusteringIdxNew(optTransport, cost, n, nperm,
                                          dataBeg = count, dataEnd = fcount,
-                                         method = "shortsimplex", cost_of_flow)
+                                         method = "shortsimplex", cost_of_flow,
+                                         threads = threads)
 
         tmp <- li_madden_xu[["Dis_all"]][, 1:nperm] # On ne prend pas le dernier = le "vrai"
         Dis <- li_madden_xu[["Dis_all"]][, (nperm + 1 )]## un peu idiot, déjà calculer avec Da <- costTot(optTransMat, cost)
@@ -269,11 +272,12 @@ costTot <- function(flow, cost) {
 # Perry
 #' @export
 #------------------------------------------------------------------------------#
-clusteringIdx <- function(flow, cost, n, nperm, dataBeg, dataEnd, method = "shortsimplex", cost_of_flow) {
+clusteringIdx <- function(flow, cost, n, nperm, dataBeg, dataEnd,
+                          method = "shortsimplex", cost_of_flow, threads) {
     seqNrowFlow <- seq_len(nrow(flow))
     progress       <- txtProgressBar(min = 0, max = nperm, style = 3)
     #randomisations <- parallel::mclapply(seq_len(nperm), function(i) {
-    randomisations <- lapply(seq_len(nperm), function(i) {
+    randomisations <- pbapply::pblapply(seq_len(nperm), function(i) {
         # Yi & Yc
         idx       <- seqNrowFlow
         randIdx   <- sample(idx)
@@ -310,7 +314,7 @@ clusteringIdx <- function(flow, cost, n, nperm, dataBeg, dataEnd, method = "shor
                     Yci = resYci,
                     Yii = resYii,
                     costTot = costTot(optTransMat, cost))) # Pour calculer Ia
-    })
+    }, cl = threads)
     #}, mc.cores = 8)
 
     Ycs <- rowMeans(simplify2array(lapply(randomisations, function(x) x[["Yci"]])))
@@ -339,7 +343,9 @@ clusteringIdx <- function(flow, cost, n, nperm, dataBeg, dataEnd, method = "shor
 # standardised and dimensionless clustering index (nui) for a donor
 #' @export
 #------------------------------------------------------------------------------#
-clusteringIdxNew <- function(flow, cost, n, nperm, dataBeg, dataEnd, method = "shortsimplex", cost_of_flow) {
+clusteringIdxNew <- function(flow, cost, n, nperm, dataBeg, dataEnd,
+                             method = "shortsimplex", cost_of_flow,
+                             threads) {
     seqNrowFlow <- seq_len(nrow(flow))
     base           <- list(rep(NA, nrow(flow)))
     randomisations <- rep(base, (nperm + 1)) # + 1 pour ajout du "Di" (le vrai !) à la fin
@@ -347,7 +353,7 @@ clusteringIdxNew <- function(flow, cost, n, nperm, dataBeg, dataEnd, method = "s
 
     # New idx : LMX
     #for (i in seq_len(nperm)) { ## NEW
-    lapply(seq_len(nperm), function(i) {
+    pbapply::pblapply(seq_len(nperm), function(i) {
         #for (j in seqNrowFlow) { ## NEW
         lapply(seqNrowFlow, function(j) {
             idx     <- seqNrowFlow
@@ -369,11 +375,11 @@ clusteringIdxNew <- function(flow, cost, n, nperm, dataBeg, dataEnd, method = "s
             randomisations[[i]][[j]] <<- costToti(j, optTransMat, cost, type = type)
         })
         setTxtProgressBar(progress, value = i) ## Ajout du +1 après si integration de la boucle ci dessous
-    })
+    }, cl = threads)
 
     # Di, le vrai!
     #for (j in seqNrowFlow) {
-    lapply(seqNrowFlow, function(j) { ### Déjà présent dans le "main.R" // redondant
+    pbapply::pblapply(seqNrowFlow, function(j) { ### Déjà présent dans le "main.R" // redondant
         idx        <- seqNrowFlow
         #dataBegbis <- matrix(dataBeg[idx], nrow = nrow(dataBeg))
         dataBegbis <- dataBeg ### A simplifier
@@ -387,7 +393,7 @@ clusteringIdxNew <- function(flow, cost, n, nperm, dataBeg, dataEnd, method = "s
         else                       type <- "out" # NEW NEW
         #type <- "in"
         randomisations[[length(randomisations)]][[j]] <<- costToti(j, optTransMat, cost, type = type)
-    })
+    }, cl = threads)
 
     randomisations <- simplify2array(randomisations)
     Dis_bar        <- rowMeans(randomisations) # Négatif tous pour l'instant
