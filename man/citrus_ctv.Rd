@@ -3,34 +3,21 @@
 \docType{data}
 \name{citrus_ctv}
 \alias{citrus_ctv}
-\title{CTV disease incidence at 3 assessment dates.}
-\format{There 3 data sets here:
-
-Field IVIA3&4: A data frame with ... rows and 7 variables:
-\tabular{rll}{
-    [, 1:2] \tab x,y \tab Spatial coordinates. \cr
-    [, 3:4] \tab X,Y \tab Metric spatial coordinates. \cr
-    [, 5]   \tab t   \tab Time/Year of the disease assessments (1991, 1992, 1993 or 1994). \cr
-    [, 6]   \tab r   \tab Disease incidence records. 1: Diseased, 0: Healthy. \cr
-    [, 7]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
+\title{Incidence of citrus tristeza virus (CTV) disease in three fields.}
+\format{There are three data sets:
+\itemize{
+    \item \code{IVI3and4}: A data frame with 864 rows and 5 variables.
+    \item \code{IVI6and7}: A data frame with 648 rows and 5 variables.
+    \item \code{El_Realengo}: A data frame with 2000 rows and 5 variables.
 }
 
-Field IVIA6&7: A data frame with ... rows and 7 variables:
-\tabular{rll}{
-    [, 1:2] \tab x,y \tab Spatial coordinates. \cr
-    [, 3:4] \tab X,Y \tab Metric spatial coordinates. \cr
-    [, 5]   \tab t   \tab Time/Year of the disease assessments (1990, 1991, or 1992). \cr
-    [, 6]   \tab r   \tab Disease incidence records. 1: Diseased, 0: Healthy. \cr
-    [, 7]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
-}
+The structure is the same for all the data sets:
 
-Field El-Realengo: A data frame with ... rows and 7 variables:
 \tabular{rll}{
-    [, 1:2] \tab x,y \tab Spatial coordinates. \cr
-    [, 3:4] \tab X,Y \tab Metric spatial coordinates. \cr
-    [, 5]   \tab t   \tab Time/Year of the disease assessments (1981, 1982, 1984, 1985, 1990). \cr
-    [, 6]   \tab r   \tab Disease incidence records. 1: Diseased, 0: Healthy. \cr
-    [, 7]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
+    [, 1:2] \tab x,y \tab Spatial coordinates (in a grid). \cr
+    [, 3]   \tab t   \tab Year of disease assessments. \cr
+    [, 4]   \tab r   \tab Disease incidence. 0: Healthy, 1: Diseased. \cr
+    [, 5]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
 }}
 \source{
 Gottwald TR, Cambra M, Moreno P, Camarasa E, Piquer J. 1996. Spatial
@@ -45,16 +32,17 @@ Gibson GJ. 1997. Investigating mechanisms of spatiotemporal epidemic
 citrus_ctv
 }
 \description{
-Map of Citrus tristeza virus disease incidence at three assessment years.
-21 x 21 grid???
+CTV incidence data for three orchards in eastern Spain reported for
+consecutive years.
 }
 \details{
-Epidemic of citrus tristeza virus (CTV) observed in eastern Spain (epidemic IVIA3&4 [13]). Black squares denote positions of infections observed at
-previous observation times, and white squares represent the new infections recorded in each disease map. From left to right, mappings represent infections dis-
+Both \code{IVI3and4} and \code{IVI6and7} orchards contained 216 trees, and
+\code{El_Realengo} orchard, 400 trees.
+
+From left to right, mappings represent infections dis-
 covered up to May 1991 (45 infections), May 1992 (77 infections), and May 1993 (127 infections), respectively.
 
-A, Epidemic of citrus tristeza virus (CTV) observed in eastern Spain (epidemic IVIA3&4 [13]). Black squares denote positions of infections observed at
-previous observation times, and white squares represent the new infections recorded in each disease map. From left to right, mappings represent infections dis-
+From left to right, mappings represent infections dis-
 covered up to May 1991 (45 infections), May 1992 (77 infections), and May 1993 (127 infections), respectively. B, Corresponding information for epidemic
 IVIA6&7 (13). From left to right, mappings represent infections discovered up to May 1990 (60 infections), May 1991 (77 infections), and May 1992 (127
 infections), respectively.

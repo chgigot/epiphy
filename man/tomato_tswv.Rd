@@ -3,22 +3,25 @@
 \docType{data}
 \name{tomato_tswv}
 \alias{tomato_tswv}
-\title{Incidence of TSWV in tomato fields (2 varieties + 2 irrigation systems) and Incidence of TSWV recorded in a tomato field over time.}
-\format{records1: A data frame with 11088 rows and 7 variables:
+\title{Incidence of tomato spotted wilt virus (TSWV) disease in field trials.}
+\format{There are two data sets.
+
+\code{field_1928}: A data frame with 11088 rows and 8 variables:
 \tabular{rll}{
-    [, 1]   \tab variety    \tab \cr
-    [, 2]   \tab irrigation \tab \cr
-    [, 3:4] \tab x,y \tab Spatial coordinates. \cr
-    [, 5]   \tab t   \tab Time of the disease assessments. \cr
-    [, 6]   \tab r   \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
-    [, 7]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
+    [, 1]   \tab plot       \tab Plot id. \cr
+    [, 2]   \tab variety    \tab Variety name. \cr
+    [, 3]   \tab irrigation \tab Irrigation system. \cr
+    [, 4:5] \tab x,y        \tab Spatial coordinates (in a grid). \cr
+    [, 6]   \tab t          \tab Date of disease assessments. 1: 6 Nov, 2: 14 Nov, 3: 21 Nov, 4: 28-29 Nov, 5: 5 Dec, 6: 12 Dec 1928. \cr
+    [, 7]   \tab i          \tab Disease incidence. 0: Healthy, 1: Diseased. \cr
+    [, 8]   \tab n          \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
 }
 
-**records2: A data frame with 4320 rows and 5 variables:
+\code{field_1929}: A data frame with 4320 rows and 5 variables:
 \tabular{rll}{
-    [, 1:2] \tab x,y \tab Spatial coordinates. \cr
-    [, 3]   \tab t   \tab Time of the disease assessments. 1: 18 December 1929, 2: 31 December 1929, 3: 22 January 1930. \cr
-    [, 4]   \tab r   \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
+    [, 1:2] \tab x,y \tab Spatial coordinates (in a grid). \cr
+    [, 3]   \tab t   \tab Date of disease assessments. 1: 18 Dec, 2: 31 Dec 1929, 3: 22 Jan 1930. \cr
+    [, 4]   \tab i   \tab Disease incidence. 0: Healthy, 1: Diseased. \cr
     [, 5]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
 }}
 \source{
@@ -27,51 +30,32 @@ Cochran WG. 1936. The statistical analysis of field counts of
     Society 3, 49–67. \href{http://dx.doi.org/10.2307/2983677}{doi:10.2307/2983677}
 
 Bald JG. 1937. Investigations on "spotted wilt" of tomatoes. III.
-  Infection in field plots. Bulletin 106. Melbourne, Australia: Council for
-  Scientific and Industrial Research.
+    Infection in field plots. Bulletin 106. Melbourne, Australia: Council for
+    Scientific and Industrial Research.
 }
 \usage{
 tomato_tswv
 }
 \description{
-Records1: Tomato plants with symptoms of Tomato spotted wilt virus disease. The assessments of
-disease incidence were made in 1928, and reported by Bald (1937). Four rectangular plots,
-each containing ??? plants (?? rows and ?? columns). Combinations of two cultivars (Burwood Prize and Early Dwarf
-Red) and two irrigation systems (overhead sprays and trenches) were studied.
+Intensively mapped TSWV incidence data reported by Cochran (1936) and Bald
+(1937). The disease assessments were performed in field trials at the Waite
+Institute (Australia) in 1928 and 1929. TSWV is a virus disease spread by
+thrips.
 }
 \details{
-Two varieties were used: Early Dwarf Red and Burwood Prize. There were set in the field on 15th October, 1928.
-There were two blocks of each variety. After the seedlings were rooted, there were watered by overhead sprays, or by trenches? Otherwise
-all were treated alike. The plants were pruned and staked, and weekly infection records were taken from 6th November to 12th December.
+The data set \code{field_1928}, reported by Bald (1937), was a set of four
+plots. Each plot consisted of 14 rows containing 33 plants each, so that
+there were 462 plants in each plot. The tomato variety Early Dwarf Red was
+used in two plots, and the variety Burwood Prize in the other two. The
+tomatoes were planted out on 15th October 1928. The two plots dedicated to a
+given variety experienced different irrigation practices, using either
+overhead sprays or trenches. Otherwise, all were treated alike. Weekly
+records of TSWV incidence were performed from 6th November to 12th December.
 
-Note that this plot of tomatoes was subjectd to the severest early-season epidemic of spotted wilt recorded at the Waite Intityte, and the severity
-of the disease was correlated witht the invasion of thrips in exceptional numbers.
-
-Field plan showing weekly records of infection in four plots of tomatoes.
-
-
-
-Regarding the time, here are the meanings:
-0 = Healthy plants
-Below: diseased plants
-1 = 6 November 1928
-2 = 14 November 1928
-3 = 21 November 1928
-4 = 28-29 November 1928
-5 = 5 December 1928
-6 = 12 December 1928
+The data set \code{field_1929}, reported by Cochran (1936), was a field of 24
+rows containing 60 plants each, so that there were 1440 plants. The tomatoes
+were planted out in 26th November 1929. TSWV incidence records made on 18th
+December 1929, 31st December 1929 and 22nd January 1930 are reported in this
+data set.
 }
-\section{Records2}{
-
-
-Intensively mapped disease incidence data reported by Cochran (1936). This virus disease is carried by a species of thrips. Data were obtained from field trislsmade
-made at the Waite Institute, Australia. It's an examination by Bald of the spread of this disease.
-There were 1440 plants assessed in the field. The tomatoes were planted out in November 26, 1929.
-Counts of diseased plants at the first count (December 18), the second count (December 31) and the
-last count (January 22) are recorded.
-
-Epidemiological data reported by Cochran (1936). A field map of Tomato spotted wilt virus disease incidence.
-Sowing date was 26 November 1929. Intensively mapped disease data.
-}
-
 \keyword{datasets}

@@ -1,85 +1,75 @@
 #------------------------------------------------------------------------------#
-#' Incidence of TSWV in tomato fields (2 varieties + 2 irrigation systems) and Incidence of TSWV recorded in a tomato field over time.
+#' Incidence of tomato spotted wilt virus (TSWV) disease in field trials.
 #'
-#' Records1: Tomato plants with symptoms of Tomato spotted wilt virus disease. The assessments of
-#' disease incidence were made in 1928, and reported by Bald (1937). Four rectangular plots,
-#' each containing ??? plants (?? rows and ?? columns). Combinations of two cultivars (Burwood Prize and Early Dwarf
-#' Red) and two irrigation systems (overhead sprays and trenches) were studied.
+#' Intensively mapped TSWV incidence data reported by Cochran (1936) and Bald
+#' (1937). The disease assessments were performed in field trials at the Waite
+#' Institute (Australia) in 1928 and 1929. TSWV is a virus disease spread by
+#' thrips.
 #'
-#' Two varieties were used: Early Dwarf Red and Burwood Prize. There were set in the field on 15th October, 1928.
-#' There were two blocks of each variety. After the seedlings were rooted, there were watered by overhead sprays, or by trenches? Otherwise
-#' all were treated alike. The plants were pruned and staked, and weekly infection records were taken from 6th November to 12th December.
+#' The data set \code{field_1928}, reported by Bald (1937), was a set of four
+#' plots. Each plot consisted of 14 rows containing 33 plants each, so that
+#' there were 462 plants in each plot. The tomato variety Early Dwarf Red was
+#' used in two plots, and the variety Burwood Prize in the other two. The
+#' tomatoes were planted out on 15th October 1928. The two plots dedicated to a
+#' given variety experienced different irrigation practices, using either
+#' overhead sprays or trenches. Otherwise, all were treated alike. Weekly
+#' records of TSWV incidence were performed from 6th November to 12th December.
 #'
-#' Note that this plot of tomatoes was subjectd to the severest early-season epidemic of spotted wilt recorded at the Waite Intityte, and the severity
-#' of the disease was correlated witht the invasion of thrips in exceptional numbers.
+#' The data set \code{field_1929}, reported by Cochran (1936), was a field of 24
+#' rows containing 60 plants each, so that there were 1440 plants. The tomatoes
+#' were planted out in 26th November 1929. TSWV incidence records made on 18th
+#' December 1929, 31st December 1929 and 22nd January 1930 are reported in this
+#' data set.
 #'
-#' Field plan showing weekly records of infection in four plots of tomatoes.
+#' @format
 #'
+#' There are two data sets.
 #'
-#'
-#' Regarding the time, here are the meanings:
-#' 0 = Healthy plants
-#' Below: diseased plants
-#' 1 = 6 November 1928
-#' 2 = 14 November 1928
-#' 3 = 21 November 1928
-#' 4 = 28-29 November 1928
-#' 5 = 5 December 1928
-#' 6 = 12 December 1928
-#'
-#'
-#' @section Records2:
-#'
-#' Intensively mapped disease incidence data reported by Cochran (1936). This virus disease is carried by a species of thrips. Data were obtained from field trislsmade
-#' made at the Waite Institute, Australia. It's an examination by Bald of the spread of this disease.
-#' There were 1440 plants assessed in the field. The tomatoes were planted out in November 26, 1929.
-#' Counts of diseased plants at the first count (December 18), the second count (December 31) and the
-#' last count (January 22) are recorded.
-#'
-#' Epidemiological data reported by Cochran (1936). A field map of Tomato spotted wilt virus disease incidence.
-#' Sowing date was 26 November 1929. Intensively mapped disease data.
-#'
-#'
-#' @format records1: A data frame with 11088 rows and 7 variables:
+#' \code{field_1928}: A data frame with 11088 rows and 8 variables:
 #' \tabular{rll}{
-#'     [, 1]   \tab variety    \tab \cr
-#'     [, 2]   \tab irrigation \tab \cr
-#'     [, 3:4] \tab x,y \tab Spatial coordinates. \cr
-#'     [, 5]   \tab t   \tab Time of the disease assessments. \cr
-#'     [, 6]   \tab r   \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
-#'     [, 7]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
+#'     [, 1]   \tab plot       \tab Plot id. \cr
+#'     [, 2]   \tab variety    \tab Variety name. \cr
+#'     [, 3]   \tab irrigation \tab Irrigation system. \cr
+#'     [, 4:5] \tab x,y        \tab Spatial coordinates (in a grid). \cr
+#'     [, 6]   \tab t          \tab Date of disease assessments. 1: 6 Nov, 2: 14 Nov, 3: 21 Nov, 4: 28-29 Nov, 5: 5 Dec, 6: 12 Dec 1928. \cr
+#'     [, 7]   \tab i          \tab Disease incidence. 0: Healthy, 1: Diseased. \cr
+#'     [, 8]   \tab n          \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
 #' }
 #'
-#' **records2: A data frame with 4320 rows and 5 variables:
+#' \code{field_1929}: A data frame with 4320 rows and 5 variables:
 #' \tabular{rll}{
-#'     [, 1:2] \tab x,y \tab Spatial coordinates. \cr
-#'     [, 3]   \tab t   \tab Time of the disease assessments. 1: 18 December 1929, 2: 31 December 1929, 3: 22 January 1930. \cr
-#'     [, 4]   \tab r   \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
+#'     [, 1:2] \tab x,y \tab Spatial coordinates (in a grid). \cr
+#'     [, 3]   \tab t   \tab Date of disease assessments. 1: 18 Dec, 2: 31 Dec 1929, 3: 22 Jan 1930. \cr
+#'     [, 4]   \tab i   \tab Disease incidence. 0: Healthy, 1: Diseased. \cr
 #'     [, 5]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
 #' }
 #'
-#' @source Cochran WG. 1936. The statistical analysis of field counts of
+#' @source
+#'
+#' Cochran WG. 1936. The statistical analysis of field counts of
 #'     diseased plants. Supplement to the Journal of the Royal Statistical
 #'     Society 3, 49–67. \href{http://dx.doi.org/10.2307/2983677}{doi:10.2307/2983677}
 #'
-#' @source Bald JG. 1937. Investigations on "spotted wilt" of tomatoes. III.
-#'   Infection in field plots. Bulletin 106. Melbourne, Australia: Council for
-#'   Scientific and Industrial Research.
+#' Bald JG. 1937. Investigations on "spotted wilt" of tomatoes. III.
+#'     Infection in field plots. Bulletin 106. Melbourne, Australia: Council for
+#'     Scientific and Industrial Research.
 #------------------------------------------------------------------------------#
 "tomato_tswv"
 
 #------------------------------------------------------------------------------#
-#' CTV disease incidence at 3 assessment dates.
+#' Incidence of citrus tristeza virus (CTV) disease in three fields.
 #'
-#' Map of Citrus tristeza virus disease incidence at three assessment years.
-#' 21 x 21 grid???
+#' CTV incidence data for three orchards in eastern Spain reported for
+#' consecutive years.
 #'
-#' Epidemic of citrus tristeza virus (CTV) observed in eastern Spain (epidemic IVIA3&4 [13]). Black squares denote positions of infections observed at
-#' previous observation times, and white squares represent the new infections recorded in each disease map. From left to right, mappings represent infections dis-
+#' Both \code{IVI3and4} and \code{IVI6and7} orchards contained 216 trees, and
+#' \code{El_Realengo} orchard, 400 trees.
+#'
+
+#' From left to right, mappings represent infections dis-
 #' covered up to May 1991 (45 infections), May 1992 (77 infections), and May 1993 (127 infections), respectively.
 #'
-#' A, Epidemic of citrus tristeza virus (CTV) observed in eastern Spain (epidemic IVIA3&4 [13]). Black squares denote positions of infections observed at
-#' previous observation times, and white squares represent the new infections recorded in each disease map. From left to right, mappings represent infections dis-
+#' From left to right, mappings represent infections dis-
 #' covered up to May 1991 (45 infections), May 1992 (77 infections), and May 1993 (127 infections), respectively. B, Corresponding information for epidemic
 #' IVIA6&7 (13). From left to right, mappings represent infections discovered up to May 1990 (60 infections), May 1991 (77 infections), and May 1992 (127
 #' infections), respectively.
@@ -88,40 +78,32 @@
 #' on a 2 x 6-m spacing. Both plots were located on the grounds of the Instituto Valenciano de Investigaciones
 #' Agrarias, near Moncada, Valencia, Spain and were assayed yearly from 1981 to 1994.
 #'
-#' @format There 3 data sets here:
+#' @format
 #'
-#' Field IVIA3&4: A data frame with ... rows and 7 variables:
-#' \tabular{rll}{
-#'     [, 1:2] \tab x,y \tab Spatial coordinates. \cr
-#'     [, 3:4] \tab X,Y \tab Metric spatial coordinates. \cr
-#'     [, 5]   \tab t   \tab Time/Year of the disease assessments (1991, 1992, 1993 or 1994). \cr
-#'     [, 6]   \tab r   \tab Disease incidence records. 1: Diseased, 0: Healthy. \cr
-#'     [, 7]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
+#' There are three data sets:
+#' \itemize{
+#'     \item \code{IVI3and4}: A data frame with 864 rows and 5 variables.
+#'     \item \code{IVI6and7}: A data frame with 648 rows and 5 variables.
+#'     \item \code{El_Realengo}: A data frame with 2000 rows and 5 variables.
 #' }
 #'
-#' Field IVIA6&7: A data frame with ... rows and 7 variables:
+#' The structure is the same for all the data sets:
+#'
 #' \tabular{rll}{
-#'     [, 1:2] \tab x,y \tab Spatial coordinates. \cr
-#'     [, 3:4] \tab X,Y \tab Metric spatial coordinates. \cr
-#'     [, 5]   \tab t   \tab Time/Year of the disease assessments (1990, 1991, or 1992). \cr
-#'     [, 6]   \tab r   \tab Disease incidence records. 1: Diseased, 0: Healthy. \cr
-#'     [, 7]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
+#'     [, 1:2] \tab x,y \tab Spatial coordinates (in a grid). \cr
+#     [, 3:4] \tab X,Y \tab Metric spatial coordinates. \cr
+#'     [, 3]   \tab t   \tab Year of disease assessments. \cr
+#'     [, 4]   \tab r   \tab Disease incidence. 0: Healthy, 1: Diseased. \cr
+#'     [, 5]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
 #' }
 #'
-#' Field El-Realengo: A data frame with ... rows and 7 variables:
-#' \tabular{rll}{
-#'     [, 1:2] \tab x,y \tab Spatial coordinates. \cr
-#'     [, 3:4] \tab X,Y \tab Metric spatial coordinates. \cr
-#'     [, 5]   \tab t   \tab Time/Year of the disease assessments (1981, 1982, 1984, 1985, 1990). \cr
-#'     [, 6]   \tab r   \tab Disease incidence records. 1: Diseased, 0: Healthy. \cr
-#'     [, 7]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
-#' }
+#' @source
 #'
-#' @source Gottwald TR, Cambra M, Moreno P, Camarasa E, Piquer J. 1996. Spatial
+#' Gottwald TR, Cambra M, Moreno P, Camarasa E, Piquer J. 1996. Spatial
 #'     and temporal analyses of citrus tristeza virus in eastern Spain.
 #'     Phytopathology 86, 45–55.
 #'
-#' @source Gibson GJ. 1997. Investigating mechanisms of spatiotemporal epidemic
+#' Gibson GJ. 1997. Investigating mechanisms of spatiotemporal epidemic
 #'     spread using stochastic models. Phytopathology 87, 139-46.
 #'     \href{http://dx.doi.org/10.1094/PHYTO.1997.87.2.139}{doi:10.1094/PHYTO.1997.87.2.139}
 #------------------------------------------------------------------------------#
