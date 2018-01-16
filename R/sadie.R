@@ -11,13 +11,15 @@
 #' @param data A data frame or a matrix with the counts for the different sampling units. The data
 #'     set must decribe a complete (no missing data) squared or rectangular
 #'     data set.
-#'     or a matrix (x-y)
+#'     or a matrix (x-y).
 #' @param cost A \code{length(count)} by \code{length(count)} matrix specifing
 #'     the cost of transporting single unit between the corresponding source and
 #'     destination sampling unit. If not specified, the distance between each
 #'     couple of adjacent sampling units (rook's sense) is assumed to be equal
-#'     to 1.
-#' @param index The name of the index to use: "Perry", "LMX" (Li-Madden-Xu) or "all".
+#'     to 1. If the cost matrix is not given, the two first columns of data must
+#'     correspond to "x" and "y" coordinates, and an euclidean distance between
+#'     all the recorded points will be computed.
+#' @param index The name of the index to use: "Perry", "Li-Madden-Xu" or "all".
 #'     By default, only Perry's index is computed.
 #' @param nperm Number of permutations for each sampling unit.
 #' @param rseed Randomisation seed. Unseful for checking pursposes.
@@ -44,10 +46,10 @@
 #'
 #' @examples
 #' # Possible datasets:
-#' #aphid_counts
-#' #arthropods_counts
-#' #codling_moth_counts
-#' res <- sadie(aphid_counts)
+#' #aphids
+#' #arthropods
+#' #codling_moths
+#' res <- sadie(aphids)
 #' summary(res)
 #' plot(res)
 #'
@@ -63,91 +65,112 @@ sadie <- function(data, ...) {
 #' @method sadie data.frame
 #' @export
 #------------------------------------------------------------------------------#
-sadie.data.frame <- function(data, index = c("Perry", "LMX", "all"),
+sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                              nperm = 100, rseed = TRUE, seed = 12345, cost,
-                             threads = parallel::detectCores()) {
+                             threads = 1, ..., method = "shortsimplex") {
 
     index <- match.arg(index)
+    n_col <- ncol(data)
+    stopifnot(n_col == 3)
+
     if (missing(cost)) {
-        cost <- as.matrix(dist(data[, c("x", "y")]))#, method = "manhattan"))
+        # Assumption: the 1st and 2nd columns of the input data frame correspond
+        # to "x" and "y" coordinates, respectively.
+        cost <- as.matrix(dist(data[1:2])) ### ATTENTION pour plus compliqué données eg arthropodes
     }
-
-    # IMPORTANT: count is a matrix, now
-
-    # Checking and data wrangling
+    stopifnot(is.matrix(cost))
+    # More checking and data wrangling...
 
     # More interesting
     if (!rseed) set.seed(seed)
 
-    # A faire plus propre / generic ci-dessous
-    count <- tidyr::spread(data, y, r) # Ne plus utiliser tidyr
-    row.names(count) <- count$x
-    count <- as.matrix(dplyr::select(count, -x)) # Ne plus utiliser dplyr
+    N <- nrow(data)
+    data[[n_col]] <- as.numeric(data[[n_col]]) # Just in case it's integer, to have the same nature for data and fdata
 
-    n <- prod(dim(count))
-    fcount <- matrix(data = rep(mean(count), n),
-                     nrow = nrow(count))
-    dimnames(fcount) <- list(rownames(count), colnames(count)) # Useful????
+    # Reshape long data into a wide data frame (with standrad R)
+    ##cn   <- colnames(data)
+    ##n_cn <- length(cn)
+    ##frm  <- as.formula(paste0(cn[n_cn], "~",
+    ##                          paste0(cn[1:(n_cn - 1)], collapse = "+")))
+    ##data_array <- unclass(xtabs(frm, data)) # unclass, to get a "naked" matrix/array
+    ##attr(data_array, "call") <- NULL # Just to clean the object
 
-    #optTransDT  <- wrapTransport(count, fcount)
-    #optTransMat <- optTransDT2Mat(optTransDT)
-    optTransport <- optTransDT2Mat(wrapTransport(count, fcount), n) # Bizarre que l'on prend pas cost en compte ici, sans doute basé sur les noms des row/col, à vérfier (et amélirer en reprennant le code C++ par exemple)
-    ##optTransport <- optTransDT2Mat(wrapTransportEMD(count, fcount), n)
+    # Create a homogeneous (flatten) version of data_array
 
+    ##fdata_array <- array(data = rep(mean(data_array), N),
+    ##                     dim = dim(data_array),
+    ##                     dimnames = dimnames(data_array))
 
-    Da <- costTot(optTransport, cost) # C'est quoi Da, le cost total, OK, trouver un nom plus explicite, ou bien le préciser en commentaire
+    fcount <- rep(mean(data[[n_col]]), N)
 
-    cost_of_flow <- sapply(1:n, function(x) costToti(x, optTransport, cost, type = "both"))
+    # Use optimal transportation algorithm
+    opt_transport <- wrap_transport(data[[n_col]], fcount, cost, method)
+    opt_transport <- as.matrix(opt_transport, N)
 
-    if (index == "all") index <- c("Perry", "LMX")
-    perry_ <- list(clustering = NA_real_, Ea = NA_real_)
-    li_madden_xu <- list(clustering = NA_real_, Dis_all = matrix(NA_real_))
+    # Computation the costs
+    cost_flows <- vapply(1:N, function(x) {
+        costToti(x, opt_transport, cost, type = "both")
+    }, numeric(1L))
+    # Due to the convention "in => neg value", only negative values are added
+    # up. Da = total observed distance (or total cost).
+    Da <- sum(cost_flows[cost_flows < 0])
+
+    # Deal with indices
+    if (index == "all") index <- c("Perry", "Li-Madden-Xu")
+    info_P   <- list(clust = NA_real_, Ea = NA_real_)
+    info_LMX <- list(clust = NA_real_, Dis_all = matrix(NA_real_))
     new_prob <- NA_real_
     if (any(index == "Perry")) {
-        perry_ <- clusteringIdx(optTransport, cost, n, nperm,
-                                dataBeg = count, dataEnd = fcount,
-                                method = "shortsimplex", cost_of_flow,
-                                threads = threads)
+        cat("Computation of Perry's indices:\n")
+        info_P <- clust_P(opt_transport, cost, N, nperm,
+                          start = data[[n_col]], end = fcount,
+                          method, cost_flows, threads)
     }
-    if (any(index == "LMX")) {
-        li_madden_xu <- clusteringIdxNew(optTransport, cost, n, nperm,
-                                         dataBeg = count, dataEnd = fcount,
-                                         method = "shortsimplex", cost_of_flow,
-                                         threads = threads)
-
-        tmp <- li_madden_xu[["Dis_all"]][, 1:nperm] # On ne prend pas le dernier = le "vrai"
-        Dis <- li_madden_xu[["Dis_all"]][, (nperm + 1 )]## un peu idiot, déjà calculer avec Da <- costTot(optTransMat, cost)
-        res2 <- abs(tmp) > abs(Dis)
-        res2 <- rowSums(res2)
-        res2 <- (res2 + 1) / (nperm + 1) # res2 + 1 => rank of Di(s)
-        new_prob <- res2
-
+    if (any(index == "Li-Madden-Xu")) {
+        cat("Computation of Li-Madden-Xu's indices:\n")
+        info_LMX <- clust_LMX(opt_transport, cost, N, nperm,
+                              start = data[[n_col]], end = fcount,
+                              method, cost_flows, threads)
+        # Test:
+        new_prob <- abs(info_LMX[["Dis_all"]]) > abs(cost_flows)
+        new_prob <- rowSums(new_prob)
+        new_prob <- (new_prob + 1) / (nperm + 1) # res2 + 1 => rank of Di(s)
     }
+
+    # Compute other outputs (if possible)
     # Ci-dessous, ça veut dire que l'on calcule toujours le perry's
-    Ia <- Da / mean(perry_[["Ea"]])
-    Pa <- sum((-perry_[["Ea"]]) > (-Da)) / # On met des moins pour mémoire  à cause de cette $%@*&^ de convention inversée !!!
-        length(perry_[["Ea"]])
-
-    clusteringIndices <- data.frame(data,
-                                    cost.of.outflow   = cost_of_flow,
-                                    original.index = perry_[["clustering"]],
-                                    new.index      = li_madden_xu[["clustering"]],
-                                    prob           = new_prob)
+    if (any(is.na(info_P[["Ea"]]))) {
+        warning("Ia and Pa cannot be computed if Perry's indices are not.")
+        Ia <- NA_real_
+        Pa <- NA_real_
+    } else {
+        Ia <- Da / mean(info_P[["Ea"]])
+        # On met des moins pour mémoire  à cause de cette $%@*&^ de convention inversée !!!
+        Pa <- sum((-info_P[["Ea"]]) > (-Da)) / length(info_P[["Ea"]])
+    }
+    info_clust <- data.frame(data,
+                             cost_flows = cost_flows,
+                             idx_P      = info_P[["clust"]],
+                             idx_LMX    = info_LMX[["clust"]],
+                             prob       = new_prob)
 
     # Summary indices
-    summary_indices <- data.frame(overall = c(mean(abs(clusteringIndices$original.index)), NA),
-                                  inflow  = c(mean(clusteringIndices$original.index[clusteringIndices$original.index < 0]), NA),
-                                  outflow = c(mean(clusteringIndices$original.index[clusteringIndices$original.index > 0]), NA))
-    rownames(summary_indices) <- c("Perry's index", "Li-Madden-Xu's index")
+    summary_idx <- data.frame(overall = c(mean(abs(info_clust$idx_P)),
+                                          mean(abs(info_clust$idx_LMX))),
+                              inflow  = c(mean(info_clust$idx_P[info_clust$idx_P < 0]),
+                                          mean(info_clust$idx_LMX[info_clust$idx_LMX < 0])),
+                              outflow = c(mean(info_clust$idx_P[info_clust$idx_P > 0]),
+                                          mean(info_clust$idx_LMX[info_clust$idx_LMX > 0])))
+    rownames(summary_idx) <- c("Perry's index", "Li-Madden-Xu's index")
 
     #    return(Sadie())
-    res <- list(clusteringIndices = clusteringIndices,
+    res <- list(info_clust = info_clust,
                 Da = Da,
                 Ia = Ia,
                 Pa = Pa,
-                Ea_perry = perry_[["Ea"]],
-                Ea_li = li_madden_xu[["Dis_all"]],
-                summary_indices = summary_indices,
+                Ea_perry = info_P[["Ea"]],
+                Ea_li = info_LMX[["Dis_all"]],
+                summary_idx = summary_idx,
                 nperm = nperm,
                 rseed = rseed,
                 seed = NA_real_)
@@ -156,6 +179,26 @@ sadie.data.frame <- function(data, index = c("Perry", "LMX", "all"),
     res
 }
 
+#------------------------------------------------------------------------------#
+#' @rdname sadie
+#' @export
+#------------------------------------------------------------------------------#
+sadie.matrix <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
+                         nperm = 100, rseed = TRUE, seed = 12345, cost,
+                         threads = 1) {
+    sadie.data.frame(as.data.frame(data), index, nperm, rseed, seed, cost, threads)
+}
+
+#------------------------------------------------------------------------------#
+#' @rdname sadie
+#' @export
+#------------------------------------------------------------------------------#
+sadie.count <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
+                        nperm = 100, rseed = TRUE, seed = 12345, cost,
+                        threads = 1) {
+    mapped_data <- map_data(data)
+    sadie.data.frame(mapped_data, index, nperm, rseed, seed, cost, threads)
+}
 
 
 #------------------------------------------------------------------------------#
@@ -185,12 +228,12 @@ print.summary.sadie <- function(x, ...) {
     print(attr(x, "call"))
     n <- 6L
     cat("\nFirst ", n, " rows of clustering indices:\n", sep = "") # Cf Image pkg for a nice display
-    print(head(x$clusteringIndices, n = n))
-    #printCoefmat(x$clusteringIndices)
+    print(head(x$info_clust, n = n))
+    #printCoefmat(x$info_clust)
     #cat("number of permutations: ", object$nperm, "\n",
     #    "random seed: ", object$rseed, "\n", sep = "")
     cat("\nSummary indices:\n")
-    print(x$summary_indices)
+    print(x$summary_idx)
     cat("\nMain outputs:")
     cat("\nIa: ", format(x$Ia, digits = 1, nsmall = 4),
         " (Pa = ", format.pval(x$Pa), ")\n", sep = "")
@@ -204,37 +247,37 @@ print.summary.sadie <- function(x, ...) {
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-wrapTransport <- function(dataBeg, dataEnd, method = "shortsimplex") {
-    stdout <- vector('character')
-    con    <- textConnection('stdout', 'wr', local = TRUE)
-    sink(con)
-    gen <- list(as.numeric(rownames(dataEnd)), as.numeric(colnames(dataEnd))) # Parceque on a toujours les noms des colonnes et lignes dans dataEnd, penser à les ajouter dans dataBegbis pour calcul idx old et new
-    res <- transport::transport(transport::pgrid(dataBeg, generator = gen),
-                                transport::pgrid(dataEnd, generator = gen),
-                                method = method)
-    sink()
-    close(con)
-    return(res)
+wrap_transport <- function(start, end, cost, method = "shortsimplex",
+                           control = list(), ...) {
+    # As we always have named rows and columns for end, we use this one
+    # for the generator. But in theory, start should be used too.
+
+    ##gen <- lapply(dimnames(end), as.numeric)
+    ##res <- transport::transport(transport::pgrid(start, generator = gen),
+    ##                            transport::pgrid(end, generator = gen),
+    ##                            p = p, method = method, control = control, ...)
+    ##class(res) <- c("transport", class(res))
+    ##res
+
+    res <- transport::transport(start, end, costm = cost, method = method,
+                                control = control, ...)
+    res <- res[res$from != res$to, ] # We do not take into account what happens on the diagonal
+    class(res) <- c("transport", class(res))
+    res
 }
 
 #------------------------------------------------------------------------------#
+#' @method as.matrix transport
 #' @export
 #------------------------------------------------------------------------------#
-wrapTransportEMD <- function(dataBeg, dataEnd) {
-    emdist::emd2d(dataBeg, dataEnd) # remplacer par la version C de vecteurs (et non de matrices)... d'aillerus meme chose pour transport (eviter ggrid)
-}
-
-#------------------------------------------------------------------------------#
-#' @export
-#------------------------------------------------------------------------------#
-optTransDT2Mat <- function(x, suLen) {
-    res <- matrix(rep(0, suLen^2), nrow = suLen, ncol = suLen)
-    lapply(1:nrow(x), function(j) {
-        res[x[j, 1], x[j, 2]] <<- x[j, 3]
+as.matrix.transport <- function(x, dim_mat, dimnames = NULL, ...) { # N: Number of sampling units
+    res <- matrix(rep(0, dim_mat^2), nrow = dim_mat, ncol = dim_mat,
+                  dimnames = dimnames, ...)
+    lapply(1:nrow(x), function(i1) {
+        res[x[i1, 1], x[i1, 2]] <<- x[i1, 3]
     })
-    return(res)
+    res
 }
-
 
 #------------------------------------------------------------------------------#
 #' @export
@@ -272,134 +315,142 @@ costTot <- function(flow, cost) {
 # Perry
 #' @export
 #------------------------------------------------------------------------------#
-clusteringIdx <- function(flow, cost, n, nperm, dataBeg, dataEnd,
-                          method = "shortsimplex", cost_of_flow, threads) {
-    seqNrowFlow <- seq_len(nrow(flow))
-    progress       <- txtProgressBar(min = 0, max = nperm, style = 3)
-    #randomisations <- parallel::mclapply(seq_len(nperm), function(i) {
-    randomisations <- pbapply::pblapply(seq_len(nperm), function(i) {
+clust_P <- function(flow, cost, dim_mat, nperm, start, end,
+                    method = "shortsimplex", cost_flows, threads) {
+    idx <- seq_len(nrow(flow)) # or: seq_len(length(start))
+    randomisations <- pbapply::pblapply(seq_len(nperm), function(i1) {
         # Yi & Yc
-        idx       <- seqNrowFlow
-        randIdx   <- sample(idx)
-        dataBegbis <- matrix(dataBeg[randIdx], nrow = nrow(dataBeg))
-        #dimnames(dataBegbis) <- list(rownames(dataBeg), colnames(dataBeg))
-        optTransDT <- wrapTransport(dataBegbis, dataEnd, method)
-        ##optTransDT <- wrapTransportEMD(dataBegbis, dataEnd)
+        rand_idx      <- sample(idx)
+        new_start     <- start[rand_idx] # new_start n'a pas de nom de col et row contrairement à start (????)
+        opt_transport <- wrap_transport(new_start, end, cost, method)
+        opt_transport <- as.matrix(opt_transport, dim_mat) # Replace n with N
 
         # ~ Assez long ci-dessous
-        optTransMat <- optTransDT2Mat(optTransDT, n)
-        idxSameCounts <- lapply(idx, function(j) which(dataBegbis == dataBeg[j]))
-        tmp <- vector("list", length(idxSameCounts))
-        lapply(seq_len(length(tmp)), function(j) {
-            tmp[[j]] <<- mean(vapply(seq_len(length(idxSameCounts[[j]])),
-                                     function(x) {
-                                         if (cost_of_flow[[j]] < 0) type <- "in"
-                                         else                       type <- "out"
-                                         costToti(idxSameCounts[[j]][x], optTransMat, cost, type = type)
-                                     },
-                                     numeric(1)))
-        })
-        resYci <- unlist(tmp) ## Vraiment pertinent que tmp soit liste ???
-        resYii <- vapply(idx,
-                         function(x) {
-                             if (cost_of_flow[[x]] < 0) type <- "in"
-                             else                       type <- "out"
-                             costToti(x, optTransMat, cost, type = type)
-                         },
-                         numeric(1))
-        setTxtProgressBar(progress, value = i)
+        idx_same_count <- lapply(idx, function(i2) which(new_start == start[i2]))
+        # res_Yci <- rep(NA, times = length(idx_same_count))
+        # lapply(seq_len(length(res_Yci)), function(j) {
+        #     res_Yci[j] <<- mean(vapply(seq_len(length(idx_same_count[[j]])),
+        #                                function(x) {
+        #                                    if (cost_flows[[j]] < 0) type <- "in"
+        #                                    else                     type <- "out"
+        #                                    #costToti(idx_same_count[[j]][x], opt_transport, cost, type = type)
+        #                                    costTotiCPP(idx_same_count[[j]][x], opt_transport, cost, type)
+        #                                },
+        #                                numeric(1L)))
+        # })
+        res_Yci <- vapply(seq_len(length(idx_same_count)), function(i2) {
+            mean(vapply(seq_len(length(idx_same_count[[i2]])),
+                        function(x) {
+                            if (cost_flows[[i2]] < 0) type <- "in"
+                            else                      type <- "out"
+                            #costToti(idx_same_count[[i2]][x], opt_transport, cost, type = type)
+                            costTotiCPP(idx_same_count[[i2]][x], opt_transport, cost, type)
+                        },
+                        numeric(1L)))
+        }, numeric(1L))
+        res_Yii <- vapply(idx,
+                          function(x) {
+                              if (cost_flows[[x]] < 0) type <- "in"
+                              else                     type <- "out"
+                              #costToti(x, opt_transport, cost, type = type)
+                              costTotiCPP(x, opt_transport, cost, type)
+                          },
+                          numeric(1L))
 
-        return(list(flow = optTransMat,
-                    idx  = randIdx,
-                    Yci = resYci,
-                    Yii = resYii,
-                    costTot = costTot(optTransMat, cost))) # Pour calculer Ia
+        list(flow = opt_transport,
+             idx  = rand_idx,
+             Yci = res_Yci,
+             Yii = res_Yii,
+             #costTot = costTot(opt_transport, cost))) # Pour calculer Ia
+             costTot = costTotCPP(opt_transport, cost)) # To compute Ia
     }, cl = threads)
-    #}, mc.cores = 8)
 
-    Ycs <- rowMeans(simplify2array(lapply(randomisations, function(x) x[["Yci"]])))
-    Ycs <- abs(Ycs)
-    Yis <- rowMeans(simplify2array(lapply(randomisations, function(x) x[["Yii"]])))
-    Yis <- abs(Yis)
-    # Pas sûr du tout que les Yii soient bien calculés
-
-
+    Ycs <- simplify2array(lapply(randomisations, function(x) x[["Yci"]]))
+    Ycs <- abs(rowMeans(Ycs))
+    Yis <- simplify2array(lapply(randomisations, function(x) x[["Yii"]]))
+    Yis <- abs(rowMeans(Yis))
     Y0  <- mean(Ycs) / 2
-    #Y0  <- mean(Ycs)
-    Yi  <- vapply(seqNrowFlow,
+    Yi  <- vapply(idx,
                   function(x) {
-                      if (cost_of_flow[[x]] < 0) type <- "in"
-                      else                       type <- "out"
-                      #type <- "in"
-                      costToti(x, flow, cost, type = type)
+                      if (cost_flows[[x]] < 0) type <- "in"
+                      else                     type <- "out"
+                      costTotiCPP(x, flow, cost, type)
                   },
-                  numeric(1))
+                  numeric(1L))
 
-    return(list(clustering = ((Yi * Y0) / (Yis * Ycs)),
-                Ea = unlist(lapply(randomisations, function(x) x[["costTot"]]))))
+    list(clust = ((Yi * Y0) / (Yis * Ycs)),
+         Ea = unlist(lapply(randomisations, function(x) x[["costTot"]])))
 }
 
 #------------------------------------------------------------------------------#
 # standardised and dimensionless clustering index (nui) for a donor
 #' @export
 #------------------------------------------------------------------------------#
-clusteringIdxNew <- function(flow, cost, n, nperm, dataBeg, dataEnd,
-                             method = "shortsimplex", cost_of_flow,
+clust_LMX <- function(flow, cost, dim_mat, nperm, start, end,
+                             method = "shortsimplex", cost_flows,
                              threads) {
-    seqNrowFlow <- seq_len(nrow(flow))
-    base           <- list(rep(NA, nrow(flow)))
-    randomisations <- rep(base, (nperm + 1)) # + 1 pour ajout du "Di" (le vrai !) à la fin
-    progress       <- txtProgressBar(min = 0, max = nperm, style = 3)
+    idx            <- seq_len(nrow(flow)) # or: seq_len(length(start))
+    #base           <- list(rep(NA, nrow(flow)))
+    #randomisations <- rep(base, nperm) # NON : + 1 pour ajout du "Di" (le vrai !) à la fin
 
-    # New idx : LMX
+    # New idx : Li-Madden-Xu
     #for (i in seq_len(nperm)) { ## NEW
-    pbapply::pblapply(seq_len(nperm), function(i) {
-        #for (j in seqNrowFlow) { ## NEW
-        lapply(seqNrowFlow, function(j) {
-            idx     <- seqNrowFlow
-            idx     <- idx[idx != j] ## NEW
-            randIdx <- sample(idx)
-            ##TO DOUBLE CHECK## randIdx <- insert(randIdx, j, j) ##NEW : insert is in pkgg R.utils à récupérer uniquement fn intéressante en cpp après
-            randIdx <- append(randIdx, j, j)
-            dataBegbis <- matrix(dataBeg[randIdx], nrow = nrow(dataBeg))
-            #dimnames(dataBegbis) <- list(rownames(dataBeg), colnames(dataBeg))
-            optTransDT <- wrapTransport(dataBegbis, dataEnd, method)
-
-            # ~ Assez long ci-dessous
-            optTransMat <- optTransDT2Mat(optTransDT, n)
+    #lapply(seq_len(nperm), function(i1) {
+    randomisations <- pbapply::pblapply(seq_len(nperm), function(i1) {
+        #for (j in idx) { ## NEW
+        vapply(idx, function(i2) {
+            sub_idx   <- idx[idx != i2] ## NEW
+            rand_idx  <- sample(sub_idx)
+            ##TO DOUBLE CHECK## rand_idx <- insert(rand_idx, i2, i2) ##NEW : insert is in pkgg R.utils à récupérer uniquement fn intéressante en cpp après
+            rand_idx  <- append(rand_idx, i2, i2)
+            new_start <- start[rand_idx]
+            #dimnames(new_start) <- list(rownames(start), colnames(start))
+            opt_transport <- wrap_transport(new_start, end, cost, method)
+            opt_transport <- as.matrix(opt_transport, dim_mat)
 
             # imp!
-            if (cost_of_flow[[j]] < 0) type <- "in"  # NEW NEW
-            else                       type <- "out" # NEW NEW
-            #type <- "in"
-            randomisations[[i]][[j]] <<- costToti(j, optTransMat, cost, type = type)
-        })
-        setTxtProgressBar(progress, value = i) ## Ajout du +1 après si integration de la boucle ci dessous
+            if (cost_flows[[i2]] < 0) type <- "in"  # NEW NEW
+            else                      type <- "out" # NEW NEW
+            costTotiCPP(i2, opt_transport, cost, type)
+        }, numeric(1L))
+
+        # lapply(idx, function(j) {
+        #     sub_idx   <- idx[idx != j] ## NEW
+        #     rand_idx  <- sample(sub_idx)
+        #     ##TO DOUBLE CHECK## rand_idx <- insert(rand_idx, j, j) ##NEW : insert is in pkgg R.utils à récupérer uniquement fn intéressante en cpp après
+        #     rand_idx  <- append(rand_idx, j, j)
+        #     new_start <- start[rand_idx]
+        #     #dimnames(new_start) <- list(rownames(start), colnames(start))
+        #     opt_transport <- wrap_transport(new_start, end, cost, method)
+        #     opt_transport <- as.matrix(opt_transport, dim_mat)
+        #
+        #     # imp!
+        #     if (cost_flows[[j]] < 0) type <- "in"  # NEW NEW
+        #     else                     type <- "out" # NEW NEW
+        #     randomisations[[i]][[j]] <<- costTotiCPP(j, opt_transport, cost, type = type)
+        # })
     }, cl = threads)
 
-    # Di, le vrai!
-    #for (j in seqNrowFlow) {
-    pbapply::pblapply(seqNrowFlow, function(j) { ### Déjà présent dans le "main.R" // redondant
-        idx        <- seqNrowFlow
-        #dataBegbis <- matrix(dataBeg[idx], nrow = nrow(dataBeg))
-        dataBegbis <- dataBeg ### A simplifier
-        optTransDT <- wrapTransport(dataBegbis, dataEnd, method)
-
-        # ~ Assez long ci-dessous
-        optTransMat <- optTransDT2Mat(optTransDT, n)
-
-        # imp!
-        if (cost_of_flow[[j]] < 0) type <- "in"  # NEW NEW
-        else                       type <- "out" # NEW NEW
-        #type <- "in"
-        randomisations[[length(randomisations)]][[j]] <<- costToti(j, optTransMat, cost, type = type)
-    }, cl = threads)
+    # Di, le vrai! ... NOT NEED EN THEORIE CAR DEJA CALCULER avec la var cost_flows
+    #for (j in idx) {
+    #lapply(idx, function(j) { ### Déjà présent dans le "main.R" // redondant
+    # pbapply::pblapply(idx, function(j) { ### Déjà présent dans le "main.R" // redondant
+    #     #idx        <- idx
+    #     #new_start <- matrix(start[idx], nrow = nrow(start))
+    #     new_start <- start ### A simplifier
+    #     opt_transport <- wrap_transport(new_start, end, cost, method)
+    #     opt_transport <- as.matrix(opt_transport, dim_mat)
+    #
+    #     # imp!
+    #     if (cost_flows[[j]] < 0) type <- "in"  # NEW NEW
+    #     else                     type <- "out" # NEW NEW
+    #     randomisations[[length(randomisations)]][[j]] <<- costTotiCPP(j, opt_transport, cost, type = type)
+    # }, cl = threads)
 
     randomisations <- simplify2array(randomisations)
-    Dis_bar        <- rowMeans(randomisations) # Négatif tous pour l'instant
+    Dis_bar        <- rowMeans(cbind(randomisations, cost_flows)) # Négatif tous pour l'instant. cost_flows = Dis
     Dis_bar        <- abs(Dis_bar)
-    Dis            <- randomisations[, (nperm + 1)] # Négatif tous pour l'instant
-    return(list(clustering = (Dis / Dis_bar), # positif pour l'instant par construction
+    return(list(clust = (cost_flows / Dis_bar), # positif pour l'instant par construction
                 Dis_all = randomisations))
 }
 
@@ -422,9 +473,9 @@ Ia <- function(Da, Ea) {return(Da/Ea)} # Da = observed, Ea = mean of randomized 
 plot.sadie <- function(x, y, ..., isoclines = FALSE, onlySignificant = FALSE,
                        resolution = rep(100, 2)) { # + specify significancy we want (0.95,...)
 
-    data1 <- x$clusteringIndices
+    data1 <- x$info_clust
 
-    dataLoess <- stats::loess(original.index ~ x * y, data = data1,
+    dataLoess <- stats::loess(idx_P ~ x * y, data = data1,
                               degree = 2, span = 0.2)
     x <- seq(min(data1$x), max(data1$x), length = resolution[1]) # xResolution
     y <- seq(min(data1$y), max(data1$y), length = resolution[2]) # yResolution
@@ -444,7 +495,7 @@ plot.sadie <- function(x, y, ..., isoclines = FALSE, onlySignificant = FALSE,
             else              return("white")   # no
         }
     }
-    data1$col <- vapply(data1$original.index, cpt, character(1))
+    data1$col <- vapply(data1$idx_P, cpt, character(1))
     #data1$col <- "no-se"
 
     #g <- ggplot(data2, aes(x = x, y = y, z = z)) +
@@ -452,7 +503,7 @@ plot.sadie <- function(x, y, ..., isoclines = FALSE, onlySignificant = FALSE,
     #    geom_contour(color = "white", size = 0.25) +
     #    geom_point(data = data1, inherit.aes = FALSE,
     #               aes(x = x, y = y,
-    #                   size = abs(original.index)),
+    #                   size = abs(idx_P)),
     #               #                                 fill = as.factor(col)),
     #               colour = "black", pch = 21) +
     #    scale_fill_gradient(low = "white", high = "black")
@@ -471,7 +522,7 @@ plot.sadie <- function(x, y, ..., isoclines = FALSE, onlySignificant = FALSE,
                        color.palette = terrain.colors,
                        plot.axes = {
                            with(data1, points(x, y, pch = 21,
-                                              cex = abs(original.index),
+                                              cex = abs(idx_P),
                                               col = "black", bg = col));
                            contour(x = unique(data2$x), y = unique(data2$y),
                                    z = as.matrix(data3),
@@ -479,7 +530,7 @@ plot.sadie <- function(x, y, ..., isoclines = FALSE, onlySignificant = FALSE,
                                    vfont = c("sans serif", "plain"))
                        })
     } else {
-        with(data1, plot(x, y, pch = 21, cex = abs(original.index),
+        with(data1, plot(x, y, pch = 21, cex = abs(idx_P),
                          col = "black", bg = col))
     }
 }

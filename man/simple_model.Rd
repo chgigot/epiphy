@@ -33,7 +33,7 @@ utilities related to this simple dispersal model using:
 invisible(list2env(epiphy:::simple_model, environment()))
 
 set.seed(12345)
-foci <- disperse(nfoci = 10, xrate = 20, ngen = 3, lambda = 50, ngen_active = 1)
+foci <- disperse(nfoci = 1, xrate = 3, ngen = 10, lambda = 20, ngen_active = 1)
 plot(foci, cex = 0.1)
 quad <- quadrat(surf_dim = c(x = 1, y = 1), nint = c(x = 90, y = 90))
 collection <- collect(foci, quad)

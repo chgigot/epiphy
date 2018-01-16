@@ -3,21 +3,29 @@
 \name{sadie}
 \alias{sadie}
 \alias{sadie.data.frame}
+\alias{sadie.matrix}
+\alias{sadie.count}
 \title{Spatial Analysis by Distance IndicEs (SADIE)}
 \usage{
 sadie(data, ...)
 
-\method{sadie}{data.frame}(data, index = c("Perry", "LMX", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, cost,
-  threads = parallel::detectCores())
+\method{sadie}{data.frame}(data, index = c("Perry", "Li-Madden-Xu", "all"),
+  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1, ...,
+  method = "shortsimplex")
+
+\method{sadie}{matrix}(data, index = c("Perry", "Li-Madden-Xu", "all"),
+  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1)
+
+\method{sadie}{count}(data, index = c("Perry", "Li-Madden-Xu", "all"),
+  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1)
 }
 \arguments{
 \item{data}{A data frame or a matrix with the counts for the different sampling units. The data
 set must decribe a complete (no missing data) squared or rectangular
 data set.
-or a matrix (x-y)}
+or a matrix (x-y).}
 
-\item{index}{The name of the index to use: "Perry", "LMX" (Li-Madden-Xu) or "all".
+\item{index}{The name of the index to use: "Perry", "Li-Madden-Xu" or "all".
 By default, only Perry's index is computed.}
 
 \item{nperm}{Number of permutations for each sampling unit.}
@@ -34,7 +42,9 @@ fully C++-coded in this package in order to minimize R-code for fast reasons.}
 the cost of transporting single unit between the corresponding source and
 destination sampling unit. If not specified, the distance between each
 couple of adjacent sampling units (rook's sense) is assumed to be equal
-to 1.}
+to 1. If the cost matrix is not given, the two first columns of data must
+correspond to "x" and "y" coordinates, and an euclidean distance between
+all the recorded points will be computed.}
 }
 \description{
 The SADIE approach is implemented in this package. Refer to the documentation
@@ -46,10 +56,10 @@ Ia indice and Pa probability.
 }
 \examples{
 # Possible datasets:
-#aphid_counts
-#arthropods_counts
-#codling_moth_counts
-res <- sadie(aphid_counts)
+#aphids
+#arthropods
+#codling_moths
+res <- sadie(aphids)
 summary(res)
 plot(res)
 
