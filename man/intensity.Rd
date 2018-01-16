@@ -121,18 +121,18 @@ this point.
 \examples{
 # Implicite call: The parameter struct does not need to be specified if
 # the column names of the input data frame respect the convention.
-colnames(Cochran1936) # Returns c("x", "y", "t", "r", "n")
+colnames(Cochran1936) # Returns c("x", "y", "t", "i", "n")
 incidence(Cochran1936)
 
 # Explicit call: Otherwise, struct must be present:
-incidence(Cochran1936, c(r = "r", n = "n", t = "t", x = "x", y = "y"))
+incidence(Cochran1936, c(r = "i", n = "n", t = "t", x = "x", y = "y"))
 incidence(Cochran1936, c(r = 4, n = 5, t = 3, x = 1, y = 2))
 incidence(Cochran1936, list(space = 1:2, time = 3, obs = 4:5))
 
 ## If a variable is not specified, this means it does not exist in the
 ## input data frame.
 subData <- subset(Cochran1936, t == 1,
-                  select = c("x", "y", "r", "n"))
+                  select = c("x", "y", "i", "n"))
 # The two following instructions work:
 incidence(subData)
 incidence(subData, c(x = 1, y = 2, r = 4, n = 5))

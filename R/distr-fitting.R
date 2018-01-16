@@ -111,7 +111,7 @@ fit_distr.count <- function(data, ..., random = smle_pois,
                             freq_model) { # functions TOD0
     call <- match.call()
     mapped_data <- map_data(data)
-    r <- mapped_data[["r"]]
+    r <- mapped_data[["i"]]
     N <- nrow(mapped_data)
 
     # Try to fit two distributions:
@@ -156,7 +156,7 @@ fit_distr.incidence <- function(data, ..., random = smle_binom,
                                 freq_model) { # functions TOD0
     call <- match.call()
     mapped_data <- map_data(data)
-    r <- mapped_data[["r"]]
+    r <- mapped_data[["i"]]
     N <- nrow(mapped_data)
     n <- unique(mapped_data[["n"]])
     if (length(n) != 1) stop(paste0("Current implementation only deals ",

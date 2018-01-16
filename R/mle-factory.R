@@ -66,7 +66,7 @@ NULL
 #'     incidence() %>%
 #'     clump(unit_size = c(x = 3, y = 3))
 #' ll_betabinom <- function(data, param) {
-#'     sum(dbetabinom(x = data[["r"]], size = data[["n"]],
+#'     sum(dbetabinom(x = data[["i"]], size = data[["n"]],
 #'                    prob = param[["prob"]], theta = param[["theta"]],
 #'                    log = TRUE))
 #' }
@@ -250,9 +250,9 @@ logLik.smle <- function(object, ...) {
 #' @export
 #------------------------------------------------------------------------------#
 print.smle <- function(x, ...) {
-    invisible(lapply(seq_len(length(x$coef)), function(i) {
-        cat(names(coef(x))[i], ": ", formatC(coef(x)[i]),
-            " (\u00b1 ", formatC(x$coef_se[i]), ")\n", sep = "")
+    invisible(lapply(seq_len(length(x$coef)), function(i1) {
+        cat(names(coef(x))[i1], ": ", formatC(coef(x)[i1]),
+            " (\u00b1 ", formatC(x$coef_se[i1]), ")\n", sep = "")
     }))
 }
 
@@ -294,7 +294,7 @@ coef.summary.smle <- function(object, ...) object$cmat
 # Used to find initial estimates of the parameters.
 #==============================================================================#
 mme_pois <- function(data, name, bounds = TRUE) {
-    x <- data$r
+    x <- data[["i"]]
     m1 <- mean(x) # na.rm = TRUE?
     fmt_init(data, name, bounds = bounds,
              lambda = quote(c(0 + epiphy_env$epsilon,
@@ -303,7 +303,7 @@ mme_pois <- function(data, name, bounds = TRUE) {
 }
 
 mme_nbinom <- function(data, name, bounds = TRUE) {
-    x <- data$r
+    x <- data[["i"]]
     m1 <- mean(x)   # na.rm = TRUE?
     m2 <- mean(x^2) # na.rm = TRUE?
     s2 <- var(x)    # na.rm = TRUE?
@@ -317,7 +317,7 @@ mme_nbinom <- function(data, name, bounds = TRUE) {
 }
 
 mme_binom <- function(data, name, bounds = TRUE) {
-    x <- data$r
+    x <- data[["i"]]
     n <- data$n[[1]] # if pas de n, alors n = max(x) /// et c'est pas tres propre
     m1 <- mean(x) # na.rm = TRUE?
     fmt_init(data, name, bounds = bounds,
@@ -327,7 +327,7 @@ mme_binom <- function(data, name, bounds = TRUE) {
 }
 
 mme_betabinom <- function(data, name, bounds = TRUE) { # TODO: To double-check
-    x <- data$r
+    x <- data[["i"]]
     n <- data$n[[1]] # if pas de n, alors n = max(x) /// et c'est pas tres propre
     m1 <- mean(x) # na.rm = TRUE?
     m2 <- mean(x^2) # na.rm = TRUE?
@@ -353,21 +353,21 @@ mme_betabinom <- function(data, name, bounds = TRUE) { # TODO: To double-check
 # Log-Likelihood functions
 #==============================================================================#
 ll_pois <- function(data, param) {
-    sum(dpois(x = data[["r"]], lambda = param["lambda"], log = TRUE))
+    sum(dpois(x = data[["i"]], lambda = param["lambda"], log = TRUE))
 }
 
 ll_nbinom <- function(data, param) {
-    sum(dnbinom(x = data[["r"]], mu = param["mu"], size = param["k"],
+    sum(dnbinom(x = data[["i"]], mu = param["mu"], size = param["k"],
                 log = TRUE))
 }
 
 ll_binom <- function(data, param) {
-    sum(dbinom(x = data[["r"]], size = data[["n"]], prob = param[["prob"]],
+    sum(dbinom(x = data[["i"]], size = data[["n"]], prob = param[["prob"]],
                log = TRUE))
 }
 
 ll_betabinom <- function(data, param) {
-    sum(dbetabinom(x = data[["r"]], size = data[["n"]],
+    sum(dbetabinom(x = data[["i"]], size = data[["n"]],
                    prob = param[["prob"]], theta = param[["theta"]],
                    #shape1 = param[["alpha"]], shape2 = param[["beta"]],
                    log = TRUE))

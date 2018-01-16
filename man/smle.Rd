@@ -74,7 +74,7 @@ data <- tomato_tswv$field_1929 \%>\%
     incidence() \%>\%
     clump(unit_size = c(x = 3, y = 3))
 ll_betabinom <- function(data, param) {
-    sum(dbetabinom(x = data[["r"]], size = data[["n"]],
+    sum(dbetabinom(x = data[["i"]], size = data[["n"]],
                    prob = param[["prob"]], theta = param[["theta"]],
                    log = TRUE))
 }

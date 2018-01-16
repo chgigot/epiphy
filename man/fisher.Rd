@@ -40,8 +40,8 @@ my_data <- filter(tomato_tswv$field_1929) \%>\%
     filter(t == 1) \%>\%
     incidence() \%>\%
     clump(unit_dim = c(x = 3, y = 3))
-r <- as.data.frame(my_data)$r
-n <- as.data.frame(my_data)$n[[1]]
+r <- as.data.frame(my_data)[["i"]]
+n <- as.data.frame(my_data)[["n"]][[1]]
 fisher(r, n = n, flavor = "incidence")
 
 # More elegant approach

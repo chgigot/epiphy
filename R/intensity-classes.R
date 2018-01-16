@@ -131,21 +131,21 @@ valid_intensity <- function(object) {
     ## count
     if (any(class(object) == "count")) {
         if (ncol(object$obs) != 1)
-            stop("Each record must have only one observation ('r').")
-        if (!all(names(object$obs) %in% "r"))
-            stop("Name of observation column must be 'r'.")
+            stop("Each record must have only one observation ('i').")
+        if (!all(names(object$obs) %in% "i"))
+            stop("Name of observation column must be 'i'.")
         if (!all(is.wholenumber(object$obs)))
             stop("Observation values must be integers.")
-        if (!all(object$obs$r >= 0))
+        if (!all(object$obs[["i"]] >= 0))
             stop("Observation values must be >= 0")
     }
 
     ## incidence
     if (any(class(object) == "incidence")) {
         if (ncol(object$obs) != 2)
-            stop("Each record must have two observations ('r' and 'n').")
-        if (!all(names(object$obs) %in% c("r", "n")))
-            stop("Names of observation columns must be 'r' and 'n'.")
+            stop("Each record must have two observations ('i' and 'n').")
+        if (!all(names(object$obs) %in% c("i", "n")))
+            stop("Names of observation columns must be 'i' and 'n'.")
         if (!all(is.wholenumber(object$obs)))
             stop("Observation values must be integers.")
     }
@@ -153,9 +153,9 @@ valid_intensity <- function(object) {
     ## severity
     if (any(class(object) == "severity")) {
         if (ncol(object$obs) != 1)
-            stop("Each record must have only one observation ('r').")
-        if (!all(names(object$obs) %in% "r"))
-            stop("Name of observation column must be 'r'.")
+            stop("Each record must have only one observation ('i').")
+        if (!all(names(object$obs) %in% "i"))
+            stop("Name of observation column must be 'i'.")
         if (!all((object$obs >= 0) & (object$obs <= 1)))
             stop("Observation values must between 0 and 1.")
     }
@@ -170,7 +170,7 @@ init_intensity <- function(data, mapping, keep_std, type) {
 
     std_names <- list(space = c("x", "y", "z"), # up to 3 dim for space
                       time = "t",               # up to 1 dim for time
-                      obs = c("r", "n"))        # up to 2 "dim" for observations:
+                      obs = c("i", "n"))        # up to 2 "dim" for observations:
                                                 # - r = records
                                                 # - n = number of individuals
 
@@ -330,18 +330,18 @@ init_intensity <- function(data, mapping, keep_std, type) {
 #' @examples
 #' # Implicite call: The parameter struct does not need to be specified if
 #' # the column names of the input data frame respect the convention.
-#' colnames(Cochran1936) # Returns c("x", "y", "t", "r", "n")
+#' colnames(Cochran1936) # Returns c("x", "y", "t", "i", "n")
 #' incidence(Cochran1936)
 #'
 #' # Explicit call: Otherwise, struct must be present:
-#' incidence(Cochran1936, c(r = "r", n = "n", t = "t", x = "x", y = "y"))
+#' incidence(Cochran1936, c(r = "i", n = "n", t = "t", x = "x", y = "y"))
 #' incidence(Cochran1936, c(r = 4, n = 5, t = 3, x = 1, y = 2))
 #' incidence(Cochran1936, list(space = 1:2, time = 3, obs = 4:5))
 #'
 #' ## If a variable is not specified, this means it does not exist in the
 #' ## input data frame.
 #' subData <- subset(Cochran1936, t == 1,
-#'                   select = c("x", "y", "r", "n"))
+#'                   select = c("x", "y", "i", "n"))
 #' # The two following instructions work:
 #' incidence(subData)
 #' incidence(subData, c(x = 1, y = 2, r = 4, n = 5))
@@ -638,8 +638,8 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
 
     # TODO : Gérer aussi le cas du zér0 !!!
     # exemple avec incidence(hop_viruses$HpLV, mapping(x=xm,y=ym))
-    invisible(lapply(seq_len(length(unit_size)), function(i) {
-        id  <- names(unit_size)[i]
+    invisible(lapply(seq_len(length(unit_size)), function(i1) {
+        id  <- names(unit_size)[i1]
         tmp <- ceiling(mapped_data[[id]] / unit_size[[id]])
         if (length(unique(table(tmp))) > 1) {
             tmp[tmp == max(tmp)] <- NA
@@ -662,7 +662,7 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
     f <- mapped_data[, non_obs_names]
     # There is no more NA in f, but they may still remain some NA in
     # observational data (i.e. in r and n? columns)
-    split_data <- base::split(mapped_data, f = f, lex.order = TRUE)
+    split_data <- base::split(mapped_data, f = f) #, lex.order = TRUE)... only in most recent R version # Only cosmetic (to get a nice order)
 
     # Make the real calculation
     clumped_data <- do.call(rbind, lapply(split_data, function(sub_data) {
@@ -679,7 +679,7 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
     # Note: We need to do all of that to avoid any conversion to a matrix
     # just in case we have different types of data (e.g. numeric and character).
     clumped_data <- setNames(lapply(seq_len(ncol(clumped_data)),
-                                 function(i) unname(unlist(clumped_data[, i]))),
+                                 function(i1) unname(unlist(clumped_data[, i1]))),
                              colnames_mapped_data)
     #--------------------------------------------------------------------------#
     # Return an "intensity" object
@@ -722,7 +722,7 @@ split.intensity <- function(x, f, drop = FALSE, ..., by) {
 #------------------------------------------------------------------------------#
 level_up <- function(data) {
     mapped_data <- map_data(data)
-    mapped_data[["r"]] <- ifelse(mapped_data[["r"]] > 0, 1, 0)
+    mapped_data[["i"]] <- ifelse(mapped_data[["i"]] > 0, 1, 0)
     if ("n" %in% colnames(mapped_data)) {
         mapped_data[["n"]] <- 1
     }
@@ -791,8 +791,8 @@ plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "both"),
     label       <- lapply(x$mapping, deparse) # useful?
 
     max_fill_scale <- ifelse(class(x)[1] == "incidence",
-                             max(mapped_data$n),
-                             max(mapped_data$r))
+                             max(mapped_data[["n"]]),
+                             max(mapped_data[["i"]]))
 
     gg <- list()
 
@@ -808,13 +808,13 @@ plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "both"),
         # List of layers
         gg_sub <- list(
             geom_raster(data = mapped_data,
-                        mapping = aes(x, y, fill = r), ...),
+                        mapping = aes(x, y, fill = i), ...),
             geom_point(data = mapped_data,
-                       mapping = aes(x, y, fill = r), pch = pch, ...),
-            #scale_fill_manual(name = paste0(class(x)[[1]], " (r)"),
+                       mapping = aes(x, y, fill = i), pch = pch, ...),
+            #scale_fill_manual(name = paste0(class(x)[[1]], " (i)"),
             #                  values = seq_gdt,
             #                  guide = guide_legend(reverse = TRUE)),
-            scale_fill_gradient(name = paste0(class(x)[1], " (r)"),
+            scale_fill_gradient(name = paste0(class(x)[1], " (i)"),
                                 low = "white", high = "red",
                                 guide = guide_legend(reverse = TRUE),
                                 #breaks = seq(0, max_fill_scale), # To improve later
@@ -869,23 +869,23 @@ plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "both"),
         # List of layers
         gg_sub <- list(
             geom_jitter(data = mapped_data,
-                        mapping = aes(t, r), alpha = 0.2,
+                        mapping = aes(t, i), alpha = 0.2,
                         width = 0.2, height = 0),
             stat_summary(data = mapped_data,
-                         mapping = aes(t, r),
+                         mapping = aes(t, i),
                          fun.y = "mean", geom = "line", color = "red",
                          linetype = "dashed"),
             stat_summary(data = mapped_data,
-                         mapping = aes(t, r, group = t),
+                         mapping = aes(t, i, group = t),
                          fun.data = "mean_sdl", fun.args = list(mult = 1),
                          geom = "pointrange", # default
                          color = "red"),
             scale_x_continuous(breaks = seq(0: max(mapped_data$t))),
-            scale_y_continuous(breaks = seq(0, max(mapped_data$r))),
+            scale_y_continuous(breaks = seq(0, max(mapped_data[["i"]]))),
             # scale_y_continuous("score (1-9 scale)", breaks=0:9), #### à Généralsier !!!!7        ######### De plus attention, warning quand on combine les graphs
             #### Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
             #g <- g + scale_x_continuous("date", breaks=seq(1,i))
-            expand_limits(y = range(mapped_data$r)),
+            expand_limits(y = range(mapped_data[["i"]])),
             theme_bw()
         )
 
@@ -893,7 +893,7 @@ plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "both"),
         ######### De plus attention, warning quand on combine les graphs
         #### Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
         #### g <- g + scale_x_continuous("date", breaks=seq(1,i))
-        #geom_point(data = data, aes(x = t, y = r),
+        #geom_point(data = data, aes(x = t, y = i),
         #           alpha = 0.2, size = 3, colour = col,
         #           position = position_jitter(w = 0.2, h = 0.2)),
         #geom_line(data = recap, aes(x = t, y = meanD),

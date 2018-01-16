@@ -38,8 +38,8 @@ print.agg_index <- function(x, ...) print(x$index)
 #'     filter(t == 1) %>%
 #'     incidence() %>%
 #'     clump(unit_dim = c(x = 3, y = 3))
-#' r <- as.data.frame(my_data)$r
-#' n <- as.data.frame(my_data)$n[[1]]
+#' r <- as.data.frame(my_data)[["i"]]
+#' n <- as.data.frame(my_data)[["n"]][[1]]
 #' fisher(r, n = n, flavor = "incidence")
 #'
 #' # More elegant approach
@@ -99,7 +99,7 @@ fisher.default <- function(x, flavor = c("count", "incidence"), n = NULL, ...) {
 #' @export
 #------------------------------------------------------------------------------#
 fisher.count <- function(x, ...) {
-    fisher.default(map_data(x)$r, flavor = "count")
+    fisher.default(map_data(x)[["i"]], flavor = "count")
 }
 
 #------------------------------------------------------------------------------#
@@ -108,9 +108,9 @@ fisher.count <- function(x, ...) {
 #------------------------------------------------------------------------------#
 fisher.incidence <- function(x, ...) {
     mapped_data <- map_data(x)
-    n <- unique(mapped_data$n)
+    n <- unique(mapped_data[["n"]])
     stopifnot(length(n) == 1)
-    fisher.default(mapped_data$r, flavor = "incidence", n = n)
+    fisher.default(mapped_data[["i"]], flavor = "incidence", n = n)
 }
 
 #------------------------------------------------------------------------------#
@@ -130,7 +130,7 @@ chisq.test.default <- function(x, ...) stats::chisq.test(x, ...)
 #------------------------------------------------------------------------------#
 chisq.test.fisher <- function(x, ...) {
     call   <- match.call()
-    N      <- x$N
+    N      <- x[["N"]]
     C      <- (N - 1) * x
     df     <- N - 1
     pvalue <- 1 - pchisq(C, df)
@@ -182,8 +182,8 @@ z.test.default <- function(x, ...) {
 z.test.fisher <- function(x, ...) {
     call   <- match.call()
     method <- "One-sample z-test (two-sided)" # Sure????
-    N      <- x$N
-    n      <- x$n # n => incidence... to double-check!!!
+    N      <- x[["N"]]
+    n      <- x[["n"]] # n => incidence... to double-check!!!
     m      <- 1
     v      <- 2 * (1 - 1/n) / (N - 1)
     se     <- sqrt(v / n)
@@ -216,8 +216,8 @@ calpha.test <- function(x, ...) UseMethod("calpha.test")
 calpha.test.fisher <- function(x, ...) {
     call   <- match.call()
     method <- "One-sample z-test (one-sided)" # Sure????
-    N      <- x$N
-    n      <- x$n # n => incidence... to double-check!!!
+    N      <- x[["N"]]
+    n      <- x[["n"]] # n => incidence... to double-check!!!
     D      <- x$index
     z      <- ((n * (N - 1) * D) - n * N) / sqrt(2 * N * (n^2 - n)) # a one-sided test
     pvalue <- pnorm(abs(z), lower.tail = FALSE) # to check
@@ -266,7 +266,7 @@ fisher1 <- function(data, confLevel = 0.95) { # confLevel non pris en compte pou
         D <- v / m
     }
     if (is.incidence(data)) {
-        n <- unique(data$obs$n)
+        n <- unique(data$obs[["n"]])
         if (length(n) != 1) stop(paste0("Current implementation only deals ",
                                         "with equal size sampling units."))
         m <- mean((d / n), na.rm = TRUE)
@@ -374,7 +374,7 @@ lloyd.default <- function(x, type = c("patchiness", "mean-crowding")) {
 #' @export
 #------------------------------------------------------------------------------#
 lloyd.count <- function(x, type = c("patchiness", "mean-crowding")) {
-    lloyd.default(map_data(x)$r, type)
+    lloyd.default(map_data(x)[["i"]], type)
 }
 
 
@@ -430,7 +430,7 @@ morisita.default <- function(x, flavor = c("count", "incidence"), n = NULL, ...)
 #' @export
 #------------------------------------------------------------------------------#
 morisita.count <- function(x, ...) {
-    morisita.default(map_data(x)$r, flavor = "count")
+    morisita.default(map_data(x)[["i"]], flavor = "count")
 }
 
 #------------------------------------------------------------------------------#
@@ -439,9 +439,9 @@ morisita.count <- function(x, ...) {
 #------------------------------------------------------------------------------#
 morisita.incidence <- function(x, ...) {
     mapped_data <- map_data(x)
-    n <- unique(mapped_data$n)
+    n <- unique(mapped_data[["n"]])
     stopifnot(length(n) == 1)
-    morisita.default(mapped_data$r, flavor = "incidence", n = n)
+    morisita.default(mapped_data[["i"]], flavor = "incidence", n = n)
 }
 
 ### OLD VERSION
@@ -457,7 +457,7 @@ morisita1 <- function(data) {
         return(structure(list(call = call, index = I_delta), class = "aggIndex"))
     }
     if (is.Incidence(data)) {# Modified Morisita's index (no more than n possible individuals in a quadrat)
-        n <- unique(data@obs$n)
+        n <- unique(data@obs[["n"]])
         if (length(n) != 1) stop(paste0("Current implementation only deals ",
                                         "with equal size sampling units."))
         I_B <- I_delta * (n - 1/N) / (n - 1) ### Selon Morisita 1962

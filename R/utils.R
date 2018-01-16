@@ -183,8 +183,8 @@ extraCoef <- function(model) { ## TODO: USEFUL ???
         rho   = quote(1  / (x1 + x2 + 1))
     )
 
-    newCoefs <- do.call(rbind, lapply(extraCoefs, function(i) {
-        unlist(estimate_param(model, i, type = "norm")) # faire plus intelligent ici avec le "norm"
+    newCoefs <- do.call(rbind, lapply(extraCoefs, function(i1) {
+        unlist(estimate_param(model, i1, type = "norm")) # faire plus intelligent ici avec le "norm"
     }))
     rbind(coefs, newCoefs)
 }
@@ -197,7 +197,7 @@ get_fmt_obs <- function(list, type = c("count", "incidence")) {
     switch (type,
         "count" = {
             lapply(list, function(obj) {
-                data_all  <- map_data(obj)$r
+                data_all  <- map_data(obj)[["i"]]
                 data_noNA <- data_all[complete.cases(data_all)]
                 if (length(data_noNA) < length(data_all)) {
                     warning("Missing cases were dropped.")
@@ -208,8 +208,8 @@ get_fmt_obs <- function(list, type = c("count", "incidence")) {
         "incidence" = {
             lapply(list, function(obj) {
                 mapped_data <- map_data(obj)
-                data_all    <- data.frame(p = mapped_data$r / mapped_data$n,
-                                          n = mapped_data$n)
+                data_all    <- data.frame(p = mapped_data[["i"]] / mapped_data[["n"]],
+                                          n = mapped_data[["n"]])
                 data_noNA   <- data_all[complete.cases(data_all), ]
                 if (nrow(data_noNA) < nrow(data_all)) {
                     warning("Missing cases were dropped.")
