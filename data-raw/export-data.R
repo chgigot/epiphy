@@ -26,7 +26,7 @@ generateGrid <- function(data, times) {
                        t = times,
                        KEEP.OUT.ATTRS = FALSE)
     res   <- res %>% arrange(x, y, t)
-    res$r <- 0
+    res$i <- 0
     res$n <- 0
     res
 }
@@ -39,7 +39,7 @@ fillDis <- function(data, listVals) {
                 apply(select(listVals[[id]], x, y), 1, paste0, collapse = "_"))
         # idb: row-ids in data where t >= id
         idb <- which(data$t >= id)
-        data[intersect(ida, idb), ]$r <<- 1 # Here, 1 means diseased (0: healthy)
+        data[intersect(ida, idb), ]$i <<- 1 # Here, 1 means diseased (0: healthy)
     })
     data
 }
@@ -133,9 +133,9 @@ use_data(dogwood_anthracnose)
 aphids <- read.csv("data-raw/aphids.csv", header = TRUE)
 
 with(aphids, plot(x, y, pch = NA))
-with(aphids, text(x, y, labels = r))
+with(aphids, text(x, y, labels = i))
 
-devtools::use_data(aphids)
+use_data(aphids)
 
 #------------------------------------------------------------------------------#
 # Export arthropods counts (Holland et al., 1999)
@@ -148,12 +148,12 @@ par(mar = c(2,2,2,2)) # We do not see x and y labels anymore.
 layout(matrix(1:6, nrow = 3, ncol = 2, byrow = TRUE))
 invisible(lapply(arthropods_splitted, function(set) {
     with(set, plot(x, y, pch = NA))
-    with(set, text(x, y, labels = r))
+    with(set, text(x, y, labels = i))
 }))
 par(opar)
 layout(1)
 
-devtools::use_data(arthropods)
+use_data(arthropods)
 
 #------------------------------------------------------------------------------#
 # Export codling moth counts (Lavigne et al., 2010)
@@ -164,9 +164,9 @@ coef <- 80 # Coef to convert arbitrary units into meters (m = coef * u.a.)
 codling_moths[, 1:2] %<>% multiply_by(coef)
 
 with(codling_moths, plot(x, y, pch = NA))
-with(codling_moths, text(x, y, labels = r))
+with(codling_moths, text(x, y, labels = i))
 
-devtools::use_data(codling_moths)
+use_data(codling_moths)
 
 
 #------------------------------------------------------------------------------#
@@ -175,13 +175,13 @@ devtools::use_data(codling_moths)
 #
 #     my_data$x  <- round((my_data$x * (50.4 / 50)) / 2.1) + 1
 #     my_data$y  <- round((my_data$y * (90   / 90)) / 1.8) + 1
-#     my_data$r  <- 1
+#     my_data$i  <- 1
 #
 #     tmp <- expand.grid(x = min(my_data$x):max(my_data$x),
 #                        y = min(my_data$y):max(my_data$y))
 #
 #     my_data <- left_join(tmp, my_data)
-#     my_data[is.na(my_data$r), ]$r <- 0
+#     my_data[is.na(my_data$i), ]$i <- 0
 #     my_data$n  <- 1
 #     my_data$xm <- (my_data$x - 1) * 2.1
 #     my_data$ym <- (my_data$y - 1) * 1.8
@@ -202,18 +202,18 @@ devtools::use_data(codling_moths)
 #                "data-raw/Pethybridge_apple_C_1997_subsequent.csv")
 # viruses   <- c("HpLV", "HpMV", "ApMV")
 #
-# for (i in 1:3) {
-#     my_data_1 <- read.csv2(year_1996[i], header = TRUE)
-#     my_data_2 <- read.csv2(year_1997[i], header = TRUE)
+# for (i1 in 1:3) {
+#     my_data_1 <- read.csv2(year_1996[i1], header = TRUE)
+#     my_data_2 <- read.csv2(year_1997[i1], header = TRUE)
 #     my_data_2 <- bind_rows(my_data_1, my_data_2)
 #     my_data_3 <- bind_rows(reorg(my_data_1, 1996),
 #                            reorg(my_data_2, 1997))
 #
-#     #with(my_data_3 %>% filter(r == 1, t == 1997),
+#     #with(my_data_3 %>% filter(i == 1, t == 1997),
 #     #     plot(xm, ym, pch = 19, col = rgb(0,0,0,1), yaxt = "n"))
 #     #axis(2, at = seq(0, 90, by = 10), las = 2)
 #
-#     write.csv(my_data_3, file = paste0("data-raw/hop_", i, "_", viruses[i], ".csv"),
+#     write.csv(my_data_3, file = paste0("data-raw/hop_", i1, "_", viruses[i1], ".csv"),
 #               quote = FALSE, row.names = FALSE)
 # }
 
