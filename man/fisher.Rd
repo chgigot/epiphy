@@ -5,7 +5,7 @@
 \alias{fisher.default}
 \alias{fisher.count}
 \alias{fisher.incidence}
-\title{indices Fisher's index of dispersion, D}
+\title{Fisher's index of dispersion, D}
 \usage{
 fisher(x, ...)
 
@@ -15,42 +15,53 @@ fisher(x, ...)
 
 \method{fisher}{incidence}(x, ...)
 }
+\arguments{
+\item{x}{A numeric vector.}
+
+\item{...}{Not yet implemented.}
+
+\item{flavor}{Which flavor of this index must be calculated ("count" or
+"incidence")?}
+
+\item{n}{Number of individuals per sampling unit. If \code{n} is provided,
+the "incidence" flavor is calculated whatever the value of \code{flavor}.
+Note that current implementation only deals with equal size sampling
+units.}
+}
 \description{
-In case of a binary variable, the index is a ratio of two variances: the
-observed variance and the theoretical variance if data follow a binomial law,
-i.e. a reference distribution for a random pattern of diseased individuals
-within sampling units.
-Under the null hypothesis (D = 1, random pattern), (N - 1)D follows a
-chi-squared distribution with N - 1 degrees of freedom. N is the number of
-quadrats.
+In case of a count, this index corresponds to the ratio of the observed
+variance to the observed mean. For a binary variable, a similar index can be
+calculated using instead the ratio of the observed variance to the
+theoretical variance if data follow a binomial law (i.e. a reference
+distribution for a random pattern of individuals within sampling units).
 }
 \details{
-Count (Moradi-Vajargah et al, 2011: CAPS)... cf Gosme for Incidence
-
+Values of such an index can be interpreted as follows:
 \itemize{
-    \item V/M < 1: means uniform / REGULAR
-    \item V/M = 1: means RANDOM
-    \item V/M > 1: means AGGREGATED / clustered
+    \item D < 1: uniform or regular pattern;
+    \item D = 1: random pattern;
+    \item D > 1: aggregated or clustered pattern.
 }
 }
 \examples{
-# Base approach
-library(dplyr)
-my_data <- filter(tomato_tswv$field_1929) \%>\%
-    filter(t == 1) \%>\%
-    incidence() \%>\%
-    clump(unit_dim = c(x = 3, y = 3))
-r <- as.data.frame(my_data)[["i"]]
-n <- as.data.frame(my_data)[["n"]][[1]]
-fisher(r, n = n, flavor = "incidence")
+# Count flavor:
+## Using a standard R idiom:
+fisher(aphids$i)
 
-# More elegant approach
-my_data <- incidence(tomato_tswv$field_1929)
-fisher(my_data)
+## Using a more "epiphy-like" approach:
+fisher(count(aphids))
+
+# Incidence flavor:
+## Using a standard R idiom:
+fisher(tobacco_viruses$i, n = tobacco_viruses$n)
+
+## Using a more "epiphy-like" approach:
+fisher(incidence(tobacco_viruses))
 
 }
 \references{
-Fisher RA. 1925. Statistical methods for research workers. Oliver and Boyd, Edinburgh.
+Fisher RA. 1925. Statistical methods for research workers. Oliver and Boyd,
+    Edinburgh.
 }
 \seealso{
 \code{\link{lloyd}}, \code{\link{morisita}}

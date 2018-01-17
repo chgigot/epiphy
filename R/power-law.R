@@ -72,7 +72,7 @@ power_law <- function(list, log_base = exp(1), ...) {
     # Perform power law analysis:
     switch(object_class,
            "count" = {
-               data <- get_fmt_obs(data, type = object_class)
+               data <- get_fmt_obs(list, type = object_class)
                x    <- vapply(data, mean, numeric(1L))
                y    <- vapply(data, var, numeric(1L))
            },

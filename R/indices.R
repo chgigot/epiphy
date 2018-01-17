@@ -13,43 +13,51 @@ NULL
 print.agg_index <- function(x, ...) print(x$index)
 
 #------------------------------------------------------------------------------#
-#' indices Fisher's index of dispersion, D
+#' Fisher's index of dispersion, D
 #'
-#' In case of a binary variable, the index is a ratio of two variances: the
-#' observed variance and the theoretical variance if data follow a binomial law,
-#' i.e. a reference distribution for a random pattern of diseased individuals
-#' within sampling units.
-#' Under the null hypothesis (D = 1, random pattern), (N - 1)D follows a
-#' chi-squared distribution with N - 1 degrees of freedom. N is the number of
-#' quadrats.
+#' In case of a count, this index corresponds to the ratio of the observed
+#' variance to the observed mean. For a binary variable, a similar index can be
+#' calculated using instead the ratio of the observed variance to the
+#' theoretical variance if data follow a binomial law (i.e. a reference
+#' distribution for a random pattern of individuals within sampling units).
 #'
-#' Count (Moradi-Vajargah et al, 2011: CAPS)... cf Gosme for Incidence
-#'
+#' Values of such an index can be interpreted as follows:
 #' \itemize{
-#'     \item V/M < 1: means uniform / REGULAR
-#'     \item V/M = 1: means RANDOM
-#'     \item V/M > 1: means AGGREGATED / clustered
+#'     \item D < 1: uniform or regular pattern;
+#'     \item D = 1: random pattern;
+#'     \item D > 1: aggregated or clustered pattern.
 #' }
 #'
-#' @examples
-#' # Base approach
-#' library(dplyr)
-#' my_data <- filter(tomato_tswv$field_1929) %>%
-#'     filter(t == 1) %>%
-#'     incidence() %>%
-#'     clump(unit_dim = c(x = 3, y = 3))
-#' r <- as.data.frame(my_data)[["i"]]
-#' n <- as.data.frame(my_data)[["n"]][[1]]
-#' fisher(r, n = n, flavor = "incidence")
+#' @param x A numeric vector.
+#' @param flavor Which flavor of this index must be calculated ("count" or
+#'     "incidence")?
+#' @param n Number of individuals per sampling unit. If \code{n} is provided,
+#'     the "incidence" flavor is calculated whatever the value of \code{flavor}.
+#'     Note that current implementation only deals with equal size sampling
+#'     units.
+#' @param ... Not yet implemented.
 #'
-#' # More elegant approach
-#' my_data <- incidence(tomato_tswv$field_1929)
-#' fisher(my_data)
+#' @examples
+#' # Count flavor:
+#' ## Using a standard R idiom:
+#' fisher(aphids$i)
+#'
+#' ## Using a more "epiphy-like" approach:
+#' fisher(count(aphids))
+#'
+#' # Incidence flavor:
+#' ## Using a standard R idiom:
+#' fisher(tobacco_viruses$i, n = tobacco_viruses$n)
+#'
+#' ## Using a more "epiphy-like" approach:
+#' fisher(incidence(tobacco_viruses))
 #'
 #' @seealso \code{\link{lloyd}}, \code{\link{morisita}}
 #'
 #' @references
-#' Fisher RA. 1925. Statistical methods for research workers. Oliver and Boyd, Edinburgh.
+#'
+#' Fisher RA. 1925. Statistical methods for research workers. Oliver and Boyd,
+#'     Edinburgh.
 #'
 #' @export
 #------------------------------------------------------------------------------#
@@ -62,8 +70,13 @@ fisher <- function(x, ...) UseMethod("fisher")
 fisher.default <- function(x, flavor = c("count", "incidence"), n = NULL, ...) {
     # Think about the revisited version (section 9.4.6, page 244, Madden et al, 2007), Incidence
     # D = s_y^2 / s_{bin}^2
+    call <- match.call()
     stopifnot(is.numeric(x))
     flavor <- match.arg(flavor)
+    if (!is.null(n) && !is.na(n)) {
+        # Force "incidence" flavor if n is provided.
+        flavor <- "incidence"
+    }
     #call <- match.call()
     x <- na.omit(x)
     N <- length(x)
@@ -75,6 +88,10 @@ fisher.default <- function(x, flavor = c("count", "incidence"), n = NULL, ...) {
         },
         "incidence" = {
             stopifnot(!is.null(n))
+            n <- unique(n) # TODO: unique ????
+            stopifnot(length(n) == 1)
+            #if (length(n) != 1) stop(paste0("Current implementation only deals ",
+            #                                "with equal size sampling units."))
             #stopifnot(n > 1)
             m <- mean(x / n)
             v <- var(x / n)
@@ -108,8 +125,7 @@ fisher.count <- function(x, ...) {
 #------------------------------------------------------------------------------#
 fisher.incidence <- function(x, ...) {
     mapped_data <- map_data(x)
-    n <- unique(mapped_data[["n"]])
-    stopifnot(length(n) == 1)
+    n <- mapped_data[["n"]]
     fisher.default(mapped_data[["i"]], flavor = "incidence", n = n)
 }
 
@@ -129,12 +145,24 @@ chisq.test.default <- function(x, ...) stats::chisq.test(x, ...)
 #' @export
 #------------------------------------------------------------------------------#
 chisq.test.fisher <- function(x, ...) {
-    call   <- match.call()
+    call   <- match.call() ## TODO: Not used?
     N      <- x[["N"]]
-    C      <- (N - 1) * x
+    C      <- (N - 1) * x[["index"]]
     df     <- N - 1
     pvalue <- 1 - pchisq(C, df)
     chisq  <- qchisq(pvalue, df)
+
+    #
+    # In case of a binary variable, the index is a ratio of two variances: the
+    # observed variance and the theoretical variance if data follow a binomial law,
+    # i.e. a reference distribution for a random pattern of diseased individuals
+    # within sampling units.
+    # Under the null hypothesis (D = 1, random pattern), (N - 1)D follows a
+    # chi-squared distribution with N - 1 degrees of freedom. N is the number of
+    # quadrats.
+    #
+    # Count (Moradi-Vajargah et al, 2011: CAPS)... cf Gosme for Incidence
+    #
 
    # chisq_test <-
     structure(list(
@@ -180,6 +208,14 @@ z.test.default <- function(x, ...) {
 #' @export
 #------------------------------------------------------------------------------#
 z.test.fisher <- function(x, ...) {
+    # - z_sm: NOT YET
+    #     # Count: (cf. Moradi-Vajargah et al, 2011,...)
+    #     --> zValue = sqrt(2 * (N - 1) * D) - sqrt(2 * (N - 1) - 1) # To double check
+    #     zValue < -1.96 -----------> UNIFORM spatial distribution
+    #     -1.96 >= zValue >= 1.96 --> RANDOM spatial distribution
+    #     1.96 < zValue ------------> AGGREGATED spatial distribution
+    #     # Incidence: (cf. Madden et al, 2007, p. 243)
+    #     --> zValue = ((n * (N - 1) * D) - (N * n)) / sqrt(2 * N * n * (n - 1)) # To double check
     call   <- match.call()
     method <- "One-sample z-test (two-sided)" # Sure????
     N      <- x[["N"]]
@@ -214,6 +250,15 @@ calpha.test <- function(x, ...) UseMethod("calpha.test")
 #' @export
 #------------------------------------------------------------------------------#
 calpha.test.fisher <- function(x, ...) {
+    # - C(alpha): NOT YET (cf. Gosme..., Turechek, Madden, 1999 - 2 colonnes)
+    #
+    # "The test statistic has a standard normal distribution under the null
+    # hypothesis and is given by zC(α) = [(nN – 1)D – nN]/[2N(n2 – n)] /2.
+    # However, the alternative hypothesis is not just overdispersion but
+    # overdispersion described by the beta-binomial. This is a one-sided test,
+    # thus, the null hypothesis is rejected when zC(α) > 1.645.
+    #
+    # ref: Tarone (1979)
     call   <- match.call()
     method <- "One-sample z-test (one-sided)" # Sure????
     N      <- x[["N"]]
@@ -247,83 +292,6 @@ summary.fisher <- function(object, ..., test = c("chisq", "calpha", "z")) {
     )
 }
 
-
-
-### OLD VERSION
-
-fisher1 <- function(data, confLevel = 0.95) { # confLevel non pris en compte pour l'instant !!!
-
-    # Think about the revisited version (section 9.4.6, page 244, Madden et al, 2007), Incidence
-    # D = s_y^2 / s_{bin}^2
-
-    stopifnot(is.count(data) || is.incidence(data))
-    call <- match.call()
-    d <- data$obs$d # All the raw data
-    N <- length(d)
-    if (is.Count(data)) {
-        m <- mean(d, na.rm = TRUE)
-        v <- var(d, na.rm = TRUE)
-        D <- v / m
-    }
-    if (is.incidence(data)) {
-        n <- unique(data$obs[["n"]])
-        if (length(n) != 1) stop(paste0("Current implementation only deals ",
-                                        "with equal size sampling units."))
-        m <- mean((d / n), na.rm = TRUE)
-        v <- var((d / n), na.rm = TRUE)
-        # in terms of proportions:
-        D <- v / (m * (1 - m) / n)
-        # in terms of numbers of diseased individuals per sampling unit:
-        #D <- var(d) / (n * m * (1 - m))) ## À vérifier (Madden et al 2007, Turechek et al 2011)... quoi qu'il en soit, je prefere en treme de proportion car p et v sont homogene dans ce cas-là
-    }
-
-    ## Different test are possible:
-    # - chi2: OK
-    # - z_sm: NOT YET
-    #     # Count: (cf. Moradi-Vajargah et al, 2011,...)
-    #     --> zValue = sqrt(2 * (N - 1) * D) - sqrt(2 * (N - 1) - 1) # To double check
-    #     zValue < -1.96 -----------> UNIFORM spatial distribution
-    #     -1.96 >= zValue >= 1.96 --> RANDOM spatial distribution
-    #     1.96 < zValue ------------> AGGREGATED spatial distribution
-    #     # Incidence: (cf. Madden et al, 2007, p. 243)
-    #     --> zValue = ((n * (N - 1) * D) - (N * n)) / sqrt(2 * N * n * (n - 1)) # To double check
-    # - C(alpha): NOT YET (cf. Gosme..., Turechek, Madden, 1999 - 2 colonnes)
-    #
-    # "The test statistic has a standard normal distribution under the null
-    # hypothesis and is given by zC(α) = [(nN – 1)D – nN]/[2N(n2 – n)] /2.
-    # However, the alternative hypothesis is not just overdispersion but
-    # overdispersion described by the beta-binomial. This is a one-sided test,
-    # thus, the null hypothesis is rejected when zC(α) > 1.645.
-    #
-    # ref: Tarone (1979)
-
-    # chi-squared test ---> PENSER à créer une fonction
-    C  <- (N - 1) * D
-    df <- N - 1
-    pvalue <- 1 - pchisq(C, df)
-    chisq   <- qchisq(pvalue, df)
-
-    chisqTest <- structure(list(
-        method = "Pearson's Chi-squared test",
-        #estimate = C,### ???????????
-        statistic = c("X-squared" = chisq),
-        parameter = c("df" = df),
-        p.value = pvalue#,
-        #data.name = ??,
-        #observed = ??,
-        #expected = ??,
-        #residuals = ??
-    ), class = "htest") # A propos "htest": http://www.inside-r.org/node/219017
-
-    structure(list(
-        call = call,
-        index = D,
-        test = chisqTest
-    ), class = "aggIndex")
-}
-
-
-##### TESTS
 
 #------------------------------------------------------------------------------#
 #' indices Lloyd's index of patchiness or Lloyd's mean crowding
