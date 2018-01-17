@@ -6,8 +6,9 @@
 \title{Counts of aphids.}
 \format{A data frame with 63 rows and 3 variables:
 \tabular{lll}{
-    [, 1:2] \tab xm,ym \tab Metric spatial coordonates. \cr
-    [, 3]   \tab i     \tab Counts of aphids. \cr
+    [, 1:2] \tab x,y   \tab Grid spatial coordinates. \cr
+    [, 3:4] \tab xm,ym \tab Metric spatial coordonates. \cr
+    [, 5]   \tab i     \tab Counts of aphids. \cr
 }}
 \source{
 Perry JN, Winder L, Holland JM, Alston RD. 1999. Red-blue plots for
