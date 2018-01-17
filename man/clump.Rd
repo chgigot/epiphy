@@ -30,16 +30,18 @@ This function provides a easy way to regroup recorded data into groups of
 same number of individuals.
 }
 \examples{
-my_data1 <- incidence(tomato_tswv$field_1929)
-summary(my_data1)
-plot(my_data1)
+my_incidence <- incidence(tomato_tswv$field_1929)
+plot(my_incidence, type = "all")
 
-my_data2 <- clump(my_data1, unit_size = c(x = 3, y = 3))
-summary(my_data2)
-plot(my_data2)
+# Different spatial size units:
+my_incidence_clumped_1 <- clump(my_incidence, unit_size = c(x = 3, y = 3))
+plot(my_incidence_clumped_1, type = "all")
 
-my_data3 <- clump(my_data1, unit_size = c(t = 3), fun = mean)
-summary(my_data3)
-plot(my_data3)
+my_incidence_clumped_2 <- clump(my_incidence, unit_size = c(x = 4, y = 5))
+plot(my_incidence_clumped_2, type = "all")
+
+# To get mean disease incidence for each plant over the 3 scoring dates:
+my_incidence_clumped_3 <- clump(my_incidence, unit_size = c(t = 3), fun = mean)
+plot(my_incidence_clumped_3)
 
 }

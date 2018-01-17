@@ -4,7 +4,7 @@
 \alias{split.intensity}
 \title{Divide into groups and reassemble}
 \usage{
-\method{split}{intensity}(x, f, drop = FALSE, ..., by)
+\method{split}{intensity}(x, f, drop = FALSE, ..., by, unit_size)
 }
 \arguments{
 \item{x}{vector or data frame containing values to be divided into groups.}

@@ -59,6 +59,7 @@ print.mapping <- function(x, ...) {
     values <- vapply(x, deparse, character(1))
     bullets <- paste0("* ", names(x), " -> ", values, "\n")
     cat(bullets, sep = "")
+    invisible(x)
 }
 
 #------------------------------------------------------------------------------#
@@ -85,6 +86,14 @@ as.character.mapping <- function(x, ...) {
     char <- as.character(unclass(x))
     names(char) <- names(x)
     char
+}
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+remap <- function(data, mapping, keep_std = TRUE) {
+    stopifnot(any(class(data) == "intensity"))
+    init_intensity(data$data, mapping, keep_std, type = is(data))
 }
 
 #------------------------------------------------------------------------------#
@@ -328,42 +337,37 @@ init_intensity <- function(data, mapping, keep_std, type) {
 #'
 #' @seealso \code{\link{intensity-class}}
 #' @examples
-#' # Implicite call: The parameter struct does not need to be specified if
-#' # the column names of the input data frame respect the convention.
-#' colnames(Cochran1936) # Returns c("x", "y", "t", "i", "n")
-#' incidence(Cochran1936)
+#' ## Create intensity objects
+#' # Implicite call: The variable mapping does not need to be specified if the
+#' # column names of the input data frame follow the default names.
+#' colnames(tomato_tswv$field_1929) # Returns c("x", "y", "t", "i", "n")
+#' my_incidence_1 <- incidence(tomato_tswv$field_1929)
+#' my_incidence_1
+#' my_incidence_2 <- incidence(tomato_tswv$field_1929,
+#'                             mapping(x = x, y = y, t = t, i = i, n = n))
+#' identical(my_incidence_1, my_incidence_2)
 #'
-#' # Explicit call: Otherwise, struct must be present:
-#' incidence(Cochran1936, c(r = "i", n = "n", t = "t", x = "x", y = "y"))
-#' incidence(Cochran1936, c(r = 4, n = 5, t = 3, x = 1, y = 2))
-#' incidence(Cochran1936, list(space = 1:2, time = 3, obs = 4:5))
+#' # Explicite call: Otherwise, the variable mapping need to be specified, at
+#' # least for column names that do not correspond to default names.
+#' colnames(aphids) # Returns c("xm", "ym", "i")
+#' my_count_1 <- count(aphids, mapping(x = xm, y = ym, i = i))
+#' my_count_1
+#' # We can drop the "i = i" in the mapping.
+#' my_count_2 <- count(aphids, mapping(x = xm, y = ym))
+#' identical(my_count_1, my_count_2)
 #'
-#' ## If a variable is not specified, this means it does not exist in the
-#' ## input data frame.
-#' subData <- subset(Cochran1936, t == 1,
-#'                   select = c("x", "y", "i", "n"))
-#' # The two following instructions work:
-#' incidence(subData)
-#' incidence(subData, c(x = 1, y = 2, r = 4, n = 5))
+#' # It is possible to change the variable mapping after the creation of an
+#' # intensity object:
+#' another_incidence <- incidence(hop_viruses$HpLV)
+#' another_incidence
+#' remap(another_incidence, mapping(x = xm, y = ym))
 #'
-#' records <- incidence(tomato_tswv$field2)
-#' records
-#' summary(records)
-#' plot(records, type = "map_2d", t = 1)
+#' ## Plotting data
+#' plot(my_incidence_1) # Same as: plot(my_incidence_1, type = "spatial")
+#' plot(my_incidence_1, type = "temporal")
 #'
-#' ##--
-#' my_raw_data <- tomato_tswv$field_1929
-#' names(my_raw_data)
-#' # Automatic mapping because the name of ...
-#' my_data <- incidence(my_raw_data)
-#' # To make it less trivial, let's change the column names:
-#' colnames(my_raw_data) <- c("coord1", "coord2", "time", "scoring", "tot_plants")
-#' my_mapping <- mapping(x = coord1, y = coord2, t = time, r = scoring, n = tot_plants)
-#' my_mapping
-#' my_data <- incidence(my_raw_data, my_mapping)
-#' my_data
-#' summary(my_data)
-#' plot(my_data)
+#' plot(my_count_1, tile = FALSE, size = 5)
+#' plot(my_count_1, type = "temporal")
 #'
 #' @name intensity
 #------------------------------------------------------------------------------#
@@ -471,6 +475,7 @@ print.intensity <- function(x, ...) {
     colnames(a) <- test
     print(a)
     cat("# ... with ", nrow(x$data) - 6, " more records (rows)\n")
+    invisible(x)
 }
 
 #------------------------------------------------------------------------------#
@@ -596,17 +601,19 @@ dim.intensity <- function(x) lengths(x$struct)
 #' @param ... Optional arguments to \code{fun}.
 #'
 #' @examples
-#' my_data1 <- incidence(tomato_tswv$field_1929)
-#' summary(my_data1)
-#' plot(my_data1)
+#' my_incidence <- incidence(tomato_tswv$field_1929)
+#' plot(my_incidence, type = "all")
 #'
-#' my_data2 <- clump(my_data1, unit_size = c(x = 3, y = 3))
-#' summary(my_data2)
-#' plot(my_data2)
+#' # Different spatial size units:
+#' my_incidence_clumped_1 <- clump(my_incidence, unit_size = c(x = 3, y = 3))
+#' plot(my_incidence_clumped_1, type = "all")
 #'
-#' my_data3 <- clump(my_data1, unit_size = c(t = 3), fun = mean)
-#' summary(my_data3)
-#' plot(my_data3)
+#' my_incidence_clumped_2 <- clump(my_incidence, unit_size = c(x = 4, y = 5))
+#' plot(my_incidence_clumped_2, type = "all")
+#'
+#' # To get mean disease incidence for each plant over the 3 scoring dates:
+#' my_incidence_clumped_3 <- clump(my_incidence, unit_size = c(t = 3), fun = mean)
+#' plot(my_incidence_clumped_3)
 #'
 #' @export
 #------------------------------------------------------------------------------#
@@ -696,15 +703,90 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
 #'
 #' @export
 #------------------------------------------------------------------------------#
-split.intensity <- function(x, f, drop = FALSE, ..., by) {
+split.intensity <- function(x, f, drop = FALSE, ..., by, unit_size) {
     mapped_data <- map_data(x)
+    if (!missing(by) && !missing(unit_size)) {
+        stop("'by' and 'unit_size' cannot be provided at the same time.")
+    }
     if (!missing(by)) {
         if (!missing(f)) stop("f and by cannot be given at the same time.")
         stopifnot(all(by %in% names(x$mapping)))
         f <- lapply(by, function(var) getElement(mapped_data, var))
     }
-    res <- split(mapped_data, f, drop, ...)
-    lapply(res, function(subx) unmap_data(subx, x))
+    if (!missing(unit_size)) {
+#==============================================================================#
+        ## TODO: BEG tmp
+        object <- x
+        ## TODO: END tmp
+        #--------------------------------------------------------------------------#
+        # Initial checks and data preparation
+        if (is.null(names(unit_size))) {
+            stop("unit_size must be a named vector.")
+        }
+        mapped_data   <- map_data(object)
+        colnames_mapped_data <- colnames(mapped_data)
+        obs_names     <- object$struct[["obs"]]
+        #non_obs_names <- unname(unlist(object$struct[c("space", "time")]))
+        non_obs_names <- colnames_mapped_data[!(colnames_mapped_data %in% obs_names)] # because of if keep_std = FALSE
+        if (!all(names(unit_size) %in% non_obs_names)) {
+            stop(paste0("All unit_size names must exist in mapped data ",
+                        "(non-observational types)."))
+        }
+
+        #--------------------------------------------------------------------------#
+        # Define groups
+
+        # TODO : Gérer aussi le cas du zér0 !!!
+        # exemple avec incidence(hop_viruses$HpLV, mapping(x=xm,y=ym))
+        invisible(lapply(seq_len(length(unit_size)), function(i1) {
+            id  <- names(unit_size)[i1]
+            tmp <- ceiling(mapped_data[[id]] / unit_size[[id]])
+            if (length(unique(table(tmp))) > 1) {
+                tmp[tmp == max(tmp)] <- NA
+            }
+            ## TODO: BEG NEW
+            mapped_data[[paste0("tmp_", id)]] <<- mapped_data[[id]]
+            ## TODO: END NEW
+            mapped_data[[id]] <<- tmp # mapped_data remains a data frame here.
+        }))
+
+        #--------------------------------------------------------------------------#
+        # Manage uncomplete non-observational cases
+        complete_non_obs_cases <- complete.cases(mapped_data[, non_obs_names])
+        if (!all(complete_non_obs_cases)) {
+            warning(paste0("To get even clumps of individuals, a total of ",
+                           sum(!complete_non_obs_cases),
+                           " source sampling units were dropped."))
+        }
+        mapped_data <- mapped_data[complete_non_obs_cases, ]
+
+        #--------------------------------------------------------------------------#
+        # Split the data frame
+        f <- mapped_data[, non_obs_names]
+        # There is no more NA in f, but they may still remain some NA in
+        # observational data (i.e. in r and n? columns)
+        #split_data <- base::split(mapped_data, f = f) #, lex.order = TRUE)... only in most recent R version # Only cosmetic (to get a nice order)
+#==============================================================================#
+    }
+    split_data <- base::split(mapped_data, f, drop, ...)
+#==============================================================================#
+    if (!missing(unit_size)) {
+        #--------------------------------------------------------------------------#
+        # Rename the variables ## TODO: NEW
+        split_data <- lapply(split_data, function(sub_data) {
+            colnames_sub_data <- colnames(sub_data)
+            tmp_vars <- colnames_sub_data[grep("tmp_", colnames_sub_data)]
+            lapply(tmp_vars, function(tmp_var) {
+                new_var <- sub("tmp_", "", tmp_var)
+                sub_data[[new_var]] <<- sub_data[[tmp_var]]
+                sub_data[[tmp_var]]             <<- NULL
+            })
+            sub_data
+        })
+    }
+#==============================================================================#
+
+    lapply(split_data, function(subx) unmap_data(subx, x))
 }
 
 # TODO: unsplit
@@ -780,138 +862,90 @@ as.character.severity <- function(x, ...) "<severity object>"
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "both"),
+plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "all"),
                            tile = TRUE, pch = 22) {
 
     type <- match.arg(type)
 
-    #if (!missing(y)) ...
+    #TODO: if (!missing(y)) ...
     #mapping <- attr(x, "mapping")
     mapped_data <- map_data(x)
-    label       <- lapply(x$mapping, deparse) # useful?
+    label       <- lapply(x$mapping, deparse) # TODO: useful?
 
-    max_fill_scale <- ifelse(class(x)[1] == "incidence",
-                             max(mapped_data[["n"]]),
-                             max(mapped_data[["i"]]))
+    possible_temporal  <- ("t" %in% colnames(mapped_data)) # TODO: More security here
+    possible_x_spatial <- ("x" %in% colnames(mapped_data)) # TODO: More security here
+    possible_y_spatial <- ("y" %in% colnames(mapped_data)) # TODO: More security here
+    possible_spatial   <- possible_x_spatial || possible_y_spatial # TODO: More security here
 
-    gg <- list()
-
-    #label_full <- ... with time, space, obs...
-
-    # For incidence:
-    #seq_gdt <- scales::seq_gradient_pal(low = "white", high = "red") # seq_gdt is a function here
-    #seq_gdt <- seq_gdt(seq(0, 1, length = max_fill_scale + 1))
-
-    # Spatial figure
-    if (type %in% c("spatial", "both")) {
-
-        # List of layers
-        gg_sub <- list(
-            geom_raster(data = mapped_data,
-                        mapping = aes(x, y, fill = i), ...),
-            geom_point(data = mapped_data,
-                       mapping = aes(x, y, fill = i), pch = pch, ...),
-            #scale_fill_manual(name = paste0(class(x)[[1]], " (i)"),
-            #                  values = seq_gdt,
-            #                  guide = guide_legend(reverse = TRUE)),
-            scale_fill_gradient(name = paste0(class(x)[1], " (i)"),
-                                low = "white", high = "red",
-                                guide = guide_legend(reverse = TRUE),
-                                #breaks = seq(0, max_fill_scale), # To improve later
-                                limits = c(0, max_fill_scale)),
-            scale_x_continuous(breaks = 1:max(mapped_data$x), expand = c(0, 0)),
-            scale_y_continuous(breaks = 1:max(mapped_data$y), expand = c(0, 0)),
-            #theme_bw(),
-            theme(panel.grid = element_blank()),
-            coord_fixed(), # Pour avoir des carr'es pour sûr
-            facet_wrap(~ t, labeller = label_both)#, # to wrap a 1d ribbon of panels into 2d.
-
-            ## Valeurs fixées à généraliser ci-après !!!!!!!!
-            #scale_colour_gradient(name = "Disease\nintensity",
-            #                      low = "white", high = "red", breaks = seq(0, maxScale),
-            #                      limits = c(0, maxScale), guide = "legend"),
-            # Faire un conditionel ici, de la forme:
-            # si pas "reverse x", alors:
-
-            # sinon
-            #scale_x_reverse(breaks = xScale, expand = c(0,0)),
-            #
-
-            #scale_y_discrete(breaks = yScale, expand = c(0,0)),
-
-            #                         expand = c(0,0)),
-            ##
-            ## expand = c(0,0) : - OK avec geom_tile
-            ##                   - NON avec geom_point
-            ##
-
-            # theme(panel.grid = element_blank()),
-
-            #coord_flip(), # Le faire en conditionnel, avec formula : x ~ y (default), ou y ~ x
-            #--coord_fixed(), # Pour avoir des carr'es pour sûr
-            #--facet_wrap(~ t, nrow = nRibbon)#, # to wrap a 1d ribbon of panels into 2d.
-            ### to generaliser pour nrow et ncol
-        )
-
-        # Option management
-        to_select <- !vector("logical", length = length(gg_sub)) # To create a vector of true
-        if (tile) to_select[2] <- FALSE
-        else      to_select[1] <- FALSE
-
-        # Store figure information
-        gg[[length(gg) + 1]] <- ggplot() + gg_sub[to_select]
-
-    }
+    max_scale <- ifelse(class(x)[1] == "incidence",
+                        max(mapped_data[["n"]]),
+                        max(mapped_data[["i"]]))
+    fill_breaks <- if (max_scale <= 10) seq(0, max_scale)  else waiver()
+    fill_limits <- if (max_scale <= 10) range(fill_breaks) else c(0, max_scale)
 
     # Temporal figure
-    if (type %in% c("temporal", "both")) {
-
-        # List of layers
-        gg_sub <- list(
-            geom_jitter(data = mapped_data,
-                        mapping = aes(t, i), alpha = 0.2,
-                        width = 0.2, height = 0),
-            stat_summary(data = mapped_data,
-                         mapping = aes(t, i),
-                         fun.y = "mean", geom = "line", color = "red",
-                         linetype = "dashed"),
-            stat_summary(data = mapped_data,
-                         mapping = aes(t, i, group = t),
-                         fun.data = "mean_sdl", fun.args = list(mult = 1),
-                         geom = "pointrange", # default
-                         color = "red"),
-            scale_x_continuous(breaks = seq(0: max(mapped_data$t))),
-            scale_y_continuous(breaks = seq(0, max(mapped_data[["i"]]))),
-            # scale_y_continuous("score (1-9 scale)", breaks=0:9), #### à Généralsier !!!!7        ######### De plus attention, warning quand on combine les graphs
-            #### Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
-            #g <- g + scale_x_continuous("date", breaks=seq(1,i))
-            expand_limits(y = range(mapped_data[["i"]])),
-            theme_bw()
-        )
-
-        #scale_y_continuous("score (1-9 scale)", breaks=0:9), #### à Généralsier !!!!
-        ######### De plus attention, warning quand on combine les graphs
-        #### Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
-        #### g <- g + scale_x_continuous("date", breaks=seq(1,i))
-        #geom_point(data = data, aes(x = t, y = i),
-        #           alpha = 0.2, size = 3, colour = col,
-        #           position = position_jitter(w = 0.2, h = 0.2)),
-        #geom_line(data = recap, aes(x = t, y = meanD),
-        #          size = 1.5, linetype = 2, colour = col),
-        #geom_point(data = recap, aes(x = t, y = meanD),
-        #           size = 6, shape = 15, colour = col)
-
-        # Option management
-        to_select <- !vector("logical", length = length(gg_sub)) # To create a vector of true
-        # Nothing at this point.
-
-        # Store figure information
-        gg[[length(gg) + 1]] <- ggplot() + gg_sub[to_select]
+    if (type %in% c("temporal", "all") && possible_temporal) {
+        nt <- length(unique(mapped_data$t))
+        ni <- length(unique(mapped_data$i))
+        t_breaks <- if(nt <= 10) unique(mapped_data$t) else waiver()
+        i_breaks <- if(ni <= 10) unique(mapped_data$i) else waiver()
+        gg <- ggplot()
+        gg <- gg + geom_jitter(data = mapped_data, mapping = aes(t, i),
+                               alpha = 0.2, width = 0.2, height = 0)
+        gg <- gg + stat_summary(data = mapped_data, mapping = aes(t, i),
+                                fun.y = "mean", geom = "line", color = "red",
+                                linetype = "dashed")
+        gg <- gg + stat_summary(data = mapped_data,
+                                mapping = aes(t, i, group = t),
+                                fun.data = "mean_sdl", fun.args = list(mult = 1),
+                                geom = "pointrange", # default
+                                color = "red")
+        gg <- gg + scale_x_continuous("Time (t)", breaks = t_breaks)
+        gg <- gg + scale_y_continuous(paste0(tocamel(class(x)[1]), " (i)"),
+                                      breaks = i_breaks)
+        gg <- gg + theme_bw()
+        print(gg)
     }
 
-    # Dispaly figures (nice to do that at the end to potentialy expand possibilities with + theme... e.g.)
-    if (length(gg) == 1) gg[[1]] # Return a gg object
-    else                 rev(gg)      # Return a list of gg objects with space fig at the end
+    # Spatial figure
+    if (type %in% c("spatial", "all") && possible_spatial) {
+        nx <- length(unique(mapped_data$x))
+        ny <- length(unique(mapped_data$y))
+        x_breaks <- if(nx <= 10) unique(mapped_data$x) else waiver()
+        y_breaks <- if(ny <= 10) unique(mapped_data$y) else waiver()
+        gg <- ggplot()
+        if (tile) {
+            gg <- gg + geom_raster(data = mapped_data,
+                                   mapping = aes(x, y, fill = i), ...)
+            gg <- gg + scale_x_continuous("Spatial dim 1 (x)",
+                                          breaks = x_breaks, expand = c(0, 0))
+            gg <- gg + scale_y_continuous("Spatial dim 2 (y)",
+                                          breaks = y_breaks, expand = c(0, 0))
+        } else {
+            gg <- gg + geom_point(data = mapped_data,
+                                  mapping = aes(x, y, fill = i), pch = pch, ...)
+            gg <- gg + scale_x_continuous("Spatial dim 1 (x)",
+                                          breaks = x_breaks)
+            gg <- gg + scale_y_continuous("Spatial dim 2 (y)",
+                                          breaks = y_breaks)
+        }
+        gg <- gg + scale_fill_gradient(paste0(tocamel(class(x)[1]), " (i)"),
+                                       low = "white", high = "red",
+                                       guide = guide_legend(reverse = TRUE),
+                                       breaks = fill_breaks,
+                                       limits = fill_limits)
+        gg <- gg + theme_bw() + theme(panel.grid = element_blank())
+        gg <- gg + coord_fixed() # To get squares in any case
+        if (possible_temporal) {
+            nt <- length(unique(mapped_data$t))
+            gg <- gg + facet_wrap(~ t, labeller = label_both, # TODO: Improve labeller to add "Time" everywhere
+                                  # To get a pretty output:
+                                  nrow = ifelse(nt <= 3, 1, floor(sqrt(nt))))
+        }
+        print(gg)
+    }
+
+    invisible(NULL)
 
 }
 
