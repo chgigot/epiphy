@@ -4,20 +4,21 @@
 \name{citrus_ctv}
 \alias{citrus_ctv}
 \title{Incidence of citrus tristeza virus (CTV) disease in three fields.}
-\format{There are three data sets:
+\format{There are three data frames:
 \itemize{
     \item \code{IVI3and4}: A data frame with 864 rows and 5 variables.
     \item \code{IVI6and7}: A data frame with 648 rows and 5 variables.
     \item \code{El_Realengo}: A data frame with 2000 rows and 5 variables.
 }
 
-The structure is the same for all the data sets:
+The structure is the same for all the data frames:
 
 \tabular{rll}{
-    [, 1:2] \tab x,y \tab Spatial coordinates (in a grid). \cr
+    [, 1:2] \tab x,y \tab Grid spatial coordinates. \cr
     [, 3]   \tab t   \tab Year of disease assessments. \cr
-    [, 4]   \tab r   \tab Disease incidence. 0: Healthy, 1: Diseased. \cr
-    [, 5]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
+    [, 4]   \tab i   \tab Disease incidence. 0: Healthy, 1: Diseased. \cr
+    [, 5]   \tab n   \tab Sampling unit size. n = 1 means that the sampling
+                          unit size is the plant. \cr
 }}
 \source{
 Gottwald TR, Cambra M, Moreno P, Camarasa E, Piquer J. 1996. Spatial
@@ -36,19 +37,9 @@ CTV incidence data for three orchards in eastern Spain reported for
 consecutive years.
 }
 \details{
-Both \code{IVI3and4} and \code{IVI6and7} orchards contained 216 trees, and
-\code{El_Realengo} orchard, 400 trees.
-
-From left to right, mappings represent infections dis-
-covered up to May 1991 (45 infections), May 1992 (77 infections), and May 1993 (127 infections), respectively.
-
-From left to right, mappings represent infections dis-
-covered up to May 1991 (45 infections), May 1992 (77 infections), and May 1993 (127 infections), respectively. B, Corresponding information for epidemic
-IVIA6&7 (13). From left to right, mappings represent infections discovered up to May 1990 (60 infections), May 1991 (77 infections), and May 1992 (127
-infections), respectively.
-
-Plots IVIA3&4 and IVIA6&7, consisted of 216 trees each of Washington navel orange on Troyer citrange planted in 1978
-on a 2 x 6-m spacing. Both plots were located on the grounds of the Instituto Valenciano de Investigaciones
-Agrarias, near Moncada, Valencia, Spain and were assayed yearly from 1981 to 1994.
+Both \code{IVI3and4} and \code{IVI6and7} orchards consisted of 216 trees each
+of Washington navel orange on Troyer citrange planted in 1978 on a 2 x 6-m
+spacing. \code{El_Realengo} orchard consisted of 400 Marsh seedless
+grapefruit on Troyer citrange planted in 1973 on a 5.5 x 5.5-m spacing.
 }
 \keyword{datasets}

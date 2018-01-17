@@ -6,11 +6,13 @@
 \title{Examples of simulated epidemic data.}
 \format{A data frame with 864 rows and 6 variables:
 \tabular{rll}{
-    [, 1]   \tab pattern \tab Either clumped (i.e. aggregated), random or regular. \cr
-    [, 2]   \tab mu \tab Median spore dispersal parameter. \cr
-    [, 3:4] \tab x,y \tab Spatial coordinates. \cr
-    [, 5]   \tab r   \tab Diseased individuals (from 0 to 100). \cr
-    [, 6]   \tab n   \tab Sampling unit size. Here, n = 100 individuals per sampling unit. \cr
+    [, 1]   \tab pattern \tab Either clumped (i.e. aggregated), random or
+                              regular. \cr
+    [, 2]   \tab mu      \tab Median spore dispersal parameter. \cr
+    [, 3:4] \tab x,y     \tab Grid spatial coordinates. \cr
+    [, 5]   \tab i       \tab Number of diseased plants (from 0 to 100). \cr
+    [, 6]   \tab n       \tab Sampling unit size. Here, n = 100 plants per
+                              sampling unit. \cr
 }}
 \source{
 Xu XM, Madden LV. 2004. Use of SADIE statistics to study spatial
@@ -21,8 +23,10 @@ Xu XM, Madden LV. 2004. Use of SADIE statistics to study spatial
 simulated_epidemics
 }
 \description{
-Epidemics generated using the stochastic simulator of Xu and Madden (2004).
-The data are number of diseased plants per quadrat (out of a total of n = 100
-plant in each). N = 144 quadrats. Differents parameters (pattern and mu).
+Epidemics were generated using the stochastic simulator from Xu and Madden
+(2004). The data consist of the numbers of diseased plants per sampling
+unit (out of a total of n = 100 plants in each sampling unit). N = 144
+sampling units, and different values for the parameters \code{pattern} and
+\code{mu} were used for the simulations.
 }
 \keyword{datasets}

@@ -3,12 +3,13 @@
 \docType{data}
 \name{arthropods}
 \alias{arthropods}
-\title{Arthropods counts}
+\title{Counts of arthropods.}
 \format{A data frame with 378 rows and 4 variables:
 \tabular{lll}{
-    [, 1]   \tab set \tab Grid id. \cr
-    [, 2:3] \tab x,y \tab Spatial coordonates. \cr
-    [, 4]   \tab r   \tab Counts. \cr
+    [, 1:2] \tab xm,ym \tab Metric spatial coordonates. \cr
+    [, 3]   \tab t     \tab Sampling date. 1: 7 Jun, 2: 14 Jun, 3: 21 Jun, 4:
+                            28 Jun, 5: 5 Jul, 6: 12 Jul 1996. \cr.
+    [, 4]   \tab i     \tab Counts of arthropods. \cr
 }}
 \source{
 Holland JM, Winder L, Perry JN. 1999. Arthropod prey of farmland
@@ -19,6 +20,9 @@ Holland JM, Winder L, Perry JN. 1999. Arthropod prey of farmland
 arthropods
 }
 \description{
-TODO.
+A sampling unit was made of a pitfall to collect arthropods in a field of
+organic winter wheat, near Wimborne, Dorset, UK in 1996. The sampling units
+were located on a 9 x 7 rectangular grid at intervals of 30 m. There were
+six sampling dates.
 }
 \keyword{datasets}

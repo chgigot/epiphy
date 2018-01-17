@@ -4,25 +4,30 @@
 \name{tomato_tswv}
 \alias{tomato_tswv}
 \title{Incidence of tomato spotted wilt virus (TSWV) disease in field trials.}
-\format{There are two data sets.
+\format{There are two data frames:
 
 \code{field_1928}: A data frame with 11088 rows and 8 variables:
 \tabular{rll}{
     [, 1]   \tab plot       \tab Plot id. \cr
     [, 2]   \tab variety    \tab Variety name. \cr
     [, 3]   \tab irrigation \tab Irrigation system. \cr
-    [, 4:5] \tab x,y        \tab Spatial coordinates (in a grid). \cr
-    [, 6]   \tab t          \tab Date of disease assessments. 1: 6 Nov, 2: 14 Nov, 3: 21 Nov, 4: 28-29 Nov, 5: 5 Dec, 6: 12 Dec 1928. \cr
+    [, 4:5] \tab x,y        \tab Grid spatial coordinates. \cr
+    [, 6]   \tab t          \tab Date of disease assessments. 1: 6 Nov, 2: 14
+                                 Nov, 3: 21 Nov, 4: 28-29 Nov, 5: 5 Dec, 6:
+                                 12 Dec 1928. \cr
     [, 7]   \tab i          \tab Disease incidence. 0: Healthy, 1: Diseased. \cr
-    [, 8]   \tab n          \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
+    [, 8]   \tab n          \tab Sampling unit size. n = 1 means that the
+                                 sampling unit size is the plant. \cr
 }
 
 \code{field_1929}: A data frame with 4320 rows and 5 variables:
 \tabular{rll}{
-    [, 1:2] \tab x,y \tab Spatial coordinates (in a grid). \cr
-    [, 3]   \tab t   \tab Date of disease assessments. 1: 18 Dec, 2: 31 Dec 1929, 3: 22 Jan 1930. \cr
+    [, 1:2] \tab x,y \tab Grid spatial coordinates. \cr
+    [, 3]   \tab t   \tab Date of disease assessments. 1: 18 Dec, 2: 31 Dec
+                          1929, 3: 22 Jan 1930. \cr
     [, 4]   \tab i   \tab Disease incidence. 0: Healthy, 1: Diseased. \cr
-    [, 5]   \tab n   \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
+    [, 5]   \tab n   \tab Sampling unit size. n = 1 means that the sampling
+                          unit size is the plant. \cr
 }}
 \source{
 Cochran WG. 1936. The statistical analysis of field counts of

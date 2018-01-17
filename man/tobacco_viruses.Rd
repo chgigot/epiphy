@@ -3,11 +3,12 @@
 \docType{data}
 \name{tobacco_viruses}
 \alias{tobacco_viruses}
-\title{Incidence of tobacco plants infected with viruses}
+\title{Incidence of tobacco plants infected with viruses.}
 \format{A data frame with 75 rows and 2 variables:
 \tabular{rll}{
-    [, 1] \tab r \tab Disease incidence. 1: Diseased, 0: Healthy. \cr
-    [, 2] \tab n \tab Sampling unit size. n = 1 means that the sampling unit size is the plant. \cr
+    [, 1] \tab i \tab Number of diseased plants (from 0 to 40). \cr
+    [, 2] \tab n \tab Sampling unit size. Here, n = 40 plants per sampling
+                      unit. \cr
 }}
 \source{
 Madden LV, Pirone TP, Raccah B. 1987. Analysis of spatial patterns of
@@ -17,6 +18,7 @@ Madden LV, Pirone TP, Raccah B. 1987. Analysis of spatial patterns of
 tobacco_viruses
 }
 \description{
-Field with N = 75 sampling units with n = 40 plants in each one.
+Experimental plot consisted of 75 sampling units with 40 tobacco plants in
+each one.
 }
 \keyword{datasets}

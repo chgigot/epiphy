@@ -3,11 +3,12 @@
 \docType{data}
 \name{pyrethrum_ray_blight}
 \alias{pyrethrum_ray_blight}
-\title{Ray blight disease of pyrethrum.}
+\title{Incidence of ray blight disease of pyrethrum.}
 \format{A data frame with 62 rows and 2 variables:
 \tabular{rll}{
-    [, 1] \tab r \tab Number of diseased samples in the quadrat (i.e., 0, 1, 2, 3, 4, 5, or 6). \cr
-    [, 2] \tab n \tab Sampling unit size. Number of samples assessed per quadrat, n = 6. \cr
+    [, 1] \tab i \tab Number of diseased plants (from 0 to 6). \cr
+    [, 2] \tab n \tab Sampling unit size. Here, n = 6 plants per sampling
+                      unit. \cr
 }}
 \source{
 Pethybridge SJ, Esker P, Hay F, Wilson C, Nutter FW. 2005.
@@ -19,7 +20,7 @@ Pethybridge SJ, Esker P, Hay F, Wilson C, Nutter FW. 2005.
 pyrethrum_ray_blight
 }
 \description{
-An assessment of the incidence of foliar symptoms due to ray blight disease
-of pyrethrum in 62 quadrats.
+An assessment of the incidence of ray blight disease of pyrethrum in 62
+sampling units, containing 6 plants each.
 }
 \keyword{datasets}

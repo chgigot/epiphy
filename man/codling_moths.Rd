@@ -3,11 +3,11 @@
 \docType{data}
 \name{codling_moths}
 \alias{codling_moths}
-\title{Codling moth counts}
+\title{Count of codling moth larvae.}
 \format{A data frame with 30 rows and 3 variables:
 \tabular{lll}{
-    [, 1:2] \tab x,y \tab Spatial coordonates. \cr
-    [, 3]   \tab r   \tab Counts. \cr
+    [, 1:2] \tab x,y \tab Metric spatial coordonates. \cr
+    [, 3]   \tab i   \tab Counts of codling moth larvae. \cr
 }}
 \source{
 Lavigne C, Ricci B, Franck P, Senoussi R. 2010. Spatial analyses of
@@ -19,6 +19,8 @@ Lavigne C, Ricci B, Franck P, Senoussi R. 2010. Spatial analyses of
 codling_moths
 }
 \description{
-TODO.
+Codling moth diapausing larvae were collected in an apple orchard in
+south-eastern France. Larvae were caught on strip traps wrapped around tree
+trunks in July 2008 and collected the following October. 30 traps were used.
 }
 \keyword{datasets}

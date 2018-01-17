@@ -3,16 +3,14 @@
 \docType{data}
 \name{hop_viruses}
 \alias{hop_viruses}
-\title{Incidence of three viruses in an Australian hop garden}
-\format{Three data sets, one for each virus. The structure is the same for each virus:
-List elements are "HpLV", "HpMV", and "ApMV".
-
-A data frame with ... rows and ... variables:
+\title{Incidence of three viruses in an Australian hop garden.}
+\format{There are three data frames, one for each virus (\code{HpLV}, \code{HpMV} and
+\code{ApMV}). Each data frame consists of 2550 rows and 7 variables:
 \tabular{lll}{
-    [, 1:2] \tab x,y   \tab Grid coordonates. \cr
-    [, 3:4] \tab xm,ym \tab Metric coordinates. \cr
-    [, 5]   \tab t     \tab Year of assays for viruses. \cr
-    [, 6]   \tab r     \tab Incidence. 1 = infected, 0 = uninfected. \cr
+    [, 1:2] \tab x,y   \tab Grid spatial coordonates. \cr
+    [, 3:4] \tab xm,ym \tab Metric spatial coordinates. \cr
+    [, 5]   \tab t     \tab Year of disease assessments. \cr
+    [, 6]   \tab i     \tab Incidence. 0: Healthy, 1: Diseased. \cr
     [, 7]   \tab n     \tab Sampling unit size. n = 1 means that the sampling
                             unit size is the plant. \cr
 }}
@@ -26,10 +24,12 @@ Pethybridge SJ, Madden LV. 2003. Analysis of spatiotemporal dynamics
 hop_viruses
 }
 \description{
-TODO. Three viruses: Hop latent virus (HpLV), Hop mosaic virus (HpMV), and Apple mosaic virus (ApMV).
-Hop (Humulus lupulus) cv. Victoria, in a commercial hop farm at Bushy Park, Tasmania, Australia.
-Established in 1989. An Australian hop garden.
-51 plants within each roaw and 25 rows (total number of plants = 1,275 plants).
-1.8 m within rows, and 2.1 m between rows.
+Three viruses, i.e. Hop latent virus (HpLV), Hop mosaic virus (HpMV), and
+Apple mosaic virus (ApMV), were monitored in an Australian hop garden for two
+consecutive years (1996 and 1997). The hop garden was established in 1989
+with the variety Victoria in a commercial hop farm at Bushy Park, Tasmania,
+Australia. It consisted of 25 rows containing 51 plants each, so that there
+were 1275 hop plants in total. There were 2.1 m between rows, and 1.8 m
+between plants within rows.
 }
 \keyword{datasets}

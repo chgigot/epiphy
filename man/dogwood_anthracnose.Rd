@@ -3,8 +3,14 @@
 \docType{data}
 \name{dogwood_anthracnose}
 \alias{dogwood_anthracnose}
-\title{Dogwood anthracnose data.}
-\format{An object of class \code{data.frame} with 329 rows and 3 columns.}
+\title{Incidence of dogwood anthracnose.}
+\format{A data frame with 329 rows and 3 variables:
+\tabular{rll}{
+    [, 1] \tab t \tab Year of disease assessments (1990 or 1991).. \cr
+    [, 2] \tab i \tab Number of diseased plants (from 0 to 10). \cr
+    [, 3] \tab n \tab Sampling unit size. Here, n = 10 plants per sampling
+                      unit (or plot). \cr
+}}
 \source{
 Zarnoch SJ, Anderson RL, Sheffield RM. 1995. Using the β-binomial
     distribution to characterize forest health. Canadian journal of forest
@@ -14,7 +20,9 @@ Zarnoch SJ, Anderson RL, Sheffield RM. 1995. Using the β-binomial
 dogwood_anthracnose
 }
 \description{
-Dogwood trees with symptoms of dogwood anthracnose. The assessments of disease
-incidence were based on plots containing 10 dogwood trees and reported by Zarnoch et al (1995).
+Incidence data from the Dogwood Anthracnose Impact Assessment Program for
+1990 and 1991, in the Southeast of the USA, reported by Zarnoch et al (1995).
+Only plots with exactly n = 10 dogwood trees are present in the data set (168
+and 161 plots in 1990 and 1991, respectively).
 }
 \keyword{datasets}

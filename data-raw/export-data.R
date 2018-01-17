@@ -132,8 +132,8 @@ use_data(dogwood_anthracnose)
 #------------------------------------------------------------------------------#
 aphids <- read.csv("data-raw/aphids.csv", header = TRUE)
 
-with(aphids, plot(x, y, pch = NA))
-with(aphids, text(x, y, labels = i))
+with(aphids, plot(xm, ym, pch = NA))
+with(aphids, text(xm, ym, labels = i))
 
 use_data(aphids)
 
@@ -141,14 +141,14 @@ use_data(aphids)
 # Export arthropods counts (Holland et al., 1999)
 #------------------------------------------------------------------------------#
 arthropods <- read.csv("data-raw/arthropods.csv", header = TRUE)
-arthropods_splitted <- split(arthropods, arthropods$set)
+arthropods_splitted <- split(arthropods, arthropods$t)
 
 opar <- par()
 par(mar = c(2,2,2,2)) # We do not see x and y labels anymore.
 layout(matrix(1:6, nrow = 3, ncol = 2, byrow = TRUE))
 invisible(lapply(arthropods_splitted, function(set) {
-    with(set, plot(x, y, pch = NA))
-    with(set, text(x, y, labels = i))
+    with(set, plot(xm, ym, pch = NA))
+    with(set, text(xm, ym, labels = i))
 }))
 par(opar)
 layout(1)
@@ -163,8 +163,8 @@ codling_moths <- read.csv("data-raw/codling_moths.csv", header = TRUE)
 coef <- 80 # Coef to convert arbitrary units into meters (m = coef * u.a.)
 codling_moths[, 1:2] %<>% multiply_by(coef)
 
-with(codling_moths, plot(x, y, pch = NA))
-with(codling_moths, text(x, y, labels = i))
+with(codling_moths, plot(xm, ym, pch = NA))
+with(codling_moths, text(xm, ym, labels = i))
 
 use_data(codling_moths)
 
