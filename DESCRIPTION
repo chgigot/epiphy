@@ -24,6 +24,7 @@ Suggests:
     tidyr,
     spdep,
     emdist,
+    vegan,
     knitr,
     rmarkdown
 Collate: 
