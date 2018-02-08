@@ -1,11 +1,11 @@
 Package: epiphy
 Type: Package
 Title: Tool Box for the Analysis of Plant Disease Epidemics
-Version: 0.0.0.9001
+Version: 0.3.0
 Authors@R: as.person(
     "Christophe Gigot <ch.gigot@gmail.com> [aut, cre]")
 Description: Coming soon!
-License: GPL-3
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
@@ -25,6 +25,8 @@ Suggests:
     spdep,
     emdist,
     vegan,
+    MASS,
+    emdbook,
     knitr,
     rmarkdown
 Collate: 
