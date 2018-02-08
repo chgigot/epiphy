@@ -1,0 +1,90 @@
+---
+title: "Definitions and relationships between parameters"
+author: "Christophe Gigot"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Definitions and relationships between parameters}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+bibliography: biblio.bib
+---
+
+
+## Variable definitions
+
+Throughout the package **epiphy**, special attention is given to stay consistent consistent with variable and parameter names. Some of the most significant names are the followings:
+
+- $x$, $y$ and $z$ correspond to the three spatial dimensions. Note that no currently implemented method deals with the third dimension $z$;
+- $t$ stands for the temporal dimension, if any;
+- $i$ corresponds to the used disease intensity metric. Intensity data can be either count, incidence or severity data. Note that there is no implemented methods for severity data at the moment.
+- $n$ denotes the number of individuals in a sampling unit only when disease incidence data is used. Note that currently most of the implemented methods only work with equal size sampling units (i.e. there is only one value for $n$ in a given data set).
+- $N$ means the total number of sampling units in a data set.
+- $p$ is the average disease intensity. $p = \sum_k i_k / N$ for count data ($p \in [0, +\infty[$) and severity data ($p \in [0, 1]$). $p = \sum_k (i_k/n_k) / N$ for incidence data, i.e. $p$ is an average proportion ($p \in [0, 1]$).
+
+
+## Parameters of the beta-binomial distribution
+
+### Definitions
+
+The aggregation parameter, $\theta$, can be computed from the two shape parameters of the beta-binomial distribution, $\alpha$ and $\beta$. Note that in **epiphy**, $\theta = 1 / (\alpha + \beta)$ as in @Madden_etal_2007, but this definition is not necessarily consistent with what can be found somewhere else in the literature. For example, $\theta = \alpha + \beta$ in the package **emdbook**.
+
+The intra-cluster correlation coefficient, $\rho$ [@Mak_1988], characterizes the spatial aggregation as the tendency for elements in a sampling unit to have the same disease status more frequently than expected on the basis of spatial randomness [@Madden_etal_2007]. In **epiphy**, $\rho = \theta / (\theta + 1)$.
+
+### Relationship table
+
+|   |   |   |   |
+|---|---|---|---|
+| $$f(\alpha, \beta)$$ | $$p = \frac{\alpha}{\alpha + \beta};$$ | $$\theta = \frac{1}{\alpha + \beta};$$ | $$\rho = \frac{1}{\alpha + \beta + 1}$$ |
+| $$f(\theta, \rho)$$ | $$\theta = \frac{\rho}{1 - \rho};$$ | $$\rho = \frac{\theta}{\theta + 1}$$ | |
+| $$f(p, \theta)$$ | $$\alpha = \frac{p}{\theta};$$ | $$\beta = \frac{1 - p}{\theta}$$ | |
+| $$f(p, \rho)$$ | $$\alpha = \frac{p(1-\rho)}{\rho};$$ | $$\beta = \frac{(1 - p)(1-\rho)}{\rho}$$ | |
+
+## Parameters of the binary power law
+
+There are different parametrizations of the binary form of the power law. The user should therefore be cautious when making computations and comparisons with published results. Below are reminders about definitions and relationships between these different parametrizations.
+
+### Two possible formulas for parametrization
+
+$$
+s_{obs}^2 = V_n = A_n [np(1-p)]^b = a_n [p(1-p)]^b
+$$
+
+$$
+s_{obs}^2 = V_p = A_p [p(1-p)/n]^b = a_p [p(1-p)]^b
+$$
+
+where $s_{obs}^2$ stands for the observed variance. The relationships between the different binary power law parameters ($A_p$, $a_p$, $A_n$, $a_n$ and $b$) are specified in the following relationship tables. Note that  $V_n = n^2 V_p$.
+
+### Relationship tables
+
+**Full version.**
+
+|       | $A_p$                  | $a_p$               | $A_n$                  | $a_n$               |
+|:-----:|:----------------------:|:-------------------:|:----------------------:|:-------------------:|
+| $A_p$ | $1$                    | $A_p = a_p n^b$     | $A_p = A_n n^{2(b-1)}$ | $A_p = a_n n^{b-2}$ |
+| $a_p$ | $a_p = A_p n^{-b}$     | $1$                 | $a_p = A_n n^{b-2}$    | $a_p = a_n n^{-2}$  |
+| $A_n$ | $A_n = A_p n^{2(1-b)}$ | $A_n = a_p n^{2-b}$ | $1$                    | $A_n = a_n n^{-b}$  |
+| $a_n$ | $a_n = A_p n^{2-b}$    | $a_n = a_p n^2$     | $a_p = A_n n^b$        | $1$                 |
+
+**Reader-friendly version.** To read it, the formula $\text{row} = \text{col} \times \text{cell}$ must be used.
+
+|       | $A_p$        | $a_p$     | $A_n$        | $a_n$     |
+|:-----:|:------------:|:---------:|:------------:|:---------:|
+| $A_p$ | $1$          | $n^b$     | $n^{2(b-1)}$ | $n^{b-2}$ |
+| $a_p$ | $n^{-b}$     | $1$       | $n^{b-2}$    | $n^{-2}$  |
+| $A_n$ | $n^{2(1-b)}$ | $n^{2-b}$ | $1$          | $n^{-b}$  |
+| $a_n$ | $n^{2-b}$    | $n^2$     | $n^b$        | $1$       |
+
+Note that the function `a2a` is kindly provided in **epiphy** to make these tricky conversions as easy as possible.
+
+## Relationship between beta-binomial and binary power law parameters
+
+$$
+\theta = \frac{a_p - f(p)/n}{f(p) - a_p} \text{, with } f(p) = [p(1-p)]^{1-b}
+$$
+
+## References
+
