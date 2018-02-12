@@ -57,6 +57,9 @@
 #'      ylab = "Probability density between 25 and 50 (size = 100)")
 #' lines(thetas, density1, lty = 2)
 #'
+#' @seealso \code{\link[emdbook]{dbetabinom}} in the package \strong{emdbook}
+#' where the definition of theta is different.
+#'
 #' @name BetaBinomial
 #' @export
 #------------------------------------------------------------------------------#

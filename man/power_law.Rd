@@ -57,5 +57,5 @@ Pathology 41 (6): 657–660.
 
 Madden LV, Hughes G, van den Bosch F. 2007. Spatial aspects of epidemics -
 III: Patterns of plant disease. In: The study of plant disease epidemics,
-235–78. American Phytopathological Society, St Paul, MN.
+235–278. American Phytopathological Society, St Paul, MN.
 }

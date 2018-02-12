@@ -77,7 +77,7 @@ plot(res)
 
 ## Spatial hierarchy
 low <- my_data2
-high <- lapply(my_data2, level_up)
+high <- lapply(my_data2, threshold)
 
 res <- spatial_hier(low, high)
 res

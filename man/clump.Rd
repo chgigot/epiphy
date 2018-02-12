@@ -7,7 +7,8 @@
 \usage{
 clump(object, ...)
 
-\method{clump}{intensity}(object, unit_size, fun = sum, ...)
+\method{clump}{intensity}(object, unit_size, fun = sum,
+  inclusive_unspecified = FALSE, ...)
 }
 \arguments{
 \item{object}{An \code{intensity} object.}
@@ -22,6 +23,11 @@ ones) will be dropped so that clumps of individuals remain even
 throughout the data set.}
 
 \item{fun}{Function used to group observational data together.}
+
+\item{inclusive_unspecified}{Not yet implemented. Do unspecified mapped
+variables (different from i and n) need to be included into the bigger
+possible sampling unit (TRUE) or splited into as many sampling units as
+possible (FALSE, default).}
 
 \item{group_by}{Not yet implemented.}
 }
@@ -43,5 +49,14 @@ plot(my_incidence_clumped_2, type = "all")
 # To get mean disease incidence for each plant over the 3 scoring dates:
 my_incidence_clumped_3 <- clump(my_incidence, unit_size = c(t = 3), fun = mean)
 plot(my_incidence_clumped_3)
+
+# Interest of the parameter inclusive_unspecified. TODO: Not yet implemented.
+#my_incidence1 <- clump(my_incidence, unit_size = c(x = 3, y = 3))
+#my_incidence2 <- clump(my_incidence, unit_size = c(x = 3, y = 3, t = 1))
+#identical(my_incidence1, my_incidence2)
+
+#my_incidence3 <- clump(my_incidence, unit_size = c(x = 3, y = 3), inclusive_unspecified = TRUE)
+#my_incidence4 <- clump(my_incidence, unit_size = c(x = 3, y = 3, t = 3))
+#identical(my_incidence3, my_incidence4)
 
 }

@@ -85,3 +85,7 @@ plot(thetas, density2, type = "l",
 lines(thetas, density1, lty = 2)
 
 }
+\seealso{
+\code{\link[emdbook]{dbetabinom}} in the package \strong{emdbook}
+where the definition of theta is different.
+}

@@ -5,6 +5,7 @@
 \alias{sadie.data.frame}
 \alias{sadie.matrix}
 \alias{sadie.count}
+\alias{sadie.incidence}
 \title{Spatial Analysis by Distance IndicEs (SADIE)}
 \usage{
 sadie(data, ...)
@@ -17,6 +18,9 @@ sadie(data, ...)
   nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1)
 
 \method{sadie}{count}(data, index = c("Perry", "Li-Madden-Xu", "all"),
+  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1)
+
+\method{sadie}{incidence}(data, index = c("Perry", "Li-Madden-Xu", "all"),
   nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1)
 }
 \arguments{

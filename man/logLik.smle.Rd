@@ -29,3 +29,4 @@ Returns an object of class \code{logLik}.  This is a number with at
 This function returns the maximal log-likelihood estimated with
 \code{\link{smle}}, if \code{f} returned log-likelihood value.
 }
+\keyword{internal}

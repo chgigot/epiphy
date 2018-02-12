@@ -31,7 +31,7 @@ section for more information about the available indices.
 There are currently three implemented methods to compute indices of
 aggregation.
 
-\code{fisher}: Fisher's indice of aggregation. In case of a count, this index
+\code{fisher}: Fisher's index of aggregation. In case of a count, this index
 corresponds to the ratio of the observed variance to the observed mean, and
 this is why this index is also known as the variance to mean ratio. For a
 binary variable, a similar index can be calculated using instead the ratio of

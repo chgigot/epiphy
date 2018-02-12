@@ -10,11 +10,11 @@
 \alias{severity_data}
 \title{Construct count, incidence and severity objects.}
 \usage{
-count(data, mapping, keep_std = TRUE)
+count(data, mapping, keep_only_std = TRUE)
 
-incidence(data, mapping, keep_std = TRUE)
+incidence(data, mapping, keep_only_std = TRUE)
 
-severity(data, mapping, keep_std = TRUE)
+severity(data, mapping, keep_only_std = TRUE)
 }
 \arguments{
 \item{data}{A data frame. Each line corresponds to a record (or case, or
@@ -28,8 +28,8 @@ correctly ordered, i.e. x, y, z, t, r and then n. If variables in NULL,
 then only the 6 first ... will be take into account in the following (1, 2,
 ...), i.e. the id of the value. All the 'parameters' need to be specified.}
 
-\item{keep_std}{Are only standard names kept when proceeding to mapping?
-Setting \code{keep_std} to TRUE may be useful for subsequent data splitting
+\item{keep_only_std}{Are only standard names kept when proceeding to mapping?
+Setting \code{keep_only_std} to TRUE may be useful for subsequent data splitting
 using extra labels.}
 }
 \value{

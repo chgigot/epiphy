@@ -23,7 +23,7 @@ one variable), a data frame (if there is one or more variables) or an
 }
 \description{
 These functions are the core of the fitting processes performed in
-\code{\link{fit_distr}}.
+\code{\link{fit_two_distr}}.
 }
 \examples{
 set.seed(12345)
@@ -38,3 +38,4 @@ res
 summary(res)
 
 }
+\keyword{internal}
