@@ -36,6 +36,7 @@ NULL
 mapping <- function(...) {
     map <- as.list(match.call()[-1])
     map <- lapply(map, function(x) ifelse(is.name(x), x, as.name(x)))
+    map <- map[sort(names(map))] # To reorder the names in a standad way.
     structure(map, class = "mapping")
 }
 
@@ -49,6 +50,7 @@ mapping_ <- function(x) {
     map        <- lapply(splitted, tail, n = 1L)
     names(map) <- vapply(splitted, head, n = 1L, FUN.VALUE = character(1))
     map        <- lapply(map, as.name)
+    map        <- map[sort(names(map))] # To reorder the names in a standad way.
     structure(map, class = "mapping")
 }
 
@@ -91,9 +93,9 @@ as.character.mapping <- function(x, ...) {
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-remap <- function(data, mapping, keep_std = TRUE) {
+remap <- function(data, mapping, keep_only_std = TRUE) {
     stopifnot(any(class(data) == "intensity"))
-    init_intensity(data$data, mapping, keep_std, type = is(data))
+    init_intensity(data$data, mapping, keep_only_std, type = is(data))
 }
 
 #------------------------------------------------------------------------------#
@@ -175,7 +177,10 @@ valid_intensity <- function(object) {
 #------------------------------------------------------------------------------#
 # Initial checking and building of intensity object
 #------------------------------------------------------------------------------#
-init_intensity <- function(data, mapping, keep_std, type) {
+init_intensity <- function(data, mapping, keep_only_std, type) {
+
+    # TODO: keep_only_std do not work
+    # TODO: code to be cleaned a bit.
 
     std_names <- list(space = c("x", "y", "z"), # up to 3 dim for space
                       time = "t",               # up to 1 dim for time
@@ -192,16 +197,16 @@ init_intensity <- function(data, mapping, keep_std, type) {
     if (!(is.data.frame(data))) stop("'data' must be a data frame.")
     # Subsequent verifications should be done in 'validity' function for each
     # object.
+    data_header   <- colnames(data) ## Redondant avec plus haut
     # * mapping
     if (missing(mapping)) {
-        data_header    <- colnames(data)
         data_std_names <- data_header[data_header %in% unlist(std_names)]
         mapping <- mapping_(paste0(data_std_names, "=", data_std_names))
         # checkings!!!
     } else {
         if (class(mapping) != "mapping") stop("'mapping' must be a mapping object.")
         names_mapping <- names(mapping) ## Redondant avec plus bas
-        if (!all(i_std <- names_mapping %in% unlist(std_names)) && keep_std) {
+        if (!all(i_std <- names_mapping %in% unlist(std_names)) && keep_only_std) { # TODO: What? keep_only_std here?
             #warning("Dropping unrelevant names in mapping.") # NOT CLEAR
             mapping <- mapping[i_std]
             # checkings!!!!
@@ -209,7 +214,6 @@ init_intensity <- function(data, mapping, keep_std, type) {
         # Then, Check if there are some standard names in colnames that need to be
         # auto-mapped:
         # TODO: faire en sorte que si
-        data_header   <- colnames(data) ## Redondant avec plus haut
         mapped_header <- as.character(mapping)
         unmapped_data_header <- data_header[!(data_header %in% mapped_header)]
         unmapped_data_std_names <- unmapped_data_header[
@@ -226,6 +230,14 @@ init_intensity <- function(data, mapping, keep_std, type) {
     struct <- lapply(std_names, function(type) {
         mapping_names[mapping_names %in% type]
     })
+
+    # TODO: NEW: to test.
+    if (!keep_only_std) {
+        unmapped_data_non_std_names <- data_header[!(data_header %in% mapping)]
+        extra_mapping <- mapping_(paste0(unmapped_data_non_std_names, "=", unmapped_data_non_std_names))
+        mapping <- c(extra_mapping, mapping) ## labels at the beginning (convention)
+        struct  <- c(list(label = unmapped_data_non_std_names), struct)  ## labels at the beginning (convention)
+    }
 
     #--------------------------------------------------------------------------#
     # Return an "intensity" object
@@ -314,8 +326,8 @@ init_intensity <- function(data, mapping, keep_std, type) {
 #'   correctly ordered, i.e. x, y, z, t, r and then n. If variables in NULL,
 #'   then only the 6 first ... will be take into account in the following (1, 2,
 #'   ...), i.e. the id of the value. All the 'parameters' need to be specified.
-#' @param keep_std Are only standard names kept when proceeding to mapping?
-#'   Setting \code{keep_std} to TRUE may be useful for subsequent data splitting
+#' @param keep_only_std Are only standard names kept when proceeding to mapping?
+#'   Setting \code{keep_only_std} to TRUE may be useful for subsequent data splitting
 #'   using extra labels.
 #'
 #' @return An \code{incidence} object.
@@ -378,8 +390,8 @@ NULL
 #' @aliases count_data
 #' @export
 #------------------------------------------------------------------------------#
-count <- function(data, mapping, keep_std = TRUE) {
-    init_intensity(data, mapping, keep_std, type = "count")
+count <- function(data, mapping, keep_only_std = TRUE) {
+    init_intensity(data, mapping, keep_only_std, type = "count")
 }
 
 #------------------------------------------------------------------------------#
@@ -387,8 +399,8 @@ count <- function(data, mapping, keep_std = TRUE) {
 #' @aliases incidence_data
 #' @export
 #------------------------------------------------------------------------------#
-incidence <- function(data, mapping, keep_std = TRUE) {
-    init_intensity(data, mapping, keep_std, type = "incidence")
+incidence <- function(data, mapping, keep_only_std = TRUE) {
+    init_intensity(data, mapping, keep_only_std, type = "incidence")
 }
 
 #------------------------------------------------------------------------------#
@@ -396,8 +408,8 @@ incidence <- function(data, mapping, keep_std = TRUE) {
 #' @aliases severity_data
 #' @export
 #------------------------------------------------------------------------------#
-severity <- function(data, mapping, keep_std = TRUE) {
-    init_intensity(data, mapping, keep_std, type = "severity")
+severity <- function(data, mapping, keep_only_std = TRUE) {
+    init_intensity(data, mapping, keep_only_std, type = "severity")
 }
 
 # The three following function (*_data) are alternative way to create
@@ -406,18 +418,23 @@ severity <- function(data, mapping, keep_std = TRUE) {
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-count_data <- function(data, mapping, keep_std) count(data, mapping, keep_std)
+count_data <- function(data, mapping, keep_only_std = TRUE) {
+    count(data, mapping, keep_only_std)
+}
 
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-incidence_data <- function(data, mapping, keep_std) incidence(data, mapping, keep_std)
+incidence_data <- function(data, mapping, keep_only_std = TRUE) {
+    incidence(data, mapping, keep_only_std)
+}
 
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-severity_data <- function(data, mapping, keep_std) severity(data, mapping, keep_std)
-
+severity_data <- function(data, mapping, keep_only_std = TRUE) {
+    severity(data, mapping, keep_only_std)
+}
 
 #==============================================================================#
 # Basic manipulations of "intensity" objects
@@ -456,6 +473,7 @@ is.severity  <- function(x) return(is(x, "severity"))
 #' @export
 #------------------------------------------------------------------------------#
 print.intensity <- function(x, ...) {
+    # TODO: Clean this function (no variable with name 'test','a', ...).
     cat("# A mapped object: ", class(x)[1], " class\n", sep = "")
     len <- lengths(x$struct)
     cat("# dim: ", len[1], " ", names(x$struct)[1], ", ", len[2], " ", names(x$struct)[2],
@@ -471,10 +489,14 @@ print.intensity <- function(x, ...) {
     test[!is.na(test)] <- paste0("[", test[!is.na(test)], "]")
     test[is.na(test)]  <- "."
     test <- setNames(test, heading)
-    a <- data.frame(rbind(names(test), x$data[1:6, ]), row.names = c("", 1:6))
+    nrow       <- nrow(x$data)
+    nrow_max   <- ifelse(nrow > 6, 6, nrow)
+    chr_data   <- x$data[1:nrow_max, ]
+    chr_data[] <- lapply(chr_data, as.character) # To avoid problems with factor (labels) column: niveau de facteur incorrect, NAs générés
+    a <- data.frame(rbind(names(test), chr_data), row.names = c("", 1:nrow_max))
     colnames(a) <- test
     print(a)
-    cat("# ... with ", nrow(x$data) - 6, " more records (rows)\n")
+    cat("# ... with ", nrow - nrow_max, " more records (rows)\n", sep = "")
     invisible(x)
 }
 
@@ -598,6 +620,10 @@ dim.intensity <- function(x) lengths(x$struct)
 #'     throughout the data set.
 #' @param group_by Not yet implemented.
 #' @param fun Function used to group observational data together.
+#' @param inclusive_unspecified Not yet implemented. Do unspecified mapped
+#'     variables (different from i and n) need to be included into the bigger
+#'     possible sampling unit (TRUE) or splited into as many sampling units as
+#'     possible (FALSE, default).
 #' @param ... Optional arguments to \code{fun}.
 #'
 #' @examples
@@ -615,6 +641,15 @@ dim.intensity <- function(x) lengths(x$struct)
 #' my_incidence_clumped_3 <- clump(my_incidence, unit_size = c(t = 3), fun = mean)
 #' plot(my_incidence_clumped_3)
 #'
+#' # Interest of the parameter inclusive_unspecified. TODO: Not yet implemented.
+#' #my_incidence1 <- clump(my_incidence, unit_size = c(x = 3, y = 3))
+#' #my_incidence2 <- clump(my_incidence, unit_size = c(x = 3, y = 3, t = 1))
+#' #identical(my_incidence1, my_incidence2)
+#'
+#' #my_incidence3 <- clump(my_incidence, unit_size = c(x = 3, y = 3), inclusive_unspecified = TRUE)
+#' #my_incidence4 <- clump(my_incidence, unit_size = c(x = 3, y = 3, t = 3))
+#' #identical(my_incidence3, my_incidence4)
+#'
 #' @export
 #------------------------------------------------------------------------------#
 clump <- function(object, ...) UseMethod("clump")
@@ -623,7 +658,8 @@ clump <- function(object, ...) UseMethod("clump")
 #' @rdname clump
 #' @export
 #------------------------------------------------------------------------------#
-clump.intensity <- function(object, unit_size, fun = sum, ...) {
+clump.intensity <- function(object, unit_size, fun = sum,
+                            inclusive_unspecified = FALSE, ...) { # TODO: Code inclusive_unspecified
 
     #--------------------------------------------------------------------------#
     # Initial checks and data preparation
@@ -634,7 +670,7 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
     colnames_mapped_data <- colnames(mapped_data)
     obs_names     <- object$struct[["obs"]]
     #non_obs_names <- unname(unlist(object$struct[c("space", "time")]))
-    non_obs_names <- colnames_mapped_data[!(colnames_mapped_data %in% obs_names)] # because of if keep_std = FALSE
+    non_obs_names <- colnames_mapped_data[!(colnames_mapped_data %in% obs_names)] # because of if keep_only_std = FALSE
     if (!all(names(unit_size) %in% non_obs_names)) {
         stop(paste0("All unit_size names must exist in mapped data ",
                     "(non-observational types)."))
@@ -643,11 +679,12 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
     #--------------------------------------------------------------------------#
     # Define groups
 
-    # TODO : Gérer aussi le cas du zér0 !!!
     # exemple avec incidence(hop_viruses$HpLV, mapping(x=xm,y=ym))
     invisible(lapply(seq_len(length(unit_size)), function(i1) {
         id  <- names(unit_size)[i1]
-        tmp <- ceiling(mapped_data[[id]] / unit_size[[id]])
+        val <- mapped_data[[id]]
+        val <- (val - min(val)) ## Rescale with 0 as a tmp new base in ordre to Gérer aussi le cas du zér0 !!!
+        tmp <- floor(val / unit_size[[id]]) + 1 ## +1 as a new base by convention
         if (length(unique(table(tmp))) > 1) {
             tmp[tmp == max(tmp)] <- NA
         }
@@ -669,7 +706,7 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
     f <- mapped_data[, non_obs_names]
     # There is no more NA in f, but they may still remain some NA in
     # observational data (i.e. in r and n? columns)
-    split_data <- base::split(mapped_data, f = f) #, lex.order = TRUE)... only in most recent R version # Only cosmetic (to get a nice order)
+    split_data <- base::split(mapped_data, f = f, drop = TRUE) #, lex.order = TRUE)... only in most recent R version # Only cosmetic (to get a nice order)
 
     # Make the real calculation
     clumped_data <- do.call(rbind, lapply(split_data, function(sub_data) {
@@ -690,7 +727,8 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
                              colnames_mapped_data)
     #--------------------------------------------------------------------------#
     # Return an "intensity" object
-    unmap_data(clumped_data, source_object = object)
+    unmap_data(droplevels(clumped_data), source_object = object)
+    ## above droplevels just in case...
 }
 
 #------------------------------------------------------------------------------#
@@ -700,6 +738,11 @@ clump.intensity <- function(object, unit_size, fun = sum, ...) {
 #'
 #' @inheritParams base::split
 #' @param by The name(s) of the variable(s) which define(s) the grouping.
+#'
+#' @examples
+#' #inc_spl_t <- split(inc_clu, by = "t")
+#' #inc_spl_tbis <- split(inc_clu, unit_size = c(x = 8, y = 20, t = 1))
+#' #identical(unname(inc_spl_t), unname(inc_spl_tbis))
 #'
 #' @export
 #------------------------------------------------------------------------------#
@@ -727,7 +770,7 @@ split.intensity <- function(x, f, drop = FALSE, ..., by, unit_size) {
         colnames_mapped_data <- colnames(mapped_data)
         obs_names     <- object$struct[["obs"]]
         #non_obs_names <- unname(unlist(object$struct[c("space", "time")]))
-        non_obs_names <- colnames_mapped_data[!(colnames_mapped_data %in% obs_names)] # because of if keep_std = FALSE
+        non_obs_names <- colnames_mapped_data[!(colnames_mapped_data %in% obs_names)] # because of if keep_only_std = FALSE
         if (!all(names(unit_size) %in% non_obs_names)) {
             stop(paste0("All unit_size names must exist in mapped data ",
                         "(non-observational types)."))
@@ -786,7 +829,8 @@ split.intensity <- function(x, f, drop = FALSE, ..., by, unit_size) {
     }
 #==============================================================================#
 
-    lapply(split_data, function(subx) unmap_data(subx, x))
+    ## below droplevels just in case there were factors that need to be "cleaned" aftre the spliting
+    lapply(split_data, function(subx) unmap_data(droplevels(subx), source_object = x))
 }
 
 # TODO: unsplit
@@ -794,23 +838,31 @@ split.intensity <- function(x, f, drop = FALSE, ..., by, unit_size) {
 # TODO: Doc and clean below
 
 #------------------------------------------------------------------------------#
-#' To go to higher level in the hierarchy
+#' Threshold : To go to higher level in the hierarchy
 #'
-#' TODO
+#' "The Threshold tool transforms the current layer or the selection into a
+#' black and white image, where white pixels represent the pixels of the image
+#' whose Value is in the threshold range (1), and black pixels represent pixels with
+#' Value out of the threshold range (0)."
 #'
 #' @param data An \code{intensity} object.
+#' @param value All the intensity values lower or equal to this threshold
+#'     are set set to 0. The other values are set to 1.
 #'
 #' @export
 #------------------------------------------------------------------------------#
-level_up <- function(data) {
+threshold <- function(data, value = c(0, Inf)) {
+    stopifnot(length(value) == 2)
     mapped_data <- map_data(data)
-    mapped_data[["i"]] <- ifelse(mapped_data[["i"]] > 0, 1, 0)
+    mapped_data[["i"]] <- ifelse((mapped_data[["i"]] > value[1]) &
+                                 (mapped_data[["i"]] < value[2]), 1, 0)
     if ("n" %in% colnames(mapped_data)) {
         mapped_data[["n"]] <- 1
     }
     unmap_data(mapped_data, data)
 }
 
+# TODO: to keep below?
 is.completeArray <- function(object) {
     dt <- as.data.frame(object, fields = c("space", "time"))
     ref <- expand.grid(lapply(dt, unique))
@@ -863,7 +915,7 @@ as.character.severity <- function(x, ...) "<severity object>"
 #' @export
 #------------------------------------------------------------------------------#
 plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "all"),
-                           tile = TRUE, pch = 22) {
+                           tile = TRUE, pch = 22, legend.position = "right") {
 
     type <- match.arg(type)
 
@@ -934,7 +986,9 @@ plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "all"),
                                        guide = guide_legend(reverse = TRUE),
                                        breaks = fill_breaks,
                                        limits = fill_limits)
-        gg <- gg + theme_bw() + theme(panel.grid = element_blank())
+        gg <- gg + theme_bw() +
+            theme(panel.grid = element_blank()) +
+            theme(legend.position = legend.position)
         gg <- gg + coord_fixed() # To get squares in any case
         if (possible_temporal) {
             nt <- length(unique(mapped_data$t))
