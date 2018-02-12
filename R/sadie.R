@@ -69,6 +69,11 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                              nperm = 100, rseed = TRUE, seed = 12345, cost,
                              threads = 1, ..., method = "shortsimplex") {
 
+    warning(paste0("You're using an early version of the SADIE procedure ",
+                   "for R. Congratulations!\nHowever, keep in mind that this ",
+                   "version need to be intensively tested\nbefore being ",
+                   "considered as a stable version."))
+
     index <- match.arg(index)
     n_col <- ncol(data)
     stopifnot(n_col == 3)
@@ -200,6 +205,17 @@ sadie.count <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
     sadie.data.frame(mapped_data, index, nperm, rseed, seed, cost, threads)
 }
 
+#------------------------------------------------------------------------------#
+#' @rdname sadie
+#' @export
+#------------------------------------------------------------------------------#
+sadie.incidence <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
+                        nperm = 100, rseed = TRUE, seed = 12345, cost,
+                        threads = 1) {
+    mapped_data <- map_data(data)
+    mapped_data[["n"]] <- NULL # n is not used in SADIE procedure.
+    sadie.data.frame(mapped_data, index, nperm, rseed, seed, cost, threads)
+}
 
 #------------------------------------------------------------------------------#
 #' @export
@@ -470,69 +486,74 @@ Ia <- function(Da, Ea) {return(Da/Ea)} # Da = observed, Ea = mean of randomized 
 #' @include sadie.R
 #' @export
 #------------------------------------------------------------------------------#
-plot.sadie <- function(x, y, ..., isoclines = FALSE, onlySignificant = FALSE,
-                       resolution = rep(100, 2)) { # + specify significancy we want (0.95,...)
+plot.sadie <- function(x, y, ..., index = c("Perry", "Li-Madden-Xu"),
+                       isoclines = FALSE, resolution = 100,
+                       thresholds = c(-1.5, 1.5),
+                       point_size = c("radius", "area")) {
 
-    data1 <- x$info_clust
+    index      <- match.arg(index)
+    point_size <- match.arg(point_size)
 
-    dataLoess <- stats::loess(idx_P ~ x * y, data = data1,
-                              degree = 2, span = 0.2)
-    x <- seq(min(data1$x), max(data1$x), length = resolution[1]) # xResolution
-    y <- seq(min(data1$y), max(data1$y), length = resolution[2]) # yResolution
-    interpolated <- predict(dataLoess, expand.grid(x = x, y = y))
+    idx <- switch(index, "Perry" = "idx_P", "Li-Madden-Xu" = "idx_LMX")
+    data_clust <- x$info_clust
+    data_loess <- stats::loess(as.formula(paste0(idx, " ~ x * y")), data = data_clust, degree = 2, span = 0.2)
+    input_val <- expand.grid(
+        x = seq(min(data_clust$x), max(data_clust$x), length = resolution),
+        y = seq(min(data_clust$y), max(data_clust$y), length = resolution))
+    interpolated   <- predict(data_loess, input_val)
+    data_landscape <- data.frame(input_val, z = as.vector(interpolated))
 
-    data2 <- data.frame(expand.grid(x = x, y = y), z = as.vector(interpolated))
+    data_clust$col <- vapply(data_clust[[idx]], function(x) {
+        if      (x <  thresholds[1L]) "blue" # Low values
+        else if (x <= thresholds[2L]) "white" # Intermediate values
+        else                          "red"   # High values
+    }, character(1L))
 
-    data3 <- data.frame(lapply(split(data2, data2$y), function(XX) XX$z))
-
-    thres <- c(-1.5, 1.5)
-    cpt <- function(x) {
-        if (x < 0) {
-            if (x < thres[1]) return("black") # low
-            else              return("white")  # no
-        } else {
-            if (x > thres[2]) return("red") # high
-            else              return("white")   # no
-        }
-    }
-    data1$col <- vapply(data1$idx_P, cpt, character(1))
-    #data1$col <- "no-se"
-
-    #g <- ggplot(data2, aes(x = x, y = y, z = z)) +
-    #    geom_raster(aes(fill = z)) + # tile ou rectangle plut^ot, car pas toujours des carrés !!!
-    #    geom_contour(color = "white", size = 0.25) +
-    #    geom_point(data = data1, inherit.aes = FALSE,
-    #               aes(x = x, y = y,
-    #                   size = abs(idx_P)),
-    #               #                                 fill = as.factor(col)),
-    #               colour = "black", pch = 21) +
-    #    scale_fill_gradient(low = "white", high = "black")
-    ##scale_fill_distiller(palette = "Spectral")
-    ##theme_bw()
-    ##geom_tile() +
-    ##    stat_contour(color="white", size=0.25) +
-    ##    viridis::scale_fill_viridis() +
-    ##    ggthemes::ggthemestheme_tufte(base_family="Helvetica")
-    #print(g)
-
-
-
+    gg <- ggplot()
     if (isoclines) {
-        filled.contour(x = unique(data2$x), y = unique(data2$y), z = as.matrix(data3),
-                       color.palette = terrain.colors,
-                       plot.axes = {
-                           with(data1, points(x, y, pch = 21,
-                                              cex = abs(idx_P),
-                                              col = "black", bg = col));
-                           contour(x = unique(data2$x), y = unique(data2$y),
-                                   z = as.matrix(data3),
-                                   col = "black", lty = "solid", add = TRUE,
-                                   vfont = c("sans serif", "plain"))
-                       })
+        gg <- gg + geom_raster(data = data_landscape, aes(x, y, fill = z))
+        gg <- gg + geom_contour(data = data_landscape, aes(x, y, z = z),
+                                size = 0.6, color = "black")
+        # Note that it is not possible in current ggplot2 implementation to use
+        # two different colour scales in the same figure.
+        gg <- gg + geom_point(data = data_clust,
+                              aes_(quote(x), quote(y),
+                                   size = call("abs", as.name(idx))),
+                              colour = "black", fill = "black", pch = 21)
+        switch(point_size,
+               "area" = {
+                   gg <- gg + scale_size("Absolute\nindex", range = c(0, 10))
+               },
+               "radius" = {
+                   gg <- gg + scale_radius("Absolute\nindex", range = c(0, 10))
+               }
+        )
+        gg <- gg + scale_fill_gradientn("Interpolated\nindex",
+                                        colours = terrain.colors(10))
     } else {
-        with(data1, plot(x, y, pch = 21, cex = abs(idx_P),
-                         col = "black", bg = col))
+        gg <- gg + geom_point(data = data_clust,
+                              aes_(quote(x), quote(y), fill = quote(col),
+                                   size = call("abs", as.name(idx))),
+                              colour = "black",  pch = 21)
+        switch(point_size,
+            "area" = {
+                gg <- gg + scale_size("Absolute\nindex", range = c(0, 10))
+            },
+            "radius" = {
+                gg <- gg + scale_radius("Absolute\nindex", range = c(0, 10))
+            }
+        )
+        gg <- gg + scale_fill_manual("Index\nthreshold",
+            breaks = c("red", "white", "blue"),
+            labels = c("red"   = paste0("> ", thresholds[2L]),
+                       "white" = paste0("Between ", thresholds[1L],
+                                        "\nand ", thresholds[2L]),
+                       "blue" = paste0("< ", thresholds[1L])),
+            values = c("red" = "red", "white" = "white", "blue" = "blue"))
     }
+    gg <- gg + theme_bw()
+    print(gg)
+    invisible(NULL)
 }
 
 

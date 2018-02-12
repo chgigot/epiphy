@@ -82,6 +82,10 @@ spatial_hier <- function(low, high) {
     if (length(low) != length(high)) {
         stop("'low' and 'high' lengths differ.")
     }
+    if (object_class_low[1L] != "incidence") {
+        stop("Only spatial hierarchy analysis for 'incidence' data is implemented.")
+    }
+    data_class <- object_class_low
 
     # Get formatted data for low and high:
     data_low  <- get_fmt_obs(low, type = "incidence")
@@ -111,16 +115,23 @@ spatial_hier <- function(low, high) {
     }
     model     <- lm(y ~ offset(x), data = data)
     # ^ is the same as lm((y - x) ~ 1, ...), i.e. we just look for an intercept.
-    nu        <- unname(exp(coef(model)))
-    coord_the <- data.frame(x = p_low, y = 1 - (1 - p_low)^nu)
+    param     <- coef(summary(model))
+    rownames(param) <- "log_nu"
+    baseLog   <- exp(1)
+    new_param <- list(nu = estimate_param(model, bquote(.(baseLog)^x1)))
+    param     <- rbind_param(param, new_param)
+    param     <- param[sort(rownames(param)),, drop = FALSE] # Not need, but same logic as in other functions.
+
+    coord_the <- data.frame(x = p_low, y = 1 - (1 - p_low)^param["nu", "Estimate"])
 
     # Return a spatial_hier object
-    structure(list(call      = call, # TODO: Add more information about the transformation?
-                   model     = model,
-                   nu        = nu,    # TODO: create a param element like in power_law?
-                   n         = n_low, # TODO: Where to put n???
-                   coord_obs = coord_obs,
-                   coord_the = coord_the),
+    structure(list(call       = call, # TODO: Add more information about the transformation?
+                   data_class = data_class,
+                   model      = model,
+                   param      = param,
+                   n          = n_low, # TODO: Where to put n???
+                   coord_obs  = coord_obs,
+                   coord_the  = coord_the),
               class = "spatial_hier")
 }
 
@@ -128,8 +139,10 @@ spatial_hier <- function(low, high) {
 #' @export
 #------------------------------------------------------------------------------#
 print.spatial_hier <- function(x, ...) { # TODO
-    cat("# Spatial hierarchy analysis:\n")
-    cat("nu = ", x$nu, "\n", sep = "")
+    cat("Spatial hierarchy analysis for '", x$data_class[1L], "' data.\n\n",
+        "Parameter estimate:\n", sep = "")
+    print(x$param[, 1:2, drop = FALSE])
+    invisible(x)
 }
 
 #------------------------------------------------------------------------------#
@@ -140,16 +153,7 @@ summary.spatial_hier <- function(object, ...) {
     # tous ses éléments.
     summary_model <- summary(object$model)
     summary_model$call <- object$call
-
-    # TODO: Below, move to main function (like in power_law)??
-    param   <- coef(summary(object$model))
-    baseLog <- exp(1)
-    nu      <- estimate_param(object$model, bquote(.(baseLog)^x1))
-    param   <- rbind(param, unlist(nu))
-    rownames(param) <- c("log_base(nu)", "nu")
-    summary_model$coefficients <- param
-    # ---
-
+    summary_model$coefficients <- object$param
     structure(summary_model, class = "summary.spatial_hier")
 }
 
@@ -164,53 +168,53 @@ print.summary.spatial_hier <- function(x, ...) stats:::print.summary.lm(x, ...)
 #------------------------------------------------------------------------------#
 plot.spatial_hier <- function(x, ..., scale = c("linear", "cloglog"),
                               observed = TRUE, model = TRUE, random = TRUE) {
-
     scale <- match.arg(scale)
+    gg <- ggplot()
 
     switch (scale,
         "linear" = {
-            gg <- list(
-                labs(x = expression(p[low]), y = expression(p[high])),
-                scale_x_continuous(limits = c(0, 1)),
-                scale_y_continuous(limits = c(0, 1)),
-                switch(observed, geom_point(data = x$coord_obs, aes(x, y), ...)),
-                switch(model, {
-                    p_low  <- seq(0, 1, by = 0.01)
-                    p_high <- 1 - (1 - p_low)^(x$nu)
-                    geom_line(data = data.frame(x = p_low, y = p_high),
-                              aes(x, y), ...)
-                }),
-                switch(random, {
-                    p_low  <- seq(0, 1, by = 0.01)
-                    p_high <- 1 - (1 - p_low)^(x$n)
-                    geom_line(data = data.frame(x = p_low, y = p_high),
-                              aes(x, y), linetype = "dashed", ...)
-                }),
-                theme_bw()
-            )
+            gg <- gg + labs(x = expression(p[low]), y = expression(p[high]))
+            gg <- gg + scale_x_continuous(limits = c(0, 1))
+            gg <- gg + scale_y_continuous(limits = c(0, 1))
+            if (observed) {
+                gg <- gg + geom_point(data = x[["coord_obs"]], aes(x, y), ...)
+            }
+            if (model) {
+                p_low  <- seq(0, 1, by = 0.01)
+                p_high <- 1 - (1 - p_low)^(x$param["nu", "Estimate"])
+                gg <- gg + geom_line(data = data.frame(x = p_low, y = p_high),
+                                     aes(x, y), ...)
+            }
+            if (random) {
+                p_low  <- seq(0, 1, by = 0.01)
+                p_high <- 1 - (1 - p_low)^(x[["n"]])
+                gg <- gg + geom_line(data = data.frame(x = p_low, y = p_high),
+                          aes(x, y), linetype = "dashed", ...)
+            }
         },
         "cloglog" = {
-            gg <- list(
-                labs(x = expression("cloglog(" * p[low] * ")"),
-                     y = expression("cloglog(" * p[high] * ")")),
-                switch(observed, geom_point(data = cloglog(x$coord_obs),
-                                            aes(x, y), ...)),
-                switch(model, {
-                    p_low  <- seq(0, 1, by = 0.01)
-                    p_high <- 1 - (1 - p_low)^(x$nu)
-                    geom_line(data = cloglog(data.frame(x = p_low, y = p_high)),
-                              aes(x, y), ...)
-                }),
-                switch(random, {
-                    p_low  <- seq(0, 1, by = 0.001)
-                    p_high <- 1 - (1 - p_low)^(x$n)
-                    geom_line(data = cloglog(data.frame(x = p_low, y = p_high)),
-                              aes(x, y), linetype = "dashed", ...)
-                }),
-                theme_bw()
-            )
+            gg <- gg + labs(x = expression("cloglog(" * p[low] * ")"),
+                            y = expression("cloglog(" * p[high] * ")"))
+            if (observed) {
+                gg <- gg + geom_point(data = cloglog(x[["coord_obs"]]),
+                                      aes(x, y), ...)
+            }
+            if (model) {
+                p_low  <- seq(0, 1, by = 0.01)
+                p_high <- 1 - (1 - p_low)^(x$param["nu", "Estimate"])
+                gg <- gg + geom_line(data = cloglog(data.frame(x = p_low, y = p_high)),
+                          aes(x, y), ...)
+            }
+            if (random) {
+                p_low  <- seq(0, 1, by = 0.001)
+                p_high <- 1 - (1 - p_low)^(x[["n"]])
+                gg <- gg + geom_line(data = cloglog(data.frame(x = p_low, y = p_high)),
+                          aes(x, y), linetype = "dashed", ...)
+            }
         }
     )
-    ggplot() + gg
+    gg <- gg + theme_bw()
+    print(gg)
+    invisible(NULL)
 }
 

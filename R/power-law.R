@@ -52,7 +52,7 @@ NULL
 #'
 #' Madden LV, Hughes G, van den Bosch F. 2007. Spatial aspects of epidemics -
 #' III: Patterns of plant disease. In: The study of plant disease epidemics,
-#' 235–78. American Phytopathological Society, St Paul, MN.
+#' 235–278. American Phytopathological Society, St Paul, MN.
 #'
 #' @export
 #------------------------------------------------------------------------------#
@@ -72,11 +72,13 @@ power_law <- function(list, log_base = exp(1), ...) {
     # Perform power law analysis:
     switch(object_class,
            "count" = {
+               name <- "Taylor's Power Law"
                data <- get_fmt_obs(list, type = object_class)
                x    <- vapply(data, mean, numeric(1L))
                y    <- vapply(data, var, numeric(1L))
            },
            "incidence" = {
+               name <- "Binary Power Law"
                data <- get_fmt_obs(list, type = object_class)
                # For incidence data as proportions:
                # v_t = p(1 - p)/n (Madden & Hughes, 1995)
@@ -120,13 +122,15 @@ power_law <- function(list, log_base = exp(1), ...) {
     )
 
     # Return the following object:
-    structure(list(call      = call, # TODO: Add more information about the transformation?
-                   data      = data, # TODO: Useful ??? (not in spatial_hier)
-                   model     = model,
-                   param     = param, # TODO: Where in n????
-                   log_base  = log_base,
-                   coord_obs = coord_obs,
-                   coord_the = coord_the),
+    structure(list(call       = call, # TODO: Add more information about the transformation?
+                   data_class = object_class,
+                   name       = name,
+                   data       = data, # TODO: Useful ??? (not in spatial_hier)
+                   model      = model,
+                   param      = param, # TODO: Where in n????
+                   log_base   = log_base,
+                   coord_obs  = coord_obs,
+                   coord_the  = coord_the),
               class = "power_law")
 }
 
@@ -134,12 +138,12 @@ power_law <- function(list, log_base = exp(1), ...) {
 #' @export
 #------------------------------------------------------------------------------#
 print.power_law <- function(x, ...) {
-    cat("# Power law analysis:\n")
-    cat("\nCall:\n")
-    print(x$call)
+    cat(x$name, ":\n",
+        "Power law analysis for '", x$data_class[1L], "' data.\n", sep = "")
     cat("\nCoefficients:\n")
     print(coef(x$model))
     cat("\n")
+    invisible(x)
 }
 
 #------------------------------------------------------------------------------#
@@ -184,45 +188,71 @@ plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"),
                            observed = TRUE, model = TRUE, random = TRUE) {
     scale <- match.arg(scale)
     log_base <- x$log_base
+    gg <- ggplot()
 
     switch (scale,
         "logarithmic" = {
             log_base_name <- ifelse(log_base == exp(1), "e",
                                     as.character(log_base))
-            gg <- list(
+            gg <- gg +
                 labs(x = bquote(log[.(log_base_name)] * "(binomial variance)"),
-                     y = bquote(log[.(log_base_name)] * "(observed variance)")),
-                # Below, switch is a quick & convenient way to say that if
-                # requirement is TRUE (i.e. = 1), then return the following
-                # instruction. Otherwise if requirement is FALSE (i.e. = 0),
-                # return NULL.
-                switch(observed, {
-                       geom_point(data = log(x$coord_obs, base = log_base),
-                                  aes(x, y), ...)
-                }),
-                switch(model, {
-                       geom_line(data  = log(x$coord_the, base = log_base),
-                                 aes(x, y), ...)
-                }),
-                switch(random, {
-                       geom_line(data  = log(x$coord_the, base = log_base),
-                                 aes(x, x), linetype = "dashed", ...)
-                }),
-                theme_bw()
-            )
+                     y = bquote(log[.(log_base_name)] * "(observed variance)"))
+            if (observed) {
+                gg <- gg + geom_point(data = log(x$coord_obs, base = log_base),
+                                      aes(x, y), ...)
+            }
+            if (model) {
+                gg <- gg + geom_line(data  = log(x$coord_the, base = log_base),
+                                     aes(x, y), ...)
+            }
+            if (random) {
+                gg <- gg + geom_line(data  = log(x$coord_the, base = log_base),
+                                     aes(x, x), linetype = "dashed", ...)
+            }
         },
         "linear" = {
-            gg <- list(
-                labs(x = "Binomial variance", y = "Observed variance"),
-                switch(observed, geom_point(data = x$coord_obs, aes(x, y), ...)),
-                switch(model,    geom_line(data  = x$coord_the, aes(x, y), ...)),
-                switch(random,   geom_line(data  = x$coord_the, aes(x, x),
-                                           linetype = "dashed", ...)),
-                theme_bw()
-            )
+            gg <- gg + labs(x = "Binomial variance", y = "Observed variance")
+            if (observed) {
+                gg <- gg + geom_point(data = x$coord_obs, aes(x, y), ...)
+            }
+            if (model) {
+                gg <- gg + geom_line(data  = x$coord_the, aes(x, y), ...)
+            }
+            if (random) {
+                gg <- gg + geom_line(data  = x$coord_the, aes(x, x),
+                                     linetype = "dashed", ...)
+            }
         }
     )
-    ggplot() + gg
+    gg <- gg + theme_bw()
+    print(gg)
+    invisible(NULL)
+}
+
+
+#==============================================================================#
+# Iwao's index
+#==============================================================================#
+
+#------------------------------------------------------------------------------#
+#' indices Iwao's patchiness regression index
+#'
+#' TODO: Not yet implemented.
+#'
+#' @references
+#'
+#' Iwao S. 1968. A new regression method for analyzing the aggregation pattern
+#' of animal populations. Researches on Population Ecology 10, 1–20.
+#' \href{http://dx.doi.org/10.1007/BF02514729}{doi:10.1007/BF02514729}
+#'
+#' @export
+#------------------------------------------------------------------------------#
+iwao <- function(data) {
+    stopifnot(is.count(data))
+    if (is.numeric(data)) {
+        if (!all(is.wholenumber(data))) stop("no whole numbers!")
+    }
+    return(NULL)
 }
 
 
