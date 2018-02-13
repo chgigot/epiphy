@@ -112,10 +112,10 @@ power_law <- function(list, log_base = exp(1), ...) {
         "incidence" = {
             n  <- mean(vapply(data, function(obj) mean(obj$n), numeric(1L))) ### PAS TOP
             new_param <- list(
-                Ar = estimate_param(model, bquote(.(log_base)^x1)),
-                ar = estimate_param(model, bquote(.(log_base)^x1 * .(n)^(-x2))),
-                AR = estimate_param(model, bquote(.(log_base)^x1 * .(n)^(2 * (1 - x2)))),
-                aR = estimate_param(model, bquote(.(log_base)^x1 * .(n)^(2 - x2)))
+                Ai = estimate_param(model, bquote(.(log_base)^x1)),
+                ai = estimate_param(model, bquote(.(log_base)^x1 * .(n)^(-x2))),
+                AI = estimate_param(model, bquote(.(log_base)^x1 * .(n)^(2 * (1 - x2)))),
+                aI = estimate_param(model, bquote(.(log_base)^x1 * .(n)^(2 - x2)))
             )
             param <- rbind(param, do.call(rbind, lapply(new_param, unlist))) # TODO: Not clean
         }
@@ -270,19 +270,19 @@ iwao <- function(data) {
 #' But different forms of (intercept) are possible depending on the formulation of the
 #' binomial power law.
 #' \tabular{ccccc}{
-#'       \tab Ar         \tab ar      \tab AR         \tab aR      \cr
-#'    Ar \tab 1          \tab n^b     \tab n^{2(b-1)} \tab n^{b-2} \cr
-#'    ar \tab n^{-b}     \tab 1       \tab n^{b-2}    \tab n^{-2}  \cr
-#'    AR \tab n^{2(1-b)} \tab n^{2-b} \tab 1          \tab n^{-b}  \cr
-#'    aR \tab n^{2-b}    \tab n^2     \tab n^b        \tab 1       \cr
+#'       \tab Ai         \tab ai      \tab AI         \tab aI      \cr
+#'    Ai \tab 1          \tab n^b     \tab n^{2(b-1)} \tab n^{b-2} \cr
+#'    ai \tab n^{-b}     \tab 1       \tab n^{b-2}    \tab n^{-2}  \cr
+#'    AI \tab n^{2(1-b)} \tab n^{2-b} \tab 1          \tab n^{-b}  \cr
+#'    aI \tab n^{2-b}    \tab n^2     \tab n^b        \tab 1       \cr
 #' }
 #'
 #' @param x Intercept parameter to be converted or a named list with the
-#'     parameter to be converted ("Ar", "ar", "AR" or "aR"), the slope
+#'     parameter to be converted ("Ai", "ai", "AI" or "aI"), the slope
 #'     ("slope"), and the number of individual per sampling unit ("n").
-#' @param from Kind of the input intercept parameter ("Ar", "ar", "AR" or "aR").
-#' @param to Desired kind for the ouput intercept parameter ("Ar", "ar", "AR" or
-#'     "aR").
+#' @param from Kind of the input intercept parameter ("Ai", "ai", "AI" or "aI").
+#' @param to Desired kind for the ouput intercept parameter ("Ai", "ai", "AI" or
+#'     "aI").
 #' @param slope Slope parameter.
 #' @param n Number of individuals per sampling unit.
 #'
@@ -309,15 +309,15 @@ a2a <- function(x, ...) UseMethod("a2a")
 #' @keywords internal
 #------------------------------------------------------------------------------#
 a2a_internal <- function(intercept, b, n, from, to) {
-    dico <- expand.grid(from = c("Ar", "ar", "AR", "aR"),
-                        to = c("Ar", "ar", "AR", "aR"),
+    dico <- expand.grid(from = c("Ai", "ai", "AI", "aI"),
+                        to = c("Ai", "ai", "AI", "aI"),
                         KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE)
     #-----------------------------------------------------------------#
-    #             | col Ar     |col ar  | col AR     | col aR
-    dico$coef <- c(1,           n^b,     n^(2*(b-1)), n^(b-2), # row Ar
-                   n^(-b),      1,       n^(b-2),     n^(-2),  # row ar
-                   n^(2*(1-b)), n^(2-b), 1,           n^(-b),  # row AR
-                   n^(2-b),     n^2,     n^b,         1)       # row aR
+    #             | col Ai     |col ai  | col AI     | col aI
+    dico$coef <- c(1,           n^b,     n^(2*(b-1)), n^(b-2), # row Ai
+                   n^(-b),      1,       n^(b-2),     n^(-2),  # row ai
+                   n^(2*(1-b)), n^(2-b), 1,           n^(-b),  # row AI
+                   n^(2-b),     n^2,     n^b,         1)       # row aI
     #-----------------------------------------------------------------#
     item <- dico[which(dico$from == from & dico$to == to), ]
     res  <- intercept * item[["coef"]]
@@ -334,8 +334,8 @@ a2a_internal <- function(intercept, b, n, from, to) {
 #' @export
 #------------------------------------------------------------------------------#
 a2a.numeric <- function(x, slope, n, # Here, x = intercept
-                        from = c("Ar", "ar", "AR", "aR"),
-                        to   = c("Ar", "ar", "AR", "aR")) {
+                        from = c("Ai", "ai", "AI", "aI"),
+                        to   = c("Ai", "ai", "AI", "aI")) {
 
     # Checks and variable allocation:
     from      <- match.arg(from)
@@ -352,12 +352,12 @@ a2a.numeric <- function(x, slope, n, # Here, x = intercept
 #' @export
 #------------------------------------------------------------------------------#
 a2a.list <- function(x, # Here, x: list with 3 elements: intercept, slope and n.
-                     to   = c("Ar", "ar", "AR", "aR")) {
+                     to   = c("Ai", "ai", "AI", "aI")) {
 
     # Checks and variable allocation:
     stopifnot(length(x) == 3)
     stopifnot(all(c("slope", "n") %in% names(x)))
-    cases <- c("Ar", "ar", "AR", "aR")
+    cases <- c("Ai", "ai", "AI", "aI")
     from  <- cases[cases %in% names(x)]
     stopifnot(length(from) == 1)
     to    <- match.arg(to)
