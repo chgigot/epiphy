@@ -12,6 +12,17 @@ is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
 epiphy_env <- new.env()
 epiphy_env$epsilon <- 1e-7
 
+## Below useful for clumped_data in clump (= a list)?drop
+#' @export
+droplevels.list <- function(x, except = NULL, ...) {
+    ix <- vapply(x, is.factor, logical(1L))
+    if (!is.null(except)) {
+        ix[except] <- FALSE
+    }
+    x[ix] <- lapply(x[ix], droplevels)
+    x
+}
+
 #------------------------------------------------------------------------------#
 #' Some link functions
 #'
@@ -69,10 +80,10 @@ llrtest <- function(random, aggregated) {
         warning(paste0("logLik value is lower for aggregated model than for ",
                        "random model.\nCheck function arguments."))
     }
-    value  <- 2 * (llval_aggregated[[1]] - llval_random[[1]]) # [[1]] (or [1]) to only keep the ll value (not attributes)
-    df     <- attr(llval_aggregated, "df") - attr(llval_random, "df") # Should be 1
-    pvalue <- pchisq(value, df, lower.tail = FALSE)
-    chisq  <- qchisq(pvalue, df)
+    value <- 2 * (llval_aggregated[[1]] - llval_random[[1]]) # [[1]] (or [1]) to only keep the ll value (not attributes)
+    df    <- attr(llval_aggregated, "df") - attr(llval_random, "df") # Should be 1
+    pval  <- pchisq(value, df, lower.tail = FALSE)
+    chisq <- qchisq(pval, df)
 
     tab <- matrix(rep(NA, 8), nrow = 2)
     dimnames(tab) <- list(c("random :", "aggregated :"),
@@ -80,7 +91,7 @@ llrtest <- function(random, aggregated) {
     tab[, 1]  <- c(llval_random, llval_aggregated)
     tab[2, 2] <- df
     tab[2, 3] <- value
-    tab[2, 4] <- pvalue
+    tab[2, 4] <- pval
     title <- "Likelihood ratio test\n"
     structure(as.data.frame(tab),
               heading = title, # heading must be an attribute.
@@ -122,7 +133,7 @@ llrtest <- function(random, aggregated) {
 # Estimate extra coef, based on deltamethod
 #' @export
 #------------------------------------------------------------------------------#
-estimate_param <- function(model, expr, type = c("t", "norm"), as_list = FALSE) { # List uniquement pour estimate mean / trouver autre nom
+estimate_param <- function(model, expr, type = c("t", "norm"), as_list = FALSE) { # as_list... NOT USED. List uniquement pour estimate mean / trouver autre nom
     # NEW !!!
     type <- match.arg(type)
     #expr_call <- substitute(expr) ## TODO: Non, parce que dans ce cas,on retrouve le call passé via expr (e.g. ".bquote(...)")
@@ -133,13 +144,13 @@ estimate_param <- function(model, expr, type = c("t", "norm"), as_list = FALSE) 
     coefs <- coef(model)
     envir <- list2env(setNames(as.list(coefs), paste0("x", 1:length(coefs))))
 
-    res        <- list()
-    res$est    <- eval(expr, envir)
-    res$se     <- msm::deltamethod(formula_call, coef(model), vcov(model))
-    res$tvalue <- res$est / res$se
-    res$pvalue <- ifelse((type == "t"), ## faire une condition plus intelligente (t and norm)
-                         2 * pt(abs(res$tvalue), df.residual(model), lower.tail = FALSE), # TODO: df.residual with smle???
-                         2 * pnorm(abs(res$tvalue), lower.tail = FALSE))
+    res      <- list()
+    res$est  <- eval(expr, envir)
+    res$se   <- msm::deltamethod(formula_call, coef(model), vcov(model))
+    res$tval <- res$est / res$se
+    res$pval <- ifelse((type == "t"), ## faire une condition plus intelligente (t and norm)
+                         2 * pt(abs(res$tval), df.residual(model), lower.tail = FALSE), # TODO: df.residual with smle???
+                         2 * pnorm(abs(res$tval), lower.tail = FALSE))
 
     # (1) Renvoyer les bons noms : par exemple:
     # Estimate Std. Error   z value        Pr(z)
@@ -160,6 +171,13 @@ estimate_param_ <- function(model, expr_name, type = c("t", "norm")) {
     expr <- as.name(expr_name)
     browser()
     estimate_param(model, expr, type)
+}
+
+
+# mat: existing mat of parameters
+# new_param: list of new params
+rbind_param <- function(base_mat, new_param) {
+    rbind(base_mat, do.call(rbind, lapply(new_param, unlist)))
 }
 
 
@@ -234,6 +252,8 @@ get_param_name_from_body <- function(f) {
     })))
 }
 
+# always lower, start and upper,
+# need documentation
 fmt_init <- function(data, name, ..., bounds) {
     calling_env <- parent.frame()
     dots <- list(...)
@@ -241,6 +261,9 @@ fmt_init <- function(data, name, ..., bounds) {
         if (!is.null(call <- dots[[val]])) {
             names(call) <- c("", "lower", "start", "upper")
             res <- eval(call, envir = calling_env)
+            # Checks:
+            if (res["start"] < res["lower"]) res["start"] <- res["lower"]
+            if (res["start"] > res["upper"]) res["start"] <- res["upper"]
             if (!bounds) res["start"] else res
         }
     }))
@@ -251,5 +274,78 @@ tocamel <- function(x) {
     # source: https://stackoverflow.com/questions/6364783/capitalize-the-first-letter-of-both-words-in-a-two-word-string
     gsub("(^|[[:space:]])([[:alpha:]])", "\\1\\U\\2", x, perl=TRUE)
 }
+
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+chisq.test2 <- function(x, p, n_est, df, rescale.p = FALSE, ...) {
+
+    if (missing(n_est) && missing(df)) {
+        res <- stats::chisq.test(x = x, p = p, rescale.p = rescale.p, ...)
+        res$data.name <- deparse(substitute(x))
+        res
+    } else {
+        if (!missing(n_est) && !missing(df)) {
+            stop("n_est or df must be provided, not both at the same time.")
+        }
+        if (!missing(n_est)) df <- length(x) - n_est - 1
+        n <- sum(x)
+        if (abs(sum(p) - 1) > sqrt(.Machine$double.eps)) {
+            if (rescale.p) p <- p/sum(p)
+            else stop("Probabilities must sum to 1.")
+        }
+        E <- n * p
+        V <- n * p * (1 - p)
+        statistic <- sum((x - E)^2/E)
+        pVal <- pchisq(statistic, df = df, lower.tail = FALSE)
+        names(statistic) <- "X-squared"
+        names(df) <- "df"
+        names(E) <- names(x)
+        if (any(E < 5)) warning("Chi-squared approximation may be incorrect.")
+        structure(list(statistic = statistic,
+                       parameter = df,
+                       p.value = pVal,
+                       method = "Chi-squared goodness-of-fit with intrinsic null hypothesis",
+                       data.name = deparse(substitute(x)),
+                       observed = x,
+                       expected = E,
+                       residuals = (x - E)/sqrt(E),
+                       stdres = (x - E)/sqrt(V)),
+                  class = "htest")
+    }
+}
+
+
+
+
+#------------------------------------------------------------------------------#
+# Below : used in mle_factory
+# data = vector, data.Frame or matrix
+# order is important!!
+get_std_named_df <- function(data, name) {
+    if (is.data.frame(data) && all(name %in% colnames(data))) {
+        # If it's already a std data frame (with potentially more columns that
+        # only in name)
+        data
+    } else {
+        stopifnot(all(sapply(data, is.numeric)))
+        stopifnot(is.character(name))
+        stopifnot(NCOL(data) == length(name))
+        # Coerce to data.frame if it is a vector for instance
+        data <- data.frame(data)
+        setNames(data, name[1: ncol(data)])
+    }
+}
+
+
+
+
+
+
+
+
+
+
 
 
