@@ -4,7 +4,7 @@
 \name{epiphy}
 \alias{epiphy}
 \alias{epiphy-package}
-\title{\code{epiphy}: Explore and analyze observations of plant disease epidemics}
+\title{\code{epiphy}: Analyzing plant disease epidemics}
 \description{
 This package is intended primarily for the plant pathologist community.
 }

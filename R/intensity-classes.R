@@ -840,22 +840,25 @@ split.intensity <- function(x, f, drop = FALSE, ..., by, unit_size) {
 #------------------------------------------------------------------------------#
 #' Threshold : To go to higher level in the hierarchy
 #'
-#' "The Threshold tool transforms the current layer or the selection into a
-#' black and white image, where white pixels represent the pixels of the image
-#' whose Value is in the threshold range (1), and black pixels represent pixels with
-#' Value out of the threshold range (0)."
+#' This function transforms the current \code{intensity} data set into a
+#' "simplified black and white image" of this same data set: every value of
+#' disease intensity below and above a given threshold is given the value 0 and
+#' 1, respectively.
+#'
+#' By default, everything above 0 is given 1, and 0 stays at 0. \code{threshold}
+#' is thus useful to report a whole sampling unit as "healthy" (0), if no
+#' diseased individual at all was found within the sampling unit, or "diseased"
+#' (1) if at least one diseased individual was found.
 #'
 #' @param data An \code{intensity} object.
-#' @param value All the intensity values lower or equal to this threshold
-#'     are set set to 0. The other values are set to 1.
+#' @param value All the intensity values lower or equal to this value  are set
+#'     to 0. The other values are set to 1.
 #'
 #' @export
 #------------------------------------------------------------------------------#
-threshold <- function(data, value = c(0, Inf)) {
-    stopifnot(length(value) == 2)
+threshold <- function(data, value = 0) {
     mapped_data <- map_data(data)
-    mapped_data[["i"]] <- ifelse((mapped_data[["i"]] > value[1]) &
-                                 (mapped_data[["i"]] < value[2]), 1, 0)
+    mapped_data[["i"]] <- ifelse((mapped_data[["i"]] <= value), 0, 1)
     if ("n" %in% colnames(mapped_data)) {
         mapped_data[["n"]] <- 1
     }

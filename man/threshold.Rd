@@ -4,17 +4,23 @@
 \alias{threshold}
 \title{Threshold : To go to higher level in the hierarchy}
 \usage{
-threshold(data, value = c(0, Inf))
+threshold(data, value = 0)
 }
 \arguments{
 \item{data}{An \code{intensity} object.}
 
-\item{value}{All the intensity values lower or equal to this threshold
-are set set to 0. The other values are set to 1.}
+\item{value}{All the intensity values lower or equal to this value  are set
+to 0. The other values are set to 1.}
 }
 \description{
-"The Threshold tool transforms the current layer or the selection into a
-black and white image, where white pixels represent the pixels of the image
-whose Value is in the threshold range (1), and black pixels represent pixels with
-Value out of the threshold range (0)."
+This function transforms the current \code{intensity} data set into a
+"simplified black and white image" of this same data set: every value of
+disease intensity below and above a given threshold is given the value 0 and
+1, respectively.
+}
+\details{
+By default, everything above 0 is given 1, and 0 stays at 0. \code{threshold}
+is thus useful to report a whole sampling unit as "healthy" (0), if no
+diseased individual at all was found within the sampling unit, or "diseased"
+(1) if at least one diseased individual was found.
 }

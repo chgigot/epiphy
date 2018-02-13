@@ -8,24 +8,24 @@
 \usage{
 a2a(x, ...)
 
-\method{a2a}{numeric}(x, slope, n, from = c("Ar", "ar", "AR", "aR"),
-  to = c("Ar", "ar", "AR", "aR"))
+\method{a2a}{numeric}(x, slope, n, from = c("Ai", "ai", "AI", "aI"),
+  to = c("Ai", "ai", "AI", "aI"))
 
-\method{a2a}{list}(x, to = c("Ar", "ar", "AR", "aR"))
+\method{a2a}{list}(x, to = c("Ai", "ai", "AI", "aI"))
 }
 \arguments{
 \item{x}{Intercept parameter to be converted or a named list with the
-parameter to be converted ("Ar", "ar", "AR" or "aR"), the slope
+parameter to be converted ("Ai", "ai", "AI" or "aI"), the slope
 ("slope"), and the number of individual per sampling unit ("n").}
 
 \item{slope}{Slope parameter.}
 
 \item{n}{Number of individuals per sampling unit.}
 
-\item{from}{Kind of the input intercept parameter ("Ar", "ar", "AR" or "aR").}
+\item{from}{Kind of the input intercept parameter ("Ai", "ai", "AI" or "aI").}
 
-\item{to}{Desired kind for the ouput intercept parameter ("Ar", "ar", "AR" or
-"aR").}
+\item{to}{Desired kind for the ouput intercept parameter ("Ai", "ai", "AI" or
+"aI").}
 }
 \description{
 \code{a2a} was designed to avoid headaches that are likely to occur when
@@ -36,11 +36,11 @@ The binomial power law can be expressed as: \eqn{s_y^2 = (intercept)(s_{bin}^2)^
 But different forms of (intercept) are possible depending on the formulation of the
 binomial power law.
 \tabular{ccccc}{
-      \tab Ar         \tab ar      \tab AR         \tab aR      \cr
-   Ar \tab 1          \tab n^b     \tab n^{2(b-1)} \tab n^{b-2} \cr
-   ar \tab n^{-b}     \tab 1       \tab n^{b-2}    \tab n^{-2}  \cr
-   AR \tab n^{2(1-b)} \tab n^{2-b} \tab 1          \tab n^{-b}  \cr
-   aR \tab n^{2-b}    \tab n^2     \tab n^b        \tab 1       \cr
+      \tab Ai         \tab ai      \tab AI         \tab aI      \cr
+   Ai \tab 1          \tab n^b     \tab n^{2(b-1)} \tab n^{b-2} \cr
+   ai \tab n^{-b}     \tab 1       \tab n^{b-2}    \tab n^{-2}  \cr
+   AI \tab n^{2(1-b)} \tab n^{2-b} \tab 1          \tab n^{-b}  \cr
+   aI \tab n^{2-b}    \tab n^2     \tab n^b        \tab 1       \cr
 }
 }
 \examples{
