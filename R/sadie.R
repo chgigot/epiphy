@@ -202,6 +202,7 @@ sadie.count <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                         nperm = 100, rseed = TRUE, seed = 12345, cost,
                         threads = 1) {
     mapped_data <- map_data(data)
+    mapped_data <- mapped_data[, c("x", "y", "i")] # no t
     sadie.data.frame(mapped_data, index, nperm, rseed, seed, cost, threads)
 }
 
@@ -213,7 +214,8 @@ sadie.incidence <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                         nperm = 100, rseed = TRUE, seed = 12345, cost,
                         threads = 1) {
     mapped_data <- map_data(data)
-    mapped_data[["n"]] <- NULL # n is not used in SADIE procedure.
+    mapped_data <- mapped_data[, c("x", "y", "i")] # no t, no n
+    #mapped_data[["n"]] <- NULL # n is not used in SADIE procedure.
     sadie.data.frame(mapped_data, index, nperm, rseed, seed, cost, threads)
 }
 
