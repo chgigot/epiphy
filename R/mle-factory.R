@@ -114,6 +114,7 @@ smle.default <- function(data, f, param_init, max = TRUE, ...) {
                 param_name <- get_param_name_from_body(f)
                 param_init <- param_init(data = data, name = param_name) # function param_init is overwritten here
                 # Checks... TODO
+                ## browser()
             }
             if (!is.data.frame(param_init)) {
                 param_init <- as.data.frame(param_init)
@@ -178,6 +179,12 @@ smle.default <- function(data, f, param_init, max = TRUE, ...) {
         }
         coef_se <- sqrt(diag(vcov))
     } else {
+        ## TODO: BEG TMP
+        ##dots$method  <- "Nelder-Mead"
+        ##dots$hessian <- FALSE
+        ##try(out <- do.call(optim, dots), silent = TRUE)
+        ## ref: https://stackoverflow.com/questions/28185387/non-finite-finite-difference-value-many-data-become-inf-and-na-after-exponentia
+        ## TODO: END TMP
         coef    <- NULL
         vcov    <- NULL
         coef_se <- NULL
@@ -230,6 +237,7 @@ vcov.smle <- function(object, ...) object$vcov
 #'
 #' @inherit stats::logLik return
 #' @inheritParams stats::logLik
+#' @keywords internal
 #' @export
 #------------------------------------------------------------------------------#
 logLik.smle <- function(object, ...) {
@@ -250,10 +258,14 @@ logLik.smle <- function(object, ...) {
 #' @export
 #------------------------------------------------------------------------------#
 print.smle <- function(x, ...) {
-    invisible(lapply(seq_len(length(x$coef)), function(i1) {
-        cat(names(coef(x))[i1], ": ", formatC(coef(x)[i1]),
-            " (\u00b1 ", formatC(x$coef_se[i1]), ")\n", sep = "")
-    }))
+    if (is.null(x$full_output)) {
+        cat("Maximum likelihood procedure did not succeed.\n")
+    } else {
+        invisible(lapply(seq_len(length(x$coef)), function(i1) {
+            cat(names(coef(x))[i1], ": ", formatC(coef(x)[i1]),
+                " (\u00b1 ", formatC(x$coef_se[i1]), ")\n", sep = "")
+        }))
+    }
 }
 
 #------------------------------------------------------------------------------#
@@ -294,6 +306,7 @@ coef.summary.smle <- function(object, ...) object$cmat
 # Used to find initial estimates of the parameters.
 #==============================================================================#
 mme_pois <- function(data, name, bounds = TRUE) {
+    data <- get_std_named_df(data, "i")
     x <- data[["i"]]
     m1 <- mean(x) # na.rm = TRUE?
     fmt_init(data, name, bounds = bounds,
@@ -303,6 +316,7 @@ mme_pois <- function(data, name, bounds = TRUE) {
 }
 
 mme_nbinom <- function(data, name, bounds = TRUE) {
+    data <- get_std_named_df(data, "i")
     x <- data[["i"]]
     m1 <- mean(x)   # na.rm = TRUE?
     m2 <- mean(x^2) # na.rm = TRUE?
@@ -317,8 +331,9 @@ mme_nbinom <- function(data, name, bounds = TRUE) {
 }
 
 mme_binom <- function(data, name, bounds = TRUE) {
+    data <- get_std_named_df(data, c("i", "n"))
     x <- data[["i"]]
-    n <- data$n[[1]] # if pas de n, alors n = max(x) /// et c'est pas tres propre
+    n <- data[["n"]][[1]] # if pas de n, alors n = max(x) /// et c'est pas tres propre
     m1 <- mean(x) # na.rm = TRUE?
     fmt_init(data, name, bounds = bounds,
              prob = quote(c(0 + epiphy_env$epsilon,
@@ -327,8 +342,9 @@ mme_binom <- function(data, name, bounds = TRUE) {
 }
 
 mme_betabinom <- function(data, name, bounds = TRUE) { # TODO: To double-check
+    data <- get_std_named_df(data, c("i", "n"))
     x <- data[["i"]]
-    n <- data$n[[1]] # if pas de n, alors n = max(x) /// et c'est pas tres propre
+    n <- data[["n"]][[1]] # if pas de n, alors n = max(x) /// et c'est pas tres propre
     m1 <- mean(x) # na.rm = TRUE?
     m2 <- mean(x^2) # na.rm = TRUE?
     s2 <- var(x) # x != proportion, but number of diseased individual per sampling unit.
@@ -353,20 +369,24 @@ mme_betabinom <- function(data, name, bounds = TRUE) { # TODO: To double-check
 # Log-Likelihood functions
 #==============================================================================#
 ll_pois <- function(data, param) {
+    data <- get_std_named_df(data, "i")
     sum(dpois(x = data[["i"]], lambda = param["lambda"], log = TRUE))
 }
 
 ll_nbinom <- function(data, param) {
+    data <- get_std_named_df(data, "i")
     sum(dnbinom(x = data[["i"]], mu = param["mu"], size = param["k"],
                 log = TRUE))
 }
 
 ll_binom <- function(data, param) {
+    data <- get_std_named_df(data, c("i", "n"))
     sum(dbinom(x = data[["i"]], size = data[["n"]], prob = param[["prob"]],
                log = TRUE))
 }
 
 ll_betabinom <- function(data, param) {
+    data <- get_std_named_df(data, c("i", "n"))
     sum(dbetabinom(x = data[["i"]], size = data[["n"]],
                    prob = param[["prob"]], theta = param[["theta"]],
                    #shape1 = param[["alpha"]], shape2 = param[["beta"]],
@@ -383,7 +403,7 @@ ll_betabinom <- function(data, param) {
 #' Wrappers using maximum likelihood estimation for some distributions
 #'
 #' These functions are the core of the fitting processes performed in
-#' \code{\link{fit_distr}}.
+#' \code{\link{fit_two_distr}}.
 #'
 #' @param data The data set to work with. It can be a vector (if there is only
 #'     one variable), a data frame (if there is one or more variables) or an
@@ -401,6 +421,7 @@ ll_betabinom <- function(data, param) {
 #' res
 #' summary(res)
 #'
+#' @keywords internal
 #' @name smle_wrappers
 #------------------------------------------------------------------------------#
 NULL
@@ -409,23 +430,32 @@ NULL
 #' @rdname smle_wrappers
 #' @export
 #------------------------------------------------------------------------------
-smle_pois <- function(data) smle(data, ll_pois, mme_pois)
+smle_pois <- structure(function(data) smle(data, ll_pois, mme_pois),
+                       name = "Poisson")
+# TODO: That would be great if we could use smle_*(data) instead of
+# sme_*(data.frame(i = data)) if it's only a vector.
 
 #------------------------------------------------------------------------------#
 #' @rdname smle_wrappers
 #' @export
 #------------------------------------------------------------------------------
-smle_nbinom <- function(data) smle(data, ll_nbinom, mme_nbinom)
+smle_nbinom <- structure(function(data) smle(data, ll_nbinom, mme_nbinom),
+                         name = "Negative binomial")
 
 #------------------------------------------------------------------------------#
 #' @rdname smle_wrappers
 #' @export
 #------------------------------------------------------------------------------
-smle_binom <- function(data) smle(data, ll_binom, mme_binom)
+smle_binom <- structure(function(data) smle(data, ll_binom, mme_binom),
+                        name = "Binomial")
 
 #------------------------------------------------------------------------------#
 #' @rdname smle_wrappers
 #' @export
 #------------------------------------------------------------------------------#
-smle_betabinom <- function(data) smle(data, ll_betabinom, mme_betabinom)
+smle_betabinom <- structure(function(data) smle(data, ll_betabinom, mme_betabinom),
+                            name = "Beta-binomial")
+
+
+
 
