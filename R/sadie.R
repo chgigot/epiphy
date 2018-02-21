@@ -70,7 +70,7 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                              threads = 1, ..., method = "shortsimplex") {
 
     warning(paste0("You're using an early version of the SADIE procedure ",
-                   "for R. Congratulations!\nHowever, keep in mind that this ",
+                   "for R. Keep in mind that this ",
                    "version need to be intensively tested\nbefore being ",
                    "considered as a stable version."))
 
@@ -112,9 +112,11 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
     opt_transport <- wrap_transport(data[[n_col]], fcount, cost, method)
     opt_transport <- as.matrix(opt_transport, N)
 
+    ##browser()
+
     # Computation the costs
     cost_flows <- vapply(1:N, function(x) {
-        costToti(x, opt_transport, cost, type = "both")
+        costToti(x, opt_transport, cost, type = "both") ## TODO: Mettre costTotiCPP après correction de la version CPP
     }, numeric(1L))
     # Due to the convention "in => neg value", only negative values are added
     # up. Da = total observed distance (or total cost).
@@ -190,8 +192,9 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
 #------------------------------------------------------------------------------#
 sadie.matrix <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                          nperm = 100, rseed = TRUE, seed = 12345, cost,
-                         threads = 1) {
-    sadie.data.frame(as.data.frame(data), index, nperm, rseed, seed, cost, threads)
+                         threads = 1, ..., method = "shortsimplex") {
+    sadie.data.frame(as.data.frame(data), index, nperm, rseed, seed, cost,
+                     threads, ..., method = method)
 }
 
 #------------------------------------------------------------------------------#
@@ -200,10 +203,11 @@ sadie.matrix <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
 #------------------------------------------------------------------------------#
 sadie.count <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                         nperm = 100, rseed = TRUE, seed = 12345, cost,
-                        threads = 1) {
+                        threads = 1, ..., method = "shortsimplex") {
     mapped_data <- map_data(data)
     mapped_data <- mapped_data[, c("x", "y", "i")] # no t
-    sadie.data.frame(mapped_data, index, nperm, rseed, seed, cost, threads)
+    sadie.data.frame(mapped_data, index, nperm, rseed, seed, cost, threads, ...,
+                     method = method)
 }
 
 #------------------------------------------------------------------------------#
@@ -212,11 +216,12 @@ sadie.count <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
 #------------------------------------------------------------------------------#
 sadie.incidence <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                         nperm = 100, rseed = TRUE, seed = 12345, cost,
-                        threads = 1) {
+                        threads = 1, ..., method = "shortsimplex") {
     mapped_data <- map_data(data)
     mapped_data <- mapped_data[, c("x", "y", "i")] # no t, no n
     #mapped_data[["n"]] <- NULL # n is not used in SADIE procedure.
-    sadie.data.frame(mapped_data, index, nperm, rseed, seed, cost, threads)
+    sadie.data.frame(mapped_data, index, nperm, rseed, seed, cost, threads, ...,
+                     method = method)
 }
 
 #------------------------------------------------------------------------------#
@@ -279,7 +284,7 @@ wrap_transport <- function(start, end, cost, method = "shortsimplex",
 
     res <- transport::transport(start, end, costm = cost, method = method,
                                 control = control, ...)
-    res <- res[res$from != res$to, ] # We do not take into account what happens on the diagonal
+    res <- res[res$from != res$to, ] # We do not take into account what happens on the diagonal, because ... it's not needed because ...
     class(res) <- c("transport", class(res))
     res
 }
@@ -288,7 +293,7 @@ wrap_transport <- function(start, end, cost, method = "shortsimplex",
 #' @method as.matrix transport
 #' @export
 #------------------------------------------------------------------------------#
-as.matrix.transport <- function(x, dim_mat, dimnames = NULL, ...) { # N: Number of sampling units
+as.matrix.transport <- function(x, dim_mat, dimnames = NULL, ...) { # N: Number of sampling units... to CPP to optimize the code?
     res <- matrix(rep(0, dim_mat^2), nrow = dim_mat, ncol = dim_mat,
                   dimnames = dimnames, ...)
     lapply(1:nrow(x), function(i1) {
@@ -303,20 +308,23 @@ as.matrix.transport <- function(x, dim_mat, dimnames = NULL, ...) { # N: Number 
 costToti <- function(i, flow, cost, type = "both", average = FALSE) {
     stopifnot(type == "in" | type == "out" | type == "both")
     #    sorties             entrées
-    if ((sum(flow[i, ]) <= sum(flow[, i])) &
-        ((type == "in") | (type == "both"))) {
-        res <- -sum(flow[, i] * cost[, i])
+    res <- 0
+    if (((sum(flow[i, ]) <= sum(flow[, i])) &
+        (type == "in")) | (type == "both")) {
+        res <- res + -sum(flow[, i] * cost[, i])
         if (average) res <- res / sum(flow[, i]) # sûr que i est à droite?
-        return(res) # / sum(solution[-i, i])
+        #return(res) # / sum(solution[-i, i])
         #       sorties            entrées
-    } else if ((sum(flow[i, ]) > sum(flow[, i])) &
-               ((type == "out") | (type == "both"))) {
-        res <- sum(flow[i, ] * cost[i, ])
-        if (average) res <- res / sum(flow[i, ])
-        return(res)# /
-    } else {
-        return(0)
     }
+    if (((sum(flow[i, ]) > sum(flow[, i])) &
+               (type == "out")) | (type == "both")) {
+        res <- res + sum(flow[i, ] * cost[i, ])
+        if (average) res <- res / sum(flow[i, ])
+        #return(res)# /
+    } #else {
+      #  return(0)
+    #}
+    res
 }
 
 #------------------------------------------------------------------------------#

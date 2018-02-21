@@ -15,13 +15,16 @@ sadie(data, ...)
   method = "shortsimplex")
 
 \method{sadie}{matrix}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1)
+  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1, ...,
+  method = "shortsimplex")
 
 \method{sadie}{count}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1)
+  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1, ...,
+  method = "shortsimplex")
 
 \method{sadie}{incidence}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1)
+  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1, ...,
+  method = "shortsimplex")
 }
 \arguments{
 \item{data}{A data frame or a matrix with the counts for the different sampling units. The data
