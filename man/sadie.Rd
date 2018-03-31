@@ -70,6 +70,8 @@ res <- sadie(aphids)
 summary(res)
 plot(res)
 
+plot(sadie(count(codling_moths, mapping(x = xm, y = ym))))
+
 }
 \references{
 Perry JN. 1995. Spatial analysis by distance indices. Journal of Animal

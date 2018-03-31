@@ -6,8 +6,8 @@
 using namespace Rcpp;
 
 // costTotiCPP
-double costTotiCPP(long i1, NumericMatrix& flow, NumericMatrix& cost, std::string type, bool average);
-RcppExport SEXP _epiphy_costTotiCPP(SEXP i1SEXP, SEXP flowSEXP, SEXP costSEXP, SEXP typeSEXP, SEXP averageSEXP) {
+double costTotiCPP(long i1, NumericMatrix& flow, NumericMatrix& cost, std::string type, bool averaged, bool absolute);
+RcppExport SEXP _epiphy_costTotiCPP(SEXP i1SEXP, SEXP flowSEXP, SEXP costSEXP, SEXP typeSEXP, SEXP averagedSEXP, SEXP absoluteSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -15,8 +15,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix& >::type flow(flowSEXP);
     Rcpp::traits::input_parameter< NumericMatrix& >::type cost(costSEXP);
     Rcpp::traits::input_parameter< std::string >::type type(typeSEXP);
-    Rcpp::traits::input_parameter< bool >::type average(averageSEXP);
-    rcpp_result_gen = Rcpp::wrap(costTotiCPP(i1, flow, cost, type, average));
+    Rcpp::traits::input_parameter< bool >::type averaged(averagedSEXP);
+    Rcpp::traits::input_parameter< bool >::type absolute(absoluteSEXP);
+    rcpp_result_gen = Rcpp::wrap(costTotiCPP(i1, flow, cost, type, averaged, absolute));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -32,15 +33,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// optTransDT2MatCPP
-NumericMatrix optTransDT2MatCPP(NumericMatrix x, int suLen);
-RcppExport SEXP _epiphy_optTransDT2MatCPP(SEXP xSEXP, SEXP suLenSEXP) {
+// as_matrix_transport
+NumericMatrix as_matrix_transport(List& x, double dim_mat);
+RcppExport SEXP _epiphy_as_matrix_transport(SEXP xSEXP, SEXP dim_matSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
-    Rcpp::traits::input_parameter< int >::type suLen(suLenSEXP);
-    rcpp_result_gen = Rcpp::wrap(optTransDT2MatCPP(x, suLen));
+    Rcpp::traits::input_parameter< List& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type dim_mat(dim_matSEXP);
+    rcpp_result_gen = Rcpp::wrap(as_matrix_transport(x, dim_mat));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -87,9 +88,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_epiphy_costTotiCPP", (DL_FUNC) &_epiphy_costTotiCPP, 5},
+    {"_epiphy_costTotiCPP", (DL_FUNC) &_epiphy_costTotiCPP, 6},
     {"_epiphy_costTotCPP", (DL_FUNC) &_epiphy_costTotCPP, 2},
-    {"_epiphy_optTransDT2MatCPP", (DL_FUNC) &_epiphy_optTransDT2MatCPP, 2},
+    {"_epiphy_as_matrix_transport", (DL_FUNC) &_epiphy_as_matrix_transport, 2},
     {"_epiphy_ntotfoci", (DL_FUNC) &_epiphy_ntotfoci, 4},
     {"_epiphy_dispersalCPP", (DL_FUNC) &_epiphy_dispersalCPP, 5},
     {"_epiphy_collectCPP", (DL_FUNC) &_epiphy_collectCPP, 2},

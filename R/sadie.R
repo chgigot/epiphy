@@ -53,6 +53,8 @@
 #' summary(res)
 #' plot(res)
 #'
+#' plot(sadie(count(codling_moths, mapping(x = xm, y = ym))))
+#'
 #' @name sadie
 #' @export
 #------------------------------------------------------------------------------#
@@ -92,82 +94,67 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
     N <- nrow(data)
     data[[n_col]] <- as.numeric(data[[n_col]]) # Just in case it's integer, to have the same nature for data and fdata
 
-    # Reshape long data into a wide data frame (with standrad R)
-    ##cn   <- colnames(data)
-    ##n_cn <- length(cn)
-    ##frm  <- as.formula(paste0(cn[n_cn], "~",
-    ##                          paste0(cn[1:(n_cn - 1)], collapse = "+")))
-    ##data_array <- unclass(xtabs(frm, data)) # unclass, to get a "naked" matrix/array
-    ##attr(data_array, "call") <- NULL # Just to clean the object
-
-    # Create a homogeneous (flatten) version of data_array
-
-    ##fdata_array <- array(data = rep(mean(data_array), N),
-    ##                     dim = dim(data_array),
-    ##                     dimnames = dimnames(data_array))
-
+    # Create a homogeneous (flatten) version of data
     fcount <- rep(mean(data[[n_col]]), N)
 
     # Use optimal transportation algorithm
     opt_transport <- wrap_transport(data[[n_col]], fcount, cost, method)
     opt_transport <- as.matrix(opt_transport, N)
 
-    ##browser()
-
     # Computation the costs
     cost_flows <- vapply(1:N, function(x) {
-        costToti(x, opt_transport, cost, type = "both") ## TODO: Mettre costTotiCPP après correction de la version CPP
+        costTotiCPP(x, opt_transport, cost, type = "both")
     }, numeric(1L))
-    # Due to the convention "in => neg value", only negative values are added
+    # Due to the convention only positive values are added
     # up. Da = total observed distance (or total cost).
-    Da <- sum(cost_flows[cost_flows < 0])
+    Da <- sum(cost_flows[cost_flows >= 0]) # Donors
 
     # Deal with indices
     if (index == "all") index <- c("Perry", "Li-Madden-Xu")
     info_P   <- list(clust = NA_real_, Ea = NA_real_)
     info_LMX <- list(clust = NA_real_, Dis_all = matrix(NA_real_))
+    idx_P    <- NA_real_
+    idx_LMX  <- NA_real_
+    Ea       <- NA_real_
+    Ia       <- NA_real_
+    Pa       <- NA_real_
     new_prob <- NA_real_
+    Dis_all  <- NA_real_
     if (any(index == "Perry")) {
         cat("Computation of Perry's indices:\n")
         info_P <- clust_P(opt_transport, cost, N, nperm,
                           start = data[[n_col]], end = fcount,
                           method, cost_flows, threads)
+        idx_P <- info_P[["clust"]]
+        Ea    <- info_P[["Ea"]]
+        Ia    <- Da / mean(Ea)
+        Pa    <- sum(Ea > Da) / length(Ea)
+    } else {
+        warning("Ia and Pa cannot be computed if Perry's indices are not.")
     }
     if (any(index == "Li-Madden-Xu")) {
         cat("Computation of Li-Madden-Xu's indices:\n")
         info_LMX <- clust_LMX(opt_transport, cost, N, nperm,
                               start = data[[n_col]], end = fcount,
                               method, cost_flows, threads)
-        # Test:
-        new_prob <- abs(info_LMX[["Dis_all"]]) > abs(cost_flows)
-        new_prob <- rowSums(new_prob)
-        new_prob <- (new_prob + 1) / (nperm + 1) # res2 + 1 => rank of Di(s)
+        idx_LMX  <- info_LMX[["clust"]]
+        new_prob <- info_LMX[["prob"]]
+        Dis_all  <- info_LMX[["Dis_all"]]
     }
 
-    # Compute other outputs (if possible)
-    # Ci-dessous, ça veut dire que l'on calcule toujours le perry's
-    if (any(is.na(info_P[["Ea"]]))) {
-        warning("Ia and Pa cannot be computed if Perry's indices are not.")
-        Ia <- NA_real_
-        Pa <- NA_real_
-    } else {
-        Ia <- Da / mean(info_P[["Ea"]])
-        # On met des moins pour mémoire  à cause de cette $%@*&^ de convention inversée !!!
-        Pa <- sum((-info_P[["Ea"]]) > (-Da)) / length(info_P[["Ea"]])
-    }
     info_clust <- data.frame(data,
                              cost_flows = cost_flows,
-                             idx_P      = info_P[["clust"]],
-                             idx_LMX    = info_LMX[["clust"]],
+                             idx_P      = idx_P,
+                             idx_LMX    = idx_LMX,
                              prob       = new_prob)
 
     # Summary indices
-    summary_idx <- data.frame(overall = c(mean(abs(info_clust$idx_P)),
-                                          mean(abs(info_clust$idx_LMX))),
-                              inflow  = c(mean(info_clust$idx_P[info_clust$idx_P < 0]),
-                                          mean(info_clust$idx_LMX[info_clust$idx_LMX < 0])),
-                              outflow = c(mean(info_clust$idx_P[info_clust$idx_P > 0]),
-                                          mean(info_clust$idx_LMX[info_clust$idx_LMX > 0])))
+    summary_idx <- data.frame(overall = c(mean(abs(idx_P)),
+                                          mean(abs(idx_LMX))),
+                              inflow  = c(mean(idx_P[idx_P < 0]),
+                                          mean(idx_LMX[idx_LMX < 0])),
+                              outflow = c(mean(idx_P[idx_P > 0]),
+                                          mean(idx_LMX[idx_LMX > 0])))
     rownames(summary_idx) <- c("Perry's index", "Li-Madden-Xu's index")
 
     #    return(Sadie())
@@ -175,12 +162,12 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                 Da = Da,
                 Ia = Ia,
                 Pa = Pa,
-                Ea_perry = info_P[["Ea"]],
-                Ea_li = info_LMX[["Dis_all"]],
+                Ea_perry = Ea,
+                Ea_li = Dis_all, # Needed ?
                 summary_idx = summary_idx,
                 nperm = nperm,
                 rseed = rseed,
-                seed = NA_real_)
+                seed = NA_real_) #TODO: to correct
     attr(res, "class") <- "sadie"
     attr(res, "call")  <- match.call()
     res
@@ -268,23 +255,10 @@ print.summary.sadie <- function(x, ...) {
 #------------------------------------------------------------------------------#
 # Utilities
 #------------------------------------------------------------------------------#
-#' @export
-#------------------------------------------------------------------------------#
 wrap_transport <- function(start, end, cost, method = "shortsimplex",
                            control = list(), ...) {
-    # As we always have named rows and columns for end, we use this one
-    # for the generator. But in theory, start should be used too.
-
-    ##gen <- lapply(dimnames(end), as.numeric)
-    ##res <- transport::transport(transport::pgrid(start, generator = gen),
-    ##                            transport::pgrid(end, generator = gen),
-    ##                            p = p, method = method, control = control, ...)
-    ##class(res) <- c("transport", class(res))
-    ##res
-
     res <- transport::transport(start, end, costm = cost, method = method,
                                 control = control, ...)
-    res <- res[res$from != res$to, ] # We do not take into account what happens on the diagonal, because ... it's not needed because ...
     class(res) <- c("transport", class(res))
     res
 }
@@ -293,53 +267,13 @@ wrap_transport <- function(start, end, cost, method = "shortsimplex",
 #' @method as.matrix transport
 #' @export
 #------------------------------------------------------------------------------#
-as.matrix.transport <- function(x, dim_mat, dimnames = NULL, ...) { # N: Number of sampling units... to CPP to optimize the code?
-    res <- matrix(rep(0, dim_mat^2), nrow = dim_mat, ncol = dim_mat,
-                  dimnames = dimnames, ...)
-    lapply(1:nrow(x), function(i1) {
-        res[x[i1, 1], x[i1, 2]] <<- x[i1, 3]
-    })
-    res
-}
-
-#------------------------------------------------------------------------------#
-#' @export
-#------------------------------------------------------------------------------#
-costToti <- function(i, flow, cost, type = "both", average = FALSE) {
-    stopifnot(type == "in" | type == "out" | type == "both")
-    #    sorties             entrées
-    res <- 0
-    if (((sum(flow[i, ]) <= sum(flow[, i])) &
-        (type == "in")) | (type == "both")) {
-        res <- res + -sum(flow[, i] * cost[, i])
-        if (average) res <- res / sum(flow[, i]) # sûr que i est à droite?
-        #return(res) # / sum(solution[-i, i])
-        #       sorties            entrées
-    }
-    if (((sum(flow[i, ]) > sum(flow[, i])) &
-               (type == "out")) | (type == "both")) {
-        res <- res + sum(flow[i, ] * cost[i, ])
-        if (average) res <- res / sum(flow[i, ])
-        #return(res)# /
-    } #else {
-      #  return(0)
-    #}
-    res
-}
-
-#------------------------------------------------------------------------------#
-#' @export
-#------------------------------------------------------------------------------#
-costTot <- function(flow, cost) {
-    sum(vapply(1:nrow(flow),
-               function(x) costToti(x, flow, cost, type = "in"),
-               numeric(1)))
+as.matrix.transport <- function(x, dim_mat) {#, dimnames = NULL, ...) { # N: Number of sampling units... to CPP to optimize the code?
+    as_matrix_transport(x, dim_mat)
 }
 
 #------------------------------------------------------------------------------#
 # standardised and dimensionless clustering index (nui) for a donor
 # Perry
-#' @export
 #------------------------------------------------------------------------------#
 clust_P <- function(flow, cost, dim_mat, nperm, start, end,
                     method = "shortsimplex", cost_flows, threads) {
@@ -353,144 +287,97 @@ clust_P <- function(flow, cost, dim_mat, nperm, start, end,
 
         # ~ Assez long ci-dessous
         idx_same_count <- lapply(idx, function(i2) which(new_start == start[i2]))
-        # res_Yci <- rep(NA, times = length(idx_same_count))
-        # lapply(seq_len(length(res_Yci)), function(j) {
-        #     res_Yci[j] <<- mean(vapply(seq_len(length(idx_same_count[[j]])),
-        #                                function(x) {
-        #                                    if (cost_flows[[j]] < 0) type <- "in"
-        #                                    else                     type <- "out"
-        #                                    #costToti(idx_same_count[[j]][x], opt_transport, cost, type = type)
-        #                                    costTotiCPP(idx_same_count[[j]][x], opt_transport, cost, type)
-        #                                },
-        #                                numeric(1L)))
-        # })
         res_Yci <- vapply(seq_len(length(idx_same_count)), function(i2) {
             mean(vapply(seq_len(length(idx_same_count[[i2]])),
                         function(x) {
-                            if (cost_flows[[i2]] < 0) type <- "in"
-                            else                      type <- "out"
-                            #costToti(idx_same_count[[i2]][x], opt_transport, cost, type = type)
-                            costTotiCPP(idx_same_count[[i2]][x], opt_transport, cost, type)
+                            costTotiCPP(idx_same_count[[i2]][x], opt_transport, cost, "both")
                         },
                         numeric(1L)))
         }, numeric(1L))
+
         res_Yii <- vapply(idx,
                           function(x) {
-                              if (cost_flows[[x]] < 0) type <- "in"
-                              else                     type <- "out"
-                              #costToti(x, opt_transport, cost, type = type)
-                              costTotiCPP(x, opt_transport, cost, type)
+                              costTotiCPP(x, opt_transport, cost, "both")
                           },
                           numeric(1L))
+
+        # TODO: To improve below:
+        N <- nrow(opt_transport) # TODO: Should be the same as length(start)
+        costTot <- vapply(1:N, function(x) {
+            costTotiCPP(x, opt_transport, cost, type = "both")
+        }, numeric(1L))
+        # Due to the convention only positive values are added
+        # up. Da = total observed distance (or total cost).
+        Ea <- sum(costTot[costTot >= 0]) # Donors
 
         list(flow = opt_transport,
              idx  = rand_idx,
              Yci = res_Yci,
              Yii = res_Yii,
              #costTot = costTot(opt_transport, cost))) # Pour calculer Ia
-             costTot = costTotCPP(opt_transport, cost)) # To compute Ia
+             costTot = Ea) #costTotCPP(opt_transport, cost)) # To compute Ia //TODO: Useful costTotCPP???
     }, cl = threads)
 
     Ycs <- simplify2array(lapply(randomisations, function(x) x[["Yci"]]))
-    Ycs <- abs(rowMeans(Ycs))
+    Ycs <- rowMeans(abs(Ycs))
     Yis <- simplify2array(lapply(randomisations, function(x) x[["Yii"]]))
-    Yis <- abs(rowMeans(Yis))
-    Y0  <- mean(Ycs) / 2
+    Yis <- rowMeans(abs(Yis))
+    Y0  <- mean(Ycs) # Should be equal to: mean(Yis)
     Yi  <- vapply(idx,
                   function(x) {
-                      if (cost_flows[[x]] < 0) type <- "in"
-                      else                     type <- "out"
-                      costTotiCPP(x, flow, cost, type)
+                      costTotiCPP(x, flow, cost, "both")
                   },
                   numeric(1L))
 
-    list(clust = ((Yi * Y0) / (Yis * Ycs)),
-         Ea = unlist(lapply(randomisations, function(x) x[["costTot"]])))
+    clust <- ((Yi * Y0) / (Yis * Ycs))
+    Ea <- unlist(lapply(randomisations, function(x) x[["costTot"]]))
+
+    list(clust = clust,
+         Ea = Ea)
 }
 
 #------------------------------------------------------------------------------#
 # standardised and dimensionless clustering index (nui) for a donor
-#' @export
 #------------------------------------------------------------------------------#
 clust_LMX <- function(flow, cost, dim_mat, nperm, start, end,
                              method = "shortsimplex", cost_flows,
                              threads) {
     idx            <- seq_len(nrow(flow)) # or: seq_len(length(start))
-    #base           <- list(rep(NA, nrow(flow)))
-    #randomisations <- rep(base, nperm) # NON : + 1 pour ajout du "Di" (le vrai !) à la fin
-
-    # New idx : Li-Madden-Xu
-    #for (i in seq_len(nperm)) { ## NEW
-    #lapply(seq_len(nperm), function(i1) {
     randomisations <- pbapply::pblapply(seq_len(nperm), function(i1) {
-        #for (j in idx) { ## NEW
         vapply(idx, function(i2) {
             sub_idx   <- idx[idx != i2] ## NEW
             rand_idx  <- sample(sub_idx)
             ##TO DOUBLE CHECK## rand_idx <- insert(rand_idx, i2, i2) ##NEW : insert is in pkgg R.utils à récupérer uniquement fn intéressante en cpp après
-            rand_idx  <- append(rand_idx, i2, i2)
+            rand_idx  <- append(rand_idx, i2, i2 - 1) # TODO: .insert(i, x)    Insert x at the i^th^ position of, grows vector in RCPP // Attention, at the positin VS after the position
             new_start <- start[rand_idx]
             #dimnames(new_start) <- list(rownames(start), colnames(start))
             opt_transport <- wrap_transport(new_start, end, cost, method)
             opt_transport <- as.matrix(opt_transport, dim_mat)
-
-            # imp!
-            if (cost_flows[[i2]] < 0) type <- "in"  # NEW NEW
-            else                      type <- "out" # NEW NEW
-            costTotiCPP(i2, opt_transport, cost, type)
+            costTotiCPP(i2, opt_transport, cost, "both")
         }, numeric(1L))
-
-        # lapply(idx, function(j) {
-        #     sub_idx   <- idx[idx != j] ## NEW
-        #     rand_idx  <- sample(sub_idx)
-        #     ##TO DOUBLE CHECK## rand_idx <- insert(rand_idx, j, j) ##NEW : insert is in pkgg R.utils à récupérer uniquement fn intéressante en cpp après
-        #     rand_idx  <- append(rand_idx, j, j)
-        #     new_start <- start[rand_idx]
-        #     #dimnames(new_start) <- list(rownames(start), colnames(start))
-        #     opt_transport <- wrap_transport(new_start, end, cost, method)
-        #     opt_transport <- as.matrix(opt_transport, dim_mat)
-        #
-        #     # imp!
-        #     if (cost_flows[[j]] < 0) type <- "in"  # NEW NEW
-        #     else                     type <- "out" # NEW NEW
-        #     randomisations[[i]][[j]] <<- costTotiCPP(j, opt_transport, cost, type = type)
-        # })
     }, cl = threads)
 
-    # Di, le vrai! ... NOT NEED EN THEORIE CAR DEJA CALCULER avec la var cost_flows
-    #for (j in idx) {
-    #lapply(idx, function(j) { ### Déjà présent dans le "main.R" // redondant
-    # pbapply::pblapply(idx, function(j) { ### Déjà présent dans le "main.R" // redondant
-    #     #idx        <- idx
-    #     #new_start <- matrix(start[idx], nrow = nrow(start))
-    #     new_start <- start ### A simplifier
-    #     opt_transport <- wrap_transport(new_start, end, cost, method)
-    #     opt_transport <- as.matrix(opt_transport, dim_mat)
-    #
-    #     # imp!
-    #     if (cost_flows[[j]] < 0) type <- "in"  # NEW NEW
-    #     else                     type <- "out" # NEW NEW
-    #     randomisations[[length(randomisations)]][[j]] <<- costTotiCPP(j, opt_transport, cost, type = type)
-    # }, cl = threads)
-
     randomisations <- simplify2array(randomisations)
-    Dis_bar        <- rowMeans(cbind(randomisations, cost_flows)) # Négatif tous pour l'instant. cost_flows = Dis
-    Dis_bar        <- abs(Dis_bar)
-    return(list(clust = (cost_flows / Dis_bar), # positif pour l'instant par construction
-                Dis_all = randomisations))
+    Dis_bar        <- rowMeans(cbind(randomisations, cost_flows))  # TODO : to check : # Négatif tous pour l'instant. cost_flows = Dis ; il y a (nperm + 1) elements
+
+    clust   <- cost_flows / abs(Dis_bar) # sing_ ... allows to make a donor positive and a receiver negative
+    clust_i <- randomisations / abs(Dis_bar)
+    prob    <- vapply(seq_len(length(clust)), function(i1) {
+        if (clust[i1] >= 0) rpos <- (clust_i[i1, ] > clust[i1]) # Donor
+        else                rpos <- (clust_i[i1, ] < clust[i1]) # Receiver
+        rpos <- sum(rpos) + 1 # Trick : sum(T, T, F) => 2 ; +1 because Di is +1 away from the other sup or inf Di,rep
+        rpos / (nperm + 1)
+    }, numeric(1L))
+
+    # Returns:
+    list(clust   = clust,
+         prob    = prob,
+         Dis_all = randomisations) # Needed?
 }
 
 #------------------------------------------------------------------------------#
-#' @export
-#------------------------------------------------------------------------------#
 Ia <- function(Da, Ea) {return(Da/Ea)} # Da = observed, Ea = mean of randomized distances
 # Perry_1995, explication Pa et Ia
-
-
-
-#========
-
-
 
 #------------------------------------------------------------------------------#
 #' @include sadie.R
