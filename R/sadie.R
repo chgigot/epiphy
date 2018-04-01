@@ -1,34 +1,30 @@
 #------------------------------------------------------------------------------#
 #' Spatial Analysis by Distance IndicEs (SADIE)
 #'
-#' The SADIE approach is implemented in this package. Refer to the documentation
-#' of the function \code{\link{sadie}} for more information and references about
-#' this approach.
-#' The \code{sadie} function estimates the parameters of a SADIE approach based
-#' on the number of permutations specified (\code{nperm}). It also computes the
-#' Ia indice and Pa probability.
+#' \code{sadie} performs the SADIE procedure. It computes different indices and
+#' probabilities based on the distance to regularity for the observed spatial
+#' pattern and a specified number of random permutations of this pattern. Both
+#' kind of clustering indices described by Perry et al. (1999) and Li et al.
+#' (2012) can be computed.
 #'
-#' @param data A data frame or a matrix with the counts for the different sampling units. The data
-#'     set must decribe a complete (no missing data) squared or rectangular
-#'     data set.
-#'     or a matrix (x-y).
-#' @param cost A \code{length(count)} by \code{length(count)} matrix specifing
-#'     the cost of transporting single unit between the corresponding source and
-#'     destination sampling unit. If not specified, the distance between each
-#'     couple of adjacent sampling units (rook's sense) is assumed to be equal
-#'     to 1. If the cost matrix is not given, the two first columns of data must
-#'     correspond to "x" and "y" coordinates, and an euclidean distance between
-#'     all the recorded points will be computed.
-#' @param index The name of the index to use: "Perry", "Li-Madden-Xu" or "all".
-#'     By default, only Perry's index is computed.
-#' @param nperm Number of permutations for each sampling unit.
-#' @param rseed Randomisation seed. Unseful for checking pursposes.
+#' By convention in the SADIE procedure, clustering indices for a donor unit
+#' (outflow) and a receiver unit (inflow) are positive and negative in sign,
+#' respectively.
 #'
-#' For historical reasons, the inflow is negative and the outflow is positive.... not true parce ce aue on parle de cost
-#' Two transportation algorithms are available: The Shortlist Method (Gottschlich C. and Schuhmacher D.)
-#' and the revised simplex algorithm (Luenberger and Ye (2008, Section 6.4)). The first one is substantially faster than the second one.
-#' Both of these algorithms are available in the R package \code{transportation}. There were integrated and
-#' fully C++-coded in this package in order to minimize R-code for fast reasons.
+#' @param data A data frame or a matrix with only three columns: the two first
+#'     ones must be the x and y coordinates of the sampling units, and the last
+#'     one, the corresponding disease intensity observations. It can also be a
+#'     \code{\link{count}} or an \code{\link{incidence}} object.
+#' @param index The index to be calculated: "Perry", "Li-Madden-Xu" or "all".
+#'     By default, only Perry's index is computed for each sampling unit.
+#' @param nperm Number of random permutations to assess probabilities.
+#' @param rseed Is a random seed used for the permutations? (only useful for
+#'     checking purposes).
+#' @param seed Seed used when \code{rseed = FALSE} (only useful for checking
+#'     purposes).
+#' @param threads Number of threads to perform the computations.
+#' @param ... Not yet implemented.
+#' @param method Method for the transportation algorithm.
 #'
 #' @references
 #'
@@ -45,15 +41,23 @@
 #' \href{http://dx.doi.org/10.1111/j.2041-210X.2011.00165.x}{doi:10.1111/j.2041-210X.2011.00165.x}
 #'
 #' @examples
-#' # Possible datasets:
-#' #aphids
-#' #arthropods
-#' #codling_moths
-#' res <- sadie(aphids)
-#' summary(res)
-#' plot(res)
+#' my_count <- count(aphids, mapping(x = xm, y = ym))
+#' my_res <- sadie(my_count)
+#' my_res
+#' summary(my_res)
+#' plot(my_res)
 #'
-#' plot(sadie(count(codling_moths, mapping(x = xm, y = ym))))
+#' my_df <- aphids[, c("xm", "ym", "i")]
+#' sadie(my_df)
+#'
+#' my_incidence <- incidence(tomato_tswv$field_1929[tomato_tswv$field_1929$t == 1, ])
+#' my_incidence <- clump(my_incidence, unit_size = c(x = 3, y = 3))
+#' plot(my_incidence)
+#' my_res <- sadie(my_incidence, index = "all", threads = 4)
+#' my_res
+#' summary(my_res)
+#' plot(my_res) # Identical to: plot(my_res, index = "Perry")
+#' plot(my_res, index = "Li-Madden-Xu")
 #'
 #' @name sadie
 #' @export
@@ -68,25 +72,16 @@ sadie <- function(data, ...) {
 #' @export
 #------------------------------------------------------------------------------#
 sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
-                             nperm = 100, rseed = TRUE, seed = 12345, cost,
+                             nperm = 100, rseed = TRUE, seed = 12345,
                              threads = 1, ..., method = "shortsimplex") {
-
-    warning(paste0("You're using an early version of the SADIE procedure ",
-                   "for R. Keep in mind that this ",
-                   "version need to be intensively tested\nbefore being ",
-                   "considered as a stable version."))
 
     index <- match.arg(index)
     n_col <- ncol(data)
+    # data structure:
+    # - 1st and 2nd columns: x and y coordinates, respectively.
+    # - 3rd column: observed disease intensity data.
     stopifnot(n_col == 3)
-
-    if (missing(cost)) {
-        # Assumption: the 1st and 2nd columns of the input data frame correspond
-        # to "x" and "y" coordinates, respectively.
-        cost <- as.matrix(dist(data[1:2])) ### ATTENTION pour plus compliqué données eg arthropodes
-    }
-    stopifnot(is.matrix(cost))
-    # More checking and data wrangling...
+    cost <- as.matrix(dist(data[1:2]))
 
     # More interesting
     if (!rseed) set.seed(seed)
@@ -115,8 +110,8 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
     info_LMX <- list(clust = NA_real_, Dis_all = matrix(NA_real_))
     idx_P    <- NA_real_
     idx_LMX  <- NA_real_
-    Ea       <- NA_real_
-    Ia       <- NA_real_
+    Ea       <- NA_real_ # Ea = randomized distances
+    Ia       <- NA_real_ # Da = observed,
     Pa       <- NA_real_
     new_prob <- NA_real_
     Dis_all  <- NA_real_
@@ -178,9 +173,9 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
 #' @export
 #------------------------------------------------------------------------------#
 sadie.matrix <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
-                         nperm = 100, rseed = TRUE, seed = 12345, cost,
+                         nperm = 100, rseed = TRUE, seed = 12345,
                          threads = 1, ..., method = "shortsimplex") {
-    sadie.data.frame(as.data.frame(data), index, nperm, rseed, seed, cost,
+    sadie.data.frame(as.data.frame(data), index, nperm, rseed, seed,
                      threads, ..., method = method)
 }
 
@@ -189,11 +184,11 @@ sadie.matrix <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
 #' @export
 #------------------------------------------------------------------------------#
 sadie.count <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
-                        nperm = 100, rseed = TRUE, seed = 12345, cost,
+                        nperm = 100, rseed = TRUE, seed = 12345,
                         threads = 1, ..., method = "shortsimplex") {
     mapped_data <- map_data(data)
     mapped_data <- mapped_data[, c("x", "y", "i")] # no t
-    sadie.data.frame(mapped_data, index, nperm, rseed, seed, cost, threads, ...,
+    sadie.data.frame(mapped_data, index, nperm, rseed, seed, threads, ...,
                      method = method)
 }
 
@@ -202,12 +197,12 @@ sadie.count <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
 #' @export
 #------------------------------------------------------------------------------#
 sadie.incidence <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
-                        nperm = 100, rseed = TRUE, seed = 12345, cost,
+                        nperm = 100, rseed = TRUE, seed = 12345,
                         threads = 1, ..., method = "shortsimplex") {
     mapped_data <- map_data(data)
     mapped_data <- mapped_data[, c("x", "y", "i")] # no t, no n
     #mapped_data[["n"]] <- NULL # n is not used in SADIE procedure.
-    sadie.data.frame(mapped_data, index, nperm, rseed, seed, cost, threads, ...,
+    sadie.data.frame(mapped_data, index, nperm, rseed, seed, threads, ...,
                      method = method)
 }
 
@@ -376,11 +371,6 @@ clust_LMX <- function(flow, cost, dim_mat, nperm, start, end,
 }
 
 #------------------------------------------------------------------------------#
-Ia <- function(Da, Ea) {return(Da/Ea)} # Da = observed, Ea = mean of randomized distances
-# Perry_1995, explication Pa et Ia
-
-#------------------------------------------------------------------------------#
-#' @include sadie.R
 #' @export
 #------------------------------------------------------------------------------#
 plot.sadie <- function(x, y, ..., index = c("Perry", "Li-Madden-Xu"),
@@ -401,7 +391,7 @@ plot.sadie <- function(x, y, ..., index = c("Perry", "Li-Madden-Xu"),
     data_landscape <- data.frame(input_val, z = as.vector(interpolated))
 
     data_clust$col <- vapply(data_clust[[idx]], function(x) {
-        if      (x <  thresholds[1L]) "blue" # Low values
+        if      (x <  thresholds[1L]) "blue"  # Low values
         else if (x <= thresholds[2L]) "white" # Intermediate values
         else                          "red"   # High values
     }, character(1L))

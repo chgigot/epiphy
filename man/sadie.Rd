@@ -11,66 +11,74 @@
 sadie(data, ...)
 
 \method{sadie}{data.frame}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1, ...,
+  nperm = 100, rseed = TRUE, seed = 12345, threads = 1, ...,
   method = "shortsimplex")
 
 \method{sadie}{matrix}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1, ...,
+  nperm = 100, rseed = TRUE, seed = 12345, threads = 1, ...,
   method = "shortsimplex")
 
 \method{sadie}{count}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1, ...,
+  nperm = 100, rseed = TRUE, seed = 12345, threads = 1, ...,
   method = "shortsimplex")
 
 \method{sadie}{incidence}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, cost, threads = 1, ...,
+  nperm = 100, rseed = TRUE, seed = 12345, threads = 1, ...,
   method = "shortsimplex")
 }
 \arguments{
-\item{data}{A data frame or a matrix with the counts for the different sampling units. The data
-set must decribe a complete (no missing data) squared or rectangular
-data set.
-or a matrix (x-y).}
+\item{data}{A data frame or a matrix with only three columns: the two first
+ones must be the x and y coordinates of the sampling units, and the last
+one, the corresponding disease intensity observations. It can also be a
+\code{\link{count}} or an \code{\link{incidence}} object.}
 
-\item{index}{The name of the index to use: "Perry", "Li-Madden-Xu" or "all".
-By default, only Perry's index is computed.}
+\item{...}{Not yet implemented.}
 
-\item{nperm}{Number of permutations for each sampling unit.}
+\item{index}{The index to be calculated: "Perry", "Li-Madden-Xu" or "all".
+By default, only Perry's index is computed for each sampling unit.}
 
-\item{rseed}{Randomisation seed. Unseful for checking pursposes.
+\item{nperm}{Number of random permutations to assess probabilities.}
 
-For historical reasons, the inflow is negative and the outflow is positive.... not true parce ce aue on parle de cost
-Two transportation algorithms are available: The Shortlist Method (Gottschlich C. and Schuhmacher D.)
-and the revised simplex algorithm (Luenberger and Ye (2008, Section 6.4)). The first one is substantially faster than the second one.
-Both of these algorithms are available in the R package \code{transportation}. There were integrated and
-fully C++-coded in this package in order to minimize R-code for fast reasons.}
+\item{rseed}{Is a random seed used for the permutations? (only useful for
+checking purposes).}
 
-\item{cost}{A \code{length(count)} by \code{length(count)} matrix specifing
-the cost of transporting single unit between the corresponding source and
-destination sampling unit. If not specified, the distance between each
-couple of adjacent sampling units (rook's sense) is assumed to be equal
-to 1. If the cost matrix is not given, the two first columns of data must
-correspond to "x" and "y" coordinates, and an euclidean distance between
-all the recorded points will be computed.}
+\item{seed}{Seed used when \code{rseed = FALSE} (only useful for checking
+purposes).}
+
+\item{threads}{Number of threads to perform the computations.}
+
+\item{method}{Method for the transportation algorithm.}
 }
 \description{
-The SADIE approach is implemented in this package. Refer to the documentation
-of the function \code{\link{sadie}} for more information and references about
-this approach.
-The \code{sadie} function estimates the parameters of a SADIE approach based
-on the number of permutations specified (\code{nperm}). It also computes the
-Ia indice and Pa probability.
+\code{sadie} performs the SADIE procedure. It computes different indices and
+probabilities based on the distance to regularity for the observed spatial
+pattern and a specified number of random permutations of this pattern. Both
+kind of clustering indices described by Perry et al. (1999) and Li et al.
+(2012) can be computed.
+}
+\details{
+By convention in the SADIE procedure, clustering indices for a donor unit
+(outflow) and a receiver unit (inflow) are positive and negative in sign,
+respectively.
 }
 \examples{
-# Possible datasets:
-#aphids
-#arthropods
-#codling_moths
-res <- sadie(aphids)
-summary(res)
-plot(res)
+my_count <- count(aphids, mapping(x = xm, y = ym))
+my_res <- sadie(my_count)
+my_res
+summary(my_res)
+plot(my_res)
 
-plot(sadie(count(codling_moths, mapping(x = xm, y = ym))))
+my_df <- aphids[, c("xm", "ym", "i")]
+sadie(my_df)
+
+my_incidence <- incidence(tomato_tswv$field_1929[tomato_tswv$field_1929$t == 1, ])
+my_incidence <- clump(my_incidence, unit_size = c(x = 3, y = 3))
+plot(my_incidence)
+my_res <- sadie(my_incidence, index = "all", threads = 4)
+my_res
+summary(my_res)
+plot(my_res) # Identical to: plot(my_res, index = "Perry")
+plot(my_res, index = "Li-Madden-Xu")
 
 }
 \references{
