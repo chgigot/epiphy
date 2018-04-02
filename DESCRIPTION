@@ -1,7 +1,7 @@
 Package: epiphy
 Type: Package
 Title: Tool Box for the Analysis of Plant Disease Epidemics
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: as.person(
     "Christophe Gigot <ch.gigot@gmail.com> [aut, cre]")
 Description: Coming soon!
@@ -39,6 +39,7 @@ Collate:
     'intensity-classes.R'
     'distr-fitting.R'
     'indices.R'
+    'mapcomp.R'
     'power-law.R'
     'sadie.R'
     'simple-dispersal-model.R'

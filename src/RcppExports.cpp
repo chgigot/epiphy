@@ -5,41 +5,54 @@
 
 using namespace Rcpp;
 
+// p_hscaled
+Rcpp::NumericVector p_hscaled(const Rcpp::NumericMatrix& nodes, const Rcpp::NumericMatrix& sites, double h, bool edgeCorrection);
+RcppExport SEXP _epiphy_p_hscaled(SEXP nodesSEXP, SEXP sitesSEXP, SEXP hSEXP, SEXP edgeCorrectionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type nodes(nodesSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type sites(sitesSEXP);
+    Rcpp::traits::input_parameter< double >::type h(hSEXP);
+    Rcpp::traits::input_parameter< bool >::type edgeCorrection(edgeCorrectionSEXP);
+    rcpp_result_gen = Rcpp::wrap(p_hscaled(nodes, sites, h, edgeCorrection));
+    return rcpp_result_gen;
+END_RCPP
+}
 // costTotiCPP
-double costTotiCPP(long i1, NumericMatrix& flow, NumericMatrix& cost, std::string type, bool averaged, bool absolute);
-RcppExport SEXP _epiphy_costTotiCPP(SEXP i1SEXP, SEXP flowSEXP, SEXP costSEXP, SEXP typeSEXP, SEXP averagedSEXP, SEXP absoluteSEXP) {
+double costTotiCPP(long i1, const Rcpp::NumericMatrix& flow, const Rcpp::NumericMatrix& cost, bool averaged, bool absolute);
+RcppExport SEXP _epiphy_costTotiCPP(SEXP i1SEXP, SEXP flowSEXP, SEXP costSEXP, SEXP averagedSEXP, SEXP absoluteSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< long >::type i1(i1SEXP);
-    Rcpp::traits::input_parameter< NumericMatrix& >::type flow(flowSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix& >::type cost(costSEXP);
-    Rcpp::traits::input_parameter< std::string >::type type(typeSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type flow(flowSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type cost(costSEXP);
     Rcpp::traits::input_parameter< bool >::type averaged(averagedSEXP);
     Rcpp::traits::input_parameter< bool >::type absolute(absoluteSEXP);
-    rcpp_result_gen = Rcpp::wrap(costTotiCPP(i1, flow, cost, type, averaged, absolute));
+    rcpp_result_gen = Rcpp::wrap(costTotiCPP(i1, flow, cost, averaged, absolute));
     return rcpp_result_gen;
 END_RCPP
 }
 // costTotCPP
-double costTotCPP(NumericMatrix& flow, NumericMatrix& cost);
+Rcpp::NumericVector costTotCPP(const Rcpp::NumericMatrix& flow, const Rcpp::NumericMatrix& cost);
 RcppExport SEXP _epiphy_costTotCPP(SEXP flowSEXP, SEXP costSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix& >::type flow(flowSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix& >::type cost(costSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type flow(flowSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type cost(costSEXP);
     rcpp_result_gen = Rcpp::wrap(costTotCPP(flow, cost));
     return rcpp_result_gen;
 END_RCPP
 }
 // as_matrix_transport
-NumericMatrix as_matrix_transport(List& x, double dim_mat);
+Rcpp::NumericMatrix as_matrix_transport(Rcpp::List& x, double dim_mat);
 RcppExport SEXP _epiphy_as_matrix_transport(SEXP xSEXP, SEXP dim_matSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List& >::type x(xSEXP);
     Rcpp::traits::input_parameter< double >::type dim_mat(dim_matSEXP);
     rcpp_result_gen = Rcpp::wrap(as_matrix_transport(x, dim_mat));
     return rcpp_result_gen;
@@ -88,7 +101,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_epiphy_costTotiCPP", (DL_FUNC) &_epiphy_costTotiCPP, 6},
+    {"_epiphy_p_hscaled", (DL_FUNC) &_epiphy_p_hscaled, 4},
+    {"_epiphy_costTotiCPP", (DL_FUNC) &_epiphy_costTotiCPP, 5},
     {"_epiphy_costTotCPP", (DL_FUNC) &_epiphy_costTotCPP, 2},
     {"_epiphy_as_matrix_transport", (DL_FUNC) &_epiphy_as_matrix_transport, 2},
     {"_epiphy_ntotfoci", (DL_FUNC) &_epiphy_ntotfoci, 4},
