@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------#
-#' Spatial Analysis by Distance IndicEs (SADIE)
+#' Spatial Analysis by Distance IndicEs (SADIE).
 #'
 #' \code{sadie} performs the SADIE procedure. It computes different indices and
 #' probabilities based on the distance to regularity for the observed spatial
@@ -62,9 +62,7 @@
 #' @name sadie
 #' @export
 #------------------------------------------------------------------------------#
-sadie <- function(data, ...) {
-    UseMethod("sadie")
-}
+sadie <- function(data, ...) UseMethod("sadie")
 
 #------------------------------------------------------------------------------#
 #' @rdname sadie
@@ -76,32 +74,31 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                              threads = 1, ..., method = "shortsimplex") {
 
     index <- match.arg(index)
-    n_col <- ncol(data)
     # data structure:
     # - 1st and 2nd columns: x and y coordinates, respectively.
     # - 3rd column: observed disease intensity data.
-    stopifnot(n_col == 3)
-    cost <- as.matrix(dist(data[1:2]))
+    stopifnot(ncol(data) == 3)
+    colnames(data) <- c("x", "y", "i")
+    # ^ Needed for ggplot2 figures and to simplify the code below.
+    cost <- as.matrix(dist(data[c("x", "y")]))
 
     # More interesting
     if (!rseed) set.seed(seed)
 
     N <- nrow(data)
-    data[[n_col]] <- as.numeric(data[[n_col]]) # Just in case it's integer, to have the same nature for data and fdata
+    data[["i"]] <- as.numeric(data[["i"]]) # Just in case it's integer, to have the same nature for data and fdata
 
     # Create a homogeneous (flatten) version of data
-    fcount <- rep(mean(data[[n_col]]), N)
+    fcount <- rep(mean(data[["i"]]), N)
 
     # Use optimal transportation algorithm
-    opt_transport <- wrap_transport(data[[n_col]], fcount, cost, method)
+    opt_transport <- wrap_transport(data[["i"]], fcount, cost, method)
     opt_transport <- as.matrix(opt_transport, N)
 
     # Computation the costs
-    cost_flows <- vapply(1:N, function(x) {
-        costTotiCPP(x, opt_transport, cost, type = "both")
-    }, numeric(1L))
-    # Due to the convention only positive values are added
-    # up. Da = total observed distance (or total cost).
+    # Due to the convention only positive values (donor units) are added up
+    # to compute Da. Da = total observed distance (or total cost).
+    cost_flows <- costTotCPP(opt_transport, cost)
     Da <- sum(cost_flows[cost_flows >= 0]) # Donors
 
     # Deal with indices
@@ -118,7 +115,7 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
     if (any(index == "Perry")) {
         cat("Computation of Perry's indices:\n")
         info_P <- clust_P(opt_transport, cost, N, nperm,
-                          start = data[[n_col]], end = fcount,
+                          start = data[["i"]], end = fcount,
                           method, cost_flows, threads)
         idx_P <- info_P[["clust"]]
         Ea    <- info_P[["Ea"]]
@@ -130,7 +127,7 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
     if (any(index == "Li-Madden-Xu")) {
         cat("Computation of Li-Madden-Xu's indices:\n")
         info_LMX <- clust_LMX(opt_transport, cost, N, nperm,
-                              start = data[[n_col]], end = fcount,
+                              start = data[["i"]], end = fcount,
                               method, cost_flows, threads)
         idx_LMX  <- info_LMX[["clust"]]
         new_prob <- info_LMX[["prob"]]
@@ -152,13 +149,12 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                                           mean(idx_LMX[idx_LMX > 0])))
     rownames(summary_idx) <- c("Perry's index", "Li-Madden-Xu's index")
 
-    #    return(Sadie())
+    # Returns:
     res <- list(info_clust = info_clust,
-                Da = Da,
+                Da = Da, # Da = total observed distance (or total cost).
                 Ia = Ia,
                 Pa = Pa,
-                Ea_perry = Ea,
-                Ea_li = Dis_all, # Needed ?
+                Ea = Ea,
                 summary_idx = summary_idx,
                 nperm = nperm,
                 rseed = rseed,
@@ -201,10 +197,130 @@ sadie.incidence <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                         threads = 1, ..., method = "shortsimplex") {
     mapped_data <- map_data(data)
     mapped_data <- mapped_data[, c("x", "y", "i")] # no t, no n
-    #mapped_data[["n"]] <- NULL # n is not used in SADIE procedure.
     sadie.data.frame(mapped_data, index, nperm, rseed, seed, threads, ...,
                      method = method)
 }
+
+
+#==============================================================================#
+# Utilities
+#==============================================================================#
+
+#------------------------------------------------------------------------------#
+# Wrapper for the transport::transport function.
+#------------------------------------------------------------------------------#
+wrap_transport <- function(start, end, cost, method = "shortsimplex",
+                           control = list(), ...) {
+    res <- transport::transport(start, end, costm = cost, method = method,
+                                control = control, ...)
+    class(res) <- c("transport", class(res))
+    res
+}
+
+#------------------------------------------------------------------------------#
+#' @method as.matrix transport
+#------------------------------------------------------------------------------#
+as.matrix.transport <- function(x, dim_mat) {
+    as_matrix_transport(x, dim_mat)
+}
+
+#------------------------------------------------------------------------------#
+# Computation of clustering indices from Perry et al. (1999).
+#------------------------------------------------------------------------------#
+clust_P <- function(flow, cost, dim_mat, nperm, start, end,
+                    method = "shortsimplex", cost_flows, threads) {
+
+    # Randomization procedure:
+    idx <- seq_len(nrow(flow)) # or: seq_len(length(start))
+    randomizations <- pbapply::pblapply(seq_len(nperm), function(i1) {
+        rand_idx       <- sample(idx)
+        new_start      <- start[rand_idx]
+        opt_transport  <- wrap_transport(new_start, end, cost, method)
+        opt_transport  <- as.matrix(opt_transport, dim_mat)
+        idx_same_count <- lapply(idx, function(i2) which(new_start == start[i2]))
+        res_Yci <- vapply(seq_len(length(idx_same_count)), function(i2) {
+            mean(vapply(seq_len(length(idx_same_count[[i2]])),
+                function(x) {
+                    costTotiCPP(idx_same_count[[i2]][x], opt_transport, cost)
+                }, numeric(1L)))
+        }, numeric(1L))
+        res_Yii <- vapply(idx,
+            function(x) {
+                costTotiCPP(x, opt_transport, cost)
+            }, numeric(1L))
+        # Due to the convention, only positive values (donor units) are added up
+        # to compute Ea.
+        cost_flows_perm <- costTotCPP(opt_transport, cost)
+        Ea <- sum(cost_flows_perm[cost_flows_perm >= 0]) # Donors
+        list(flow = opt_transport,
+             idx  = rand_idx,
+             Yci  = res_Yci,
+             Yii  = res_Yii,
+             cost_flows_perm = Ea)
+    }, cl = threads)
+
+    # Compute indices:
+    Ycs <- simplify2array(lapply(randomizations, function(x) x[["Yci"]]))
+    Ycs <- rowMeans(abs(Ycs))
+    Yis <- simplify2array(lapply(randomizations, function(x) x[["Yii"]]))
+    Yis <- rowMeans(abs(Yis))
+    Y0  <- mean(Ycs) # Must be equal to: mean(Yis)
+    Yi  <- vapply(idx,
+        function(x) {
+            costTotiCPP(x, flow, cost)
+        }, numeric(1L))
+    clust <- ((Yi * Y0) / (Yis * Ycs))
+    Ea <- unlist(lapply(randomizations, function(x) x[["cost_flows_perm"]]))
+
+    # Returns:
+    list(clust = clust,
+         Ea    = Ea)
+}
+
+#------------------------------------------------------------------------------#
+# Computation of clustering indices from Li, Madden and Xu (2012).
+#------------------------------------------------------------------------------#
+clust_LMX <- function(flow, cost, dim_mat, nperm, start, end,
+                      method = "shortsimplex", cost_flows, threads) {
+
+    # Randomization procedure:
+    idx <- seq_len(nrow(flow)) # or: seq_len(length(start))
+    randomizations <- pbapply::pblapply(seq_len(nperm), function(i1) {
+        vapply(idx, function(i2) {
+            sub_idx       <- idx[idx != i2]
+            rand_idx      <- sample(sub_idx)
+            rand_idx      <- append(rand_idx, i2, after = i2 - 1)
+            new_start     <- start[rand_idx]
+            opt_transport <- wrap_transport(new_start, end, cost, method)
+            opt_transport <- as.matrix(opt_transport, dim_mat)
+            costTotiCPP(i2, opt_transport, cost)
+        }, numeric(1L))
+    }, cl = threads)
+
+    # Compute indices:
+    randomizations <- simplify2array(randomizations)
+    Dis_bar        <- rowMeans(cbind(randomizations, cost_flows))
+    clust   <- cost_flows / abs(Dis_bar)
+    clust_i <- randomizations / abs(Dis_bar)
+    prob    <- vapply(seq_len(length(clust)), function(i1) {
+        if (clust[i1] >= 0) rpos <- (clust_i[i1, ] > clust[i1]) # Donor
+        else                rpos <- (clust_i[i1, ] < clust[i1]) # Receiver
+        rpos <- sum(rpos) + 1
+        # Trick above:
+        # (1) sum(T, T, F) gives 2.
+        # (2) +1 b/c clust is +1 away from the nearest lower or upper clust_i.
+        rpos / (nperm + 1)
+    }, numeric(1L))
+
+    # Returns:
+    list(clust   = clust,
+         prob    = prob)
+}
+
+
+#==============================================================================#
+# Print, summary and plot
+#==============================================================================#
 
 #------------------------------------------------------------------------------#
 #' @export
@@ -248,132 +364,9 @@ print.summary.sadie <- function(x, ...) {
 }
 
 #------------------------------------------------------------------------------#
-# Utilities
-#------------------------------------------------------------------------------#
-wrap_transport <- function(start, end, cost, method = "shortsimplex",
-                           control = list(), ...) {
-    res <- transport::transport(start, end, costm = cost, method = method,
-                                control = control, ...)
-    class(res) <- c("transport", class(res))
-    res
-}
-
-#------------------------------------------------------------------------------#
-#' @method as.matrix transport
 #' @export
 #------------------------------------------------------------------------------#
-as.matrix.transport <- function(x, dim_mat) {#, dimnames = NULL, ...) { # N: Number of sampling units... to CPP to optimize the code?
-    as_matrix_transport(x, dim_mat)
-}
-
-#------------------------------------------------------------------------------#
-# standardised and dimensionless clustering index (nui) for a donor
-# Perry
-#------------------------------------------------------------------------------#
-clust_P <- function(flow, cost, dim_mat, nperm, start, end,
-                    method = "shortsimplex", cost_flows, threads) {
-    idx <- seq_len(nrow(flow)) # or: seq_len(length(start))
-    randomisations <- pbapply::pblapply(seq_len(nperm), function(i1) {
-        # Yi & Yc
-        rand_idx      <- sample(idx)
-        new_start     <- start[rand_idx] # new_start n'a pas de nom de col et row contrairement à start (????)
-        opt_transport <- wrap_transport(new_start, end, cost, method)
-        opt_transport <- as.matrix(opt_transport, dim_mat) # Replace n with N
-
-        # ~ Assez long ci-dessous
-        idx_same_count <- lapply(idx, function(i2) which(new_start == start[i2]))
-        res_Yci <- vapply(seq_len(length(idx_same_count)), function(i2) {
-            mean(vapply(seq_len(length(idx_same_count[[i2]])),
-                        function(x) {
-                            costTotiCPP(idx_same_count[[i2]][x], opt_transport, cost, "both")
-                        },
-                        numeric(1L)))
-        }, numeric(1L))
-
-        res_Yii <- vapply(idx,
-                          function(x) {
-                              costTotiCPP(x, opt_transport, cost, "both")
-                          },
-                          numeric(1L))
-
-        # TODO: To improve below:
-        N <- nrow(opt_transport) # TODO: Should be the same as length(start)
-        costTot <- vapply(1:N, function(x) {
-            costTotiCPP(x, opt_transport, cost, type = "both")
-        }, numeric(1L))
-        # Due to the convention only positive values are added
-        # up. Da = total observed distance (or total cost).
-        Ea <- sum(costTot[costTot >= 0]) # Donors
-
-        list(flow = opt_transport,
-             idx  = rand_idx,
-             Yci = res_Yci,
-             Yii = res_Yii,
-             #costTot = costTot(opt_transport, cost))) # Pour calculer Ia
-             costTot = Ea) #costTotCPP(opt_transport, cost)) # To compute Ia //TODO: Useful costTotCPP???
-    }, cl = threads)
-
-    Ycs <- simplify2array(lapply(randomisations, function(x) x[["Yci"]]))
-    Ycs <- rowMeans(abs(Ycs))
-    Yis <- simplify2array(lapply(randomisations, function(x) x[["Yii"]]))
-    Yis <- rowMeans(abs(Yis))
-    Y0  <- mean(Ycs) # Should be equal to: mean(Yis)
-    Yi  <- vapply(idx,
-                  function(x) {
-                      costTotiCPP(x, flow, cost, "both")
-                  },
-                  numeric(1L))
-
-    clust <- ((Yi * Y0) / (Yis * Ycs))
-    Ea <- unlist(lapply(randomisations, function(x) x[["costTot"]]))
-
-    list(clust = clust,
-         Ea = Ea)
-}
-
-#------------------------------------------------------------------------------#
-# standardised and dimensionless clustering index (nui) for a donor
-#------------------------------------------------------------------------------#
-clust_LMX <- function(flow, cost, dim_mat, nperm, start, end,
-                             method = "shortsimplex", cost_flows,
-                             threads) {
-    idx            <- seq_len(nrow(flow)) # or: seq_len(length(start))
-    randomisations <- pbapply::pblapply(seq_len(nperm), function(i1) {
-        vapply(idx, function(i2) {
-            sub_idx   <- idx[idx != i2] ## NEW
-            rand_idx  <- sample(sub_idx)
-            ##TO DOUBLE CHECK## rand_idx <- insert(rand_idx, i2, i2) ##NEW : insert is in pkgg R.utils à récupérer uniquement fn intéressante en cpp après
-            rand_idx  <- append(rand_idx, i2, i2 - 1) # TODO: .insert(i, x)    Insert x at the i^th^ position of, grows vector in RCPP // Attention, at the positin VS after the position
-            new_start <- start[rand_idx]
-            #dimnames(new_start) <- list(rownames(start), colnames(start))
-            opt_transport <- wrap_transport(new_start, end, cost, method)
-            opt_transport <- as.matrix(opt_transport, dim_mat)
-            costTotiCPP(i2, opt_transport, cost, "both")
-        }, numeric(1L))
-    }, cl = threads)
-
-    randomisations <- simplify2array(randomisations)
-    Dis_bar        <- rowMeans(cbind(randomisations, cost_flows))  # TODO : to check : # Négatif tous pour l'instant. cost_flows = Dis ; il y a (nperm + 1) elements
-
-    clust   <- cost_flows / abs(Dis_bar) # sing_ ... allows to make a donor positive and a receiver negative
-    clust_i <- randomisations / abs(Dis_bar)
-    prob    <- vapply(seq_len(length(clust)), function(i1) {
-        if (clust[i1] >= 0) rpos <- (clust_i[i1, ] > clust[i1]) # Donor
-        else                rpos <- (clust_i[i1, ] < clust[i1]) # Receiver
-        rpos <- sum(rpos) + 1 # Trick : sum(T, T, F) => 2 ; +1 because Di is +1 away from the other sup or inf Di,rep
-        rpos / (nperm + 1)
-    }, numeric(1L))
-
-    # Returns:
-    list(clust   = clust,
-         prob    = prob,
-         Dis_all = randomisations) # Needed?
-}
-
-#------------------------------------------------------------------------------#
-#' @export
-#------------------------------------------------------------------------------#
-plot.sadie <- function(x, y, ..., index = c("Perry", "Li-Madden-Xu"),
+plot.sadie <- function(x, ..., index = c("Perry", "Li-Madden-Xu"),
                        isoclines = FALSE, resolution = 100,
                        thresholds = c(-1.5, 1.5),
                        point_size = c("radius", "area")) {
@@ -383,7 +376,7 @@ plot.sadie <- function(x, y, ..., index = c("Perry", "Li-Madden-Xu"),
 
     idx <- switch(index, "Perry" = "idx_P", "Li-Madden-Xu" = "idx_LMX")
     data_clust <- x$info_clust
-    data_loess <- stats::loess(as.formula(paste0(idx, " ~ x * y")), data = data_clust, degree = 2, span = 0.2)
+    data_loess <- stats::loess(as.formula(paste0(idx, " ~ x * y")), data = data_clust, degree = 2, span = 0.2) # TODO: No loess if not required
     input_val <- expand.grid(
         x = seq(min(data_clust$x), max(data_clust$x), length = resolution),
         y = seq(min(data_clust$y), max(data_clust$y), length = resolution))

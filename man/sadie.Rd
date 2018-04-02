@@ -6,7 +6,7 @@
 \alias{sadie.matrix}
 \alias{sadie.count}
 \alias{sadie.incidence}
-\title{Spatial Analysis by Distance IndicEs (SADIE)}
+\title{Spatial Analysis by Distance IndicEs (SADIE).}
 \usage{
 sadie(data, ...)
 
