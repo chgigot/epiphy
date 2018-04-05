@@ -10,30 +10,55 @@
 \usage{
 mapcomp(data, ...)
 
-\method{mapcomp}{data.frame}(data, delta, h, nperm = 100,
-  edge_correction = TRUE, threads = 1)
+\method{mapcomp}{data.frame}(data, delta, bandwidth, nperm = 100,
+  edge_correction = FALSE, threads = 1, ...)
 
-\method{mapcomp}{matrix}(data, delta, h, nperm = 100,
-  edge_correction = TRUE, threads = 1)
+\method{mapcomp}{matrix}(data, delta, bandwidth, nperm = 100,
+  edge_correction = FALSE, threads = 1, ...)
 
-\method{mapcomp}{count}(data, delta, h, nperm = 100, edge_correction = TRUE,
-  threads = 1)
+\method{mapcomp}{count}(data, delta, bandwidth, nperm = 100,
+  edge_correction = FALSE, threads = 1, ...)
 
-\method{mapcomp}{incidence}(data, delta, h, nperm = 100,
-  edge_correction = TRUE, threads = 1)
+\method{mapcomp}{incidence}(data, delta, bandwidth, nperm = 100,
+  edge_correction = FALSE, threads = 1, ...)
 }
 \arguments{
-\item{data}{A data frame with 3 columns.}
+\item{data}{A data frame or a matrix with only three columns: the two first
+ones must be the x and y coordinates of the sampling units, and the last
+one, the corresponding disease intensity observations. It can also be a
+\code{\link{count}} or an \code{\link{incidence}} object.}
+
+\item{delta}{Mesh size of the grid over the geographical domain of the
+sampling units used to compute the integral Hellinger distance between
+the probability density function of observations and the probability
+density function of sampling effort.}
+
+\item{bandwidth}{Bandwidth parameter for smoothing. It allows to test the
+spatial extent of heterogeneity if any.}
+
+\item{nperm}{Number of random permutations to assess probabilities.}
+
+\item{edge_correction}{Apply edge correction to account for the fact that
+bordering points intrinsically suffer from a lack of neighboring
+observation sites. FALSE by default.}
+
+\item{threads}{Number of threads to perform the computations.}
 }
 \description{
-\code{mapcomp} procedure. Spatial analyses of ecological count data: A density map comparaison approach
-}
-\details{
-the Hellinger distance.
+\code{mapcomp} performs a spatial pattern analysis based on the calculation
+of a formal distance (the Hellinger distance) between the density map of
+count or incidence data, and the density map of sampling effort. Statistical
+tests of spatial homogeneity are based on permutations across sampling sites
+and on valuable properties of the Hellinger distance.
 }
 \examples{
-my_res <- mapcomp(codling_moths, 4, 9, edge_correction = FALSE)
+my_res <- mapcomp(codling_moths, 1, 11, edge_correction = FALSE)
+my_res
 plot(my_res)
+
+my_count <- count(codling_moths, mapping(x = xm, y = ym))
+my_res <- mapcomp(my_count, 1, 11, edge_correction = FALSE)
+my_res
 
 }
 \references{

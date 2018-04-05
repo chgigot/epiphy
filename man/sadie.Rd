@@ -72,7 +72,7 @@ my_df <- aphids[, c("xm", "ym", "i")]
 sadie(my_df)
 
 my_incidence <- incidence(tomato_tswv$field_1929[tomato_tswv$field_1929$t == 1, ])
-my_incidence <- clump(my_incidence, unit_size = c(x = 3, y = 3))
+my_incidence <- clump(my_incidence, unit_size = c(x = 6, y = 6))
 plot(my_incidence)
 my_res <- sadie(my_incidence, index = "all", threads = 4)
 my_res

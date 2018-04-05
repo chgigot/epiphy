@@ -51,7 +51,7 @@
 #' sadie(my_df)
 #'
 #' my_incidence <- incidence(tomato_tswv$field_1929[tomato_tswv$field_1929$t == 1, ])
-#' my_incidence <- clump(my_incidence, unit_size = c(x = 3, y = 3))
+#' my_incidence <- clump(my_incidence, unit_size = c(x = 6, y = 6))
 #' plot(my_incidence)
 #' my_res <- sadie(my_incidence, index = "all", threads = 4)
 #' my_res
@@ -86,13 +86,13 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
     if (!rseed) set.seed(seed)
 
     N <- nrow(data)
-    data[["i"]] <- as.numeric(data[["i"]]) # Just in case it's integer, to have the same nature for data and fdata
+    data[["i"]] <- as.numeric(data[["i"]]) # Just in case it's an integer, to have the same nature for data and flat_data
 
     # Create a homogeneous (flatten) version of data
-    fcount <- rep(mean(data[["i"]]), N)
+    flat_data <- rep(mean(data[["i"]]), N)
 
     # Use optimal transportation algorithm
-    opt_transport <- wrap_transport(data[["i"]], fcount, cost, method)
+    opt_transport <- wrap_transport(data[["i"]], flat_data, cost, method)
     opt_transport <- as.matrix(opt_transport, N)
 
     # Computation the costs
@@ -115,7 +115,7 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
     if (any(index == "Perry")) {
         cat("Computation of Perry's indices:\n")
         info_P <- clust_P(opt_transport, cost, N, nperm,
-                          start = data[["i"]], end = fcount,
+                          start = data[["i"]], end = flat_data,
                           method, cost_flows, threads)
         idx_P <- info_P[["clust"]]
         Ea    <- info_P[["Ea"]]
@@ -127,7 +127,7 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
     if (any(index == "Li-Madden-Xu")) {
         cat("Computation of Li-Madden-Xu's indices:\n")
         info_LMX <- clust_LMX(opt_transport, cost, N, nperm,
-                              start = data[["i"]], end = fcount,
+                              start = data[["i"]], end = flat_data,
                               method, cost_flows, threads)
         idx_LMX  <- info_LMX[["clust"]]
         new_prob <- info_LMX[["prob"]]
@@ -158,7 +158,7 @@ sadie.data.frame <- function(data, index = c("Perry", "Li-Madden-Xu", "all"),
                 summary_idx = summary_idx,
                 nperm = nperm,
                 rseed = rseed,
-                seed = NA_real_) #TODO: to correct
+                seed = NA_real_) #TODO: to be corrected
     attr(res, "class") <- "sadie"
     attr(res, "call")  <- match.call()
     res
@@ -326,6 +326,7 @@ clust_LMX <- function(flow, cost, dim_mat, nperm, start, end,
 #' @export
 #------------------------------------------------------------------------------#
 print.sadie <- function(x, ...) {
+    cat("Spatial Analysis by Distance IndicEs (sadie)\n")
     cat("\nCall:\n")
     print(attr(x, "call"))
     cat("\nIa: ", format(x$Ia, digits = 1, nsmall = 4),

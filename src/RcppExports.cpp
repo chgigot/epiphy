@@ -6,16 +6,16 @@
 using namespace Rcpp;
 
 // p_hscaled
-Rcpp::NumericVector p_hscaled(const Rcpp::NumericMatrix& nodes, const Rcpp::NumericMatrix& sites, double h, bool edgeCorrection);
-RcppExport SEXP _epiphy_p_hscaled(SEXP nodesSEXP, SEXP sitesSEXP, SEXP hSEXP, SEXP edgeCorrectionSEXP) {
+Rcpp::NumericVector p_hscaled(const Rcpp::DataFrame& nodes, const Rcpp::DataFrame& sites, double bandwidth, bool edgeCorrection);
+RcppExport SEXP _epiphy_p_hscaled(SEXP nodesSEXP, SEXP sitesSEXP, SEXP bandwidthSEXP, SEXP edgeCorrectionSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type nodes(nodesSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type sites(sitesSEXP);
-    Rcpp::traits::input_parameter< double >::type h(hSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::DataFrame& >::type nodes(nodesSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::DataFrame& >::type sites(sitesSEXP);
+    Rcpp::traits::input_parameter< double >::type bandwidth(bandwidthSEXP);
     Rcpp::traits::input_parameter< bool >::type edgeCorrection(edgeCorrectionSEXP);
-    rcpp_result_gen = Rcpp::wrap(p_hscaled(nodes, sites, h, edgeCorrection));
+    rcpp_result_gen = Rcpp::wrap(p_hscaled(nodes, sites, bandwidth, edgeCorrection));
     return rcpp_result_gen;
 END_RCPP
 }
