@@ -24,6 +24,9 @@ NULL
 #'
 #' @param ... One or more unquoted expressions separated by commas.
 #' @param x Vector of one or more character strings.
+#' @param data An \code{intensity} object.
+#' @param mapping A \code{mapping} object.
+#' @param keep_only_std Keep only standard variables.
 #'
 #' @seealso \code{\link{mapped_var}}
 #'
@@ -52,6 +55,15 @@ mapping_ <- function(x) {
     map        <- lapply(map, as.name)
     map        <- map[sort(names(map))] # To reorder the names in a standad way.
     structure(map, class = "mapping")
+}
+
+#------------------------------------------------------------------------------#
+#' @rdname mapping
+#' @export
+#------------------------------------------------------------------------------#
+remap <- function(data, mapping, keep_only_std = TRUE) {
+    stopifnot(any(class(data) == "intensity"))
+    init_intensity(data$data, mapping, keep_only_std, type = is(data))
 }
 
 #------------------------------------------------------------------------------#
@@ -88,14 +100,6 @@ as.character.mapping <- function(x, ...) {
     char <- as.character(unclass(x))
     names(char) <- names(x)
     char
-}
-
-#------------------------------------------------------------------------------#
-#' @export
-#------------------------------------------------------------------------------#
-remap <- function(data, mapping, keep_only_std = TRUE) {
-    stopifnot(any(class(data) == "intensity"))
-    init_intensity(data$data, mapping, keep_only_std, type = is(data))
 }
 
 #------------------------------------------------------------------------------#
@@ -255,7 +259,7 @@ init_intensity <- function(data, mapping, keep_only_std, type) {
 #' The choice of the class depends on the nature of the data set.
 #'
 #' \code{incidence} reads disease incidence data from a data frame and return an
-#' incidence object. All of these classes inherit from \code{\link{intensity-class}}.
+#' incidence object. All of these classes inherit from \code{intensity} class.
 #' \itemize{
 #'     \item count: Each sampling unit contains from 0 to theoreticaly an infinity of data.
 #'     Number are positive integers.
@@ -347,7 +351,6 @@ init_intensity <- function(data, mapping, keep_only_std, type) {
 #' }
 #'
 #'
-#' @seealso \code{\link{intensity-class}}
 #' @examples
 #' ## Create intensity objects
 #' # Implicite call: The variable mapping does not need to be specified if the
@@ -564,7 +567,7 @@ mapped_var <- function(x) {
 #' @rdname mapped_var
 #' @export
 #------------------------------------------------------------------------------#
-"mapped_var<-" <- function(x, value, keep = TRUE) {
+"mapped_var<-" <- function(x, keep = TRUE, value) {
     stopifnot(is.intensity(x))
     if (keep) {
         idx_to_keep <- !(names(x$mapping) %in% names(value))
@@ -618,13 +621,13 @@ dim.intensity <- function(x) lengths(x$struct)
 #'     of the provided value in \code{unit_size}, some sampling units (the last
 #'     ones) will be dropped so that clumps of individuals remain even
 #'     throughout the data set.
-#' @param group_by Not yet implemented.
+# TODO: @param group_by Not yet implemented.
 #' @param fun Function used to group observational data together.
 #' @param inclusive_unspecified Not yet implemented. Do unspecified mapped
 #'     variables (different from i and n) need to be included into the bigger
 #'     possible sampling unit (TRUE) or splited into as many sampling units as
 #'     possible (FALSE, default).
-#' @param ... Optional arguments to \code{fun}.
+#' @param ... Additional arguments to be passed to \code{fun}.
 #'
 #' @examples
 #' my_incidence <- incidence(tomato_tswv$field_1929)
@@ -738,6 +741,12 @@ clump.intensity <- function(object, unit_size, fun = sum,
 #'
 #' @inheritParams base::split
 #' @param by The name(s) of the variable(s) which define(s) the grouping.
+#' @param unit_size Size of a group unit. It must be a named vector, with names
+#'     corresponding to non-observational variables (i.e. space and time
+#'     variables). If the size of a variable in the data set is not a multiple
+#'     of the provided value in \code{unit_size}, some sampling units (the last
+#'     ones) will be dropped so that clumps of individuals remain even
+#'     throughout the data set.
 #'
 #' @examples
 #' #inc_spl_t <- split(inc_clu, by = "t")

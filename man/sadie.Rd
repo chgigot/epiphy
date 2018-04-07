@@ -32,7 +32,7 @@ ones must be the x and y coordinates of the sampling units, and the last
 one, the corresponding disease intensity observations. It can also be a
 \code{\link{count}} or an \code{\link{incidence}} object.}
 
-\item{...}{Not yet implemented.}
+\item{...}{Additional arguments to be passed to other methods.}
 
 \item{index}{The index to be calculated: "Perry", "Li-Madden-Xu" or "all".
 By default, only Perry's index is computed for each sampling unit.}
@@ -45,7 +45,7 @@ checking purposes).}
 \item{seed}{Seed used when \code{rseed = FALSE} (only useful for checking
 purposes).}
 
-\item{threads}{Number of threads to perform the computations.}
+\item{threads}{Number of threads to perform the computations..}
 
 \item{method}{Method for the transportation algorithm.}
 }
@@ -74,11 +74,12 @@ sadie(my_df)
 my_incidence <- incidence(tomato_tswv$field_1929[tomato_tswv$field_1929$t == 1, ])
 my_incidence <- clump(my_incidence, unit_size = c(x = 6, y = 6))
 plot(my_incidence)
-my_res <- sadie(my_incidence, index = "all", threads = 4)
-my_res
-summary(my_res)
-plot(my_res) # Identical to: plot(my_res, index = "Perry")
-plot(my_res, index = "Li-Madden-Xu")
+# TODO: Too long?
+# my_res <- sadie(my_incidence, index = "all", threads = 4)
+# my_res
+# summary(my_res)
+# plot(my_res) # Identical to: plot(my_res, index = "Perry")
+# plot(my_res, index = "Li-Madden-Xu")
 
 }
 \references{

@@ -3,16 +3,25 @@
 \name{mapping}
 \alias{mapping}
 \alias{mapping_}
+\alias{remap}
 \title{Construct data mappings}
 \usage{
 mapping(...)
 
 mapping_(x)
+
+remap(data, mapping, keep_only_std = TRUE)
 }
 \arguments{
 \item{...}{One or more unquoted expressions separated by commas.}
 
 \item{x}{Vector of one or more character strings.}
+
+\item{data}{An \code{intensity} object.}
+
+\item{mapping}{A \code{mapping} object.}
+
+\item{keep_only_std}{Keep only standard variables.}
 }
 \description{
 Data mappings describe how variables in the data are mapped to standard names

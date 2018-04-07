@@ -10,22 +10,18 @@
 \arguments{
 \item{x}{A \code{\link{power_law}} object.}
 
+\item{...}{Additional arguments to be passed to other methods.
+TODO: Dashed lines indicate the cases where both variances are equal, which suggests an absence of aggregation.
+Points should lie on this line if ...}
+
 \item{scale}{Logarithmic or standard linear scale to display the results?}
 
 \item{observed}{Logical.}
 
 \item{model}{Logical.}
 
-\item{random}{Logical. Theoretical Random distribution.
-Dashed lines indicate the cases where both variances are equal, which suggests an absence of aggregation.
-Points should lie on this line if ...}
+\item{random}{Logical. Theoretical Random distribution.}
 }
 \description{
 Plot results of a power law analysis.
-}
-\examples{
-
-plot(my_power_law, scale = "log")
-plot(my_power_law, scale = "lin")
-
 }

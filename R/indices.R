@@ -60,7 +60,7 @@ NULL
 #'     the "incidence" flavor is calculated whatever the value of \code{flavor}.
 #'     Note that current implementation only deals with equal size sampling
 #'     units.
-#' @param ... Further arguments to be passed to specific methods.
+#' @param ... Additional arguments to be passed to other methods.
 #'
 #' @examples
 #' # Count flavor of Fisher's index:

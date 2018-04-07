@@ -28,6 +28,8 @@ ones must be the x and y coordinates of the sampling units, and the last
 one, the corresponding disease intensity observations. It can also be a
 \code{\link{count}} or an \code{\link{incidence}} object.}
 
+\item{...}{Additional arguments to be passed to other methods.}
+
 \item{delta}{Mesh size of the grid over the geographical domain of the
 sampling units used to compute the integral Hellinger distance between
 the probability density function of observations and the probability

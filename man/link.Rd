@@ -13,6 +13,11 @@ probit(x, rev = FALSE)
 
 cloglog(x, rev = FALSE)
 }
+\arguments{
+\item{x}{A numeric vector.}
+
+\item{rev}{The inverse of the function?}
+}
 \description{
 Logit, probit and cloglog functions are available.
 The logit and the logistic (with rev = TRUE), i.e. the inverse-logit functions.

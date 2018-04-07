@@ -27,7 +27,8 @@ NULL
 #' @param data An \code{intensity} object.
 #' @param random Distribution to describe random patterns.
 #' @param aggregated Distribution to describe aggregated patterns.
-#' @param ... Not yet implemented.
+#' @param n_est Number of estimated parameters for both distributions.
+#' @param ... Additional arguments to be passed to other methods.
 #'
 #' @return
 #'
@@ -86,7 +87,6 @@ NULL
 #' my_data <- split(my_data, by = "t")
 #' my_fit_two_distr <- lapply(my_data, fit_two_distr)
 #' lapply(my_fit_two_distr, function(x) x$param$aggregated[c("prob", "theta"), ])
-#' lapply(my_fit_two_distr, function(x) with(x$freq, chisq.test2(observed, aggregated, n_est = 2, rescale.p = TRUE)))
 #' lapply(my_fit_two_distr, plot)
 #'
 #' my_agg_index <- lapply(my_data, agg_index)

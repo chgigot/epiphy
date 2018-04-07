@@ -22,9 +22,9 @@
 #'     checking purposes).
 #' @param seed Seed used when \code{rseed = FALSE} (only useful for checking
 #'     purposes).
-#' @param threads Number of threads to perform the computations.
-#' @param ... Not yet implemented.
+#' @param threads Number of threads to perform the computations..
 #' @param method Method for the transportation algorithm.
+#' @param ... Additional arguments to be passed to other methods.
 #'
 #' @references
 #'
@@ -53,11 +53,12 @@
 #' my_incidence <- incidence(tomato_tswv$field_1929[tomato_tswv$field_1929$t == 1, ])
 #' my_incidence <- clump(my_incidence, unit_size = c(x = 6, y = 6))
 #' plot(my_incidence)
-#' my_res <- sadie(my_incidence, index = "all", threads = 4)
-#' my_res
-#' summary(my_res)
-#' plot(my_res) # Identical to: plot(my_res, index = "Perry")
-#' plot(my_res, index = "Li-Madden-Xu")
+#' # TODO: Too long?
+#' # my_res <- sadie(my_incidence, index = "all", threads = 4)
+#' # my_res
+#' # summary(my_res)
+#' # plot(my_res) # Identical to: plot(my_res, index = "Perry")
+#' # plot(my_res, index = "Li-Madden-Xu")
 #'
 #' @name sadie
 #' @export

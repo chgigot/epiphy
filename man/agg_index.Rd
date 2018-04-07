@@ -21,7 +21,7 @@ the "incidence" flavor is calculated whatever the value of \code{flavor}.
 Note that current implementation only deals with equal size sampling
 units.}
 
-\item{...}{Further arguments to be passed to specific methods.}
+\item{...}{Additional arguments to be passed to other methods.}
 }
 \description{
 This function can compute different aggregation indices. See "Details"

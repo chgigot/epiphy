@@ -13,7 +13,7 @@ clump(object, ...)
 \arguments{
 \item{object}{An \code{intensity} object.}
 
-\item{...}{Optional arguments to \code{fun}.}
+\item{...}{Additional arguments to be passed to \code{fun}.}
 
 \item{unit_size}{Size of a group unit. It must be a named vector, with names
 corresponding to non-observational variables (i.e. space and time
@@ -28,8 +28,6 @@ throughout the data set.}
 variables (different from i and n) need to be included into the bigger
 possible sampling unit (TRUE) or splited into as many sampling units as
 possible (FALSE, default).}
-
-\item{group_by}{Not yet implemented.}
 }
 \description{
 This function provides a easy way to regroup recorded data into groups of

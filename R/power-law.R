@@ -21,10 +21,10 @@ NULL
 #' \code{p} corresponds to the mean proportion of recorded individuals in case
 #' of incidence data, and the absolute value in case of count data.
 #'
-#' @param x A list of \code{intensity} objects (\code{count} or
+#' @param data A list of \code{intensity} objects (\code{count} or
 #'     \code{incidence} objects).
 #' @param log_base Logarithm base to be used.
-#' @param ... Not yet implemented.
+#' @param ... Additional arguments to be passed to other methods.
 #'
 #' @return A \code{power_law} object.
 #'
@@ -40,7 +40,8 @@ NULL
 #' my_power_law <- power_law(my_data)
 #' my_power_law
 #' summary(my_power_law)
-#' plot(my_power_law)
+#' plot(my_power_law) # Same as: plot(my_power_law, scale = "log")
+#' plot(my_power_law, scale = "lin")
 #'
 #' @references
 #'
@@ -56,15 +57,15 @@ NULL
 #'
 #' @export
 #------------------------------------------------------------------------------#
-power_law <- function(list, log_base = exp(1), ...) {
+power_law <- function(data, log_base = exp(1), ...) {
 
     call <- match.call()
     # Checks:
-    stopifnot(is.list(list))
-    if (length(list) < 2) {
+    stopifnot(is.list(data))
+    if (length(data) < 2) {
         stop("Less than 2 points is not enough to perform linear regressions.")
     }
-    object_class <- unique(vapply(list, function(x) class(x)[[1L]],
+    object_class <- unique(vapply(data, function(x) class(x)[[1L]],
                                   character(1L)))
     stopifnot(length(object_class) == 1)
     stopifnot(object_class %in% c("count", "incidence"))
@@ -73,13 +74,13 @@ power_law <- function(list, log_base = exp(1), ...) {
     switch(object_class,
            "count" = {
                name <- "Taylor's Power Law"
-               data <- get_fmt_obs(list, type = object_class)
+               data <- get_fmt_obs(data, type = object_class)
                x    <- vapply(data, mean, numeric(1L))
                y    <- vapply(data, var, numeric(1L))
            },
            "incidence" = {
                name <- "Binary Power Law"
-               data <- get_fmt_obs(list, type = object_class)
+               data <- get_fmt_obs(data, type = object_class)
                # For incidence data as proportions:
                # v_t = p(1 - p)/n (Madden & Hughes, 1995)
                x    <- vapply(data, function(obj) {
@@ -150,19 +151,23 @@ print.power_law <- function(x, ...) {
 #' @export
 #------------------------------------------------------------------------------#
 summary.power_law <- function(object, ...) {
-    # TODO: Bien regarder la structure d'un summary.lm pour bien comprendre
-    # tous ses éléments.
-    summary_model <- summary(object$model)
-    summary_model$call <- object$call
-    summary_model$coefficients <- object$param
-    structure(summary_model, class = "summary.power_law")
+    structure(list(call         = object$call,
+                   model        = object$model,
+                   coefficients = object$param
+    ), class = "summary.power_law")
 }
 
 #------------------------------------------------------------------------------#
 #' @method print summary.power_law
 #' @export
 #------------------------------------------------------------------------------#
-print.summary.power_law <- function(x, ...) stats:::print.summary.lm(x, ...)
+print.summary.power_law <- function(x, ...) {
+    res <- summary.lm(x$model, ...)
+    res$call <- x$call
+    res$coefficients <- x$coefficients
+    print(res)
+    invisible(res)
+}
 
 #------------------------------------------------------------------------------#
 #' Plot results of a power law analysis
@@ -174,13 +179,9 @@ print.summary.power_law <- function(x, ...) stats:::print.summary.lm(x, ...)
 #' @param observed Logical.
 #' @param model Logical.
 #' @param random Logical. Theoretical Random distribution.
-#' Dashed lines indicate the cases where both variances are equal, which suggests an absence of aggregation.
+#' @param ... Additional arguments to be passed to other methods.
+#' TODO: Dashed lines indicate the cases where both variances are equal, which suggests an absence of aggregation.
 #' Points should lie on this line if ...
-#'
-#' @examples
-#'
-#' plot(my_power_law, scale = "log")
-#' plot(my_power_law, scale = "lin")
 #'
 #' @export
 #------------------------------------------------------------------------------#
@@ -239,6 +240,8 @@ plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"),
 #'
 #' TODO: Not yet implemented.
 #'
+#' @param data Data.
+#'
 #' @references
 #'
 #' Iwao S. 1968. A new regression method for analyzing the aggregation pattern
@@ -285,21 +288,22 @@ iwao <- function(data) {
 #'     "aI").
 #' @param slope Slope parameter.
 #' @param n Number of individuals per sampling unit.
+#' @param ... Additional arguments to be passed to other methods.
 #'
 #' @examples
 #' # Values from the power_law() example:
-#' Ar    <- 38.6245
+#' Ai    <- 38.6245
 #' slope <- 1.9356
 #' n     <- 9
 #'
 #' # Usual function call syntax:
-#' a2a(Ar, slope, n, from = "Ar", to = "ar")
+#' a2a(Ai, slope, n, from = "Ai", to = "ai")
 #'
 #' # Other syntaxes:
-#' inputs <- list(Ar = Ar, slope = slope, n = n)
-#' a2a(inputs, "ar")
+#' inputs <- list(Ai = Ai, slope = slope, n = n)
+#' a2a(inputs, "ai")
 #' require(magrittr)
-#' inputs %>% a2a("ar")
+#' inputs %>% a2a("ai")
 #'
 #' @export
 #------------------------------------------------------------------------------#
@@ -335,7 +339,7 @@ a2a_internal <- function(intercept, b, n, from, to) {
 #------------------------------------------------------------------------------#
 a2a.numeric <- function(x, slope, n, # Here, x = intercept
                         from = c("Ai", "ai", "AI", "aI"),
-                        to   = c("Ai", "ai", "AI", "aI")) {
+                        to   = c("Ai", "ai", "AI", "aI"), ...) {
 
     # Checks and variable allocation:
     from      <- match.arg(from)
@@ -352,7 +356,7 @@ a2a.numeric <- function(x, slope, n, # Here, x = intercept
 #' @export
 #------------------------------------------------------------------------------#
 a2a.list <- function(x, # Here, x: list with 3 elements: intercept, slope and n.
-                     to   = c("Ai", "ai", "AI", "aI")) {
+                     to   = c("Ai", "ai", "AI", "aI"), ...) {
 
     # Checks and variable allocation:
     stopifnot(length(x) == 3)

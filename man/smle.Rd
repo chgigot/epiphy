@@ -17,7 +17,7 @@ smle(data, ...)
 one variable), a data frame (if there is one or more variables) or an
 \code{\link{intensity}} object.}
 
-\item{...}{Further arguments to be passed to \code{\link[stats]{optim}}.}
+\item{...}{Additional arguments to be passed to \code{\link[stats]{optim}}.}
 
 \item{f}{A function to be maximized, typically a log-likelihood function.
 This function must have only two arguments: \code{data} and \code{param},
@@ -42,9 +42,9 @@ parametrizations.
 The \code{\link[stats]{optim}} tool does the hard work under the hood. Extra
 arguments (e.g. method of optimization to be used) can be passed to
 \code{\link[stats]{optim}} through the \code{...} argument. Note that
-contrary to the default \code{\link[stat]{optim}} arguments, \code{smle}
+contrary to the default \code{\link[stats]{optim}} arguments, \code{smle}
 tries to solve a maximization problem using the method "L-BFGS-B" by default
-(see \code{\link[stat]{optim}} documentation for more information).
+(see \code{\link[stats]{optim}} documentation for more information).
 }
 \examples{
 set.seed(12345)

@@ -19,9 +19,9 @@ NULL
 #' The \code{\link[stats]{optim}} tool does the hard work under the hood. Extra
 #' arguments (e.g. method of optimization to be used) can be passed to
 #' \code{\link[stats]{optim}} through the \code{...} argument. Note that
-#' contrary to the default \code{\link[stat]{optim}} arguments, \code{smle}
+#' contrary to the default \code{\link[stats]{optim}} arguments, \code{smle}
 #' tries to solve a maximization problem using the method "L-BFGS-B" by default
-#' (see \code{\link[stat]{optim}} documentation for more information).
+#' (see \code{\link[stats]{optim}} documentation for more information).
 #'
 #' @param data The data set to work with. It can be a vector (if there is only
 #'     one variable), a data frame (if there is one or more variables) or an
@@ -36,7 +36,7 @@ NULL
 #'     provided with such a named vector.
 #' @param max Does \code{f} need to be maximized? Set to \code{FALSE} to require
 #'     a minimization of \code{f}.
-#' @param ... Further arguments to be passed to \code{\link[stats]{optim}}.
+#' @param ... Additional arguments to be passed to \code{\link[stats]{optim}}.
 #'
 #' @examples
 #' set.seed(12345)
@@ -215,12 +215,6 @@ smle.intensity <- function(data, f, param_init, max = TRUE, ...) {
 #' @export
 #------------------------------------------------------------------------------#
 coef.smle <- function(object, ...) object$coef
-
-#------------------------------------------------------------------------------#
-#' @rdname coef.smle
-#' @export
-#------------------------------------------------------------------------------#
-coefficients.smle <- function(object, ...) coef(object, ...)
 
 #------------------------------------------------------------------------------#
 #' @inherit stats::vcov title description return

@@ -56,7 +56,7 @@ The choice of the class depends on the nature of the data set.
 }
 \details{
 \code{incidence} reads disease incidence data from a data frame and return an
-incidence object. All of these classes inherit from \code{\link{intensity-class}}.
+incidence object. All of these classes inherit from \code{intensity} class.
 \itemize{
     \item count: Each sampling unit contains from 0 to theoreticaly an infinity of data.
     Number are positive integers.
@@ -151,7 +151,4 @@ plot(my_incidence_1, type = "temporal")
 plot(my_count_1, tile = FALSE, size = 5)
 plot(my_count_1, type = "temporal")
 
-}
-\seealso{
-\code{\link{intensity-class}}
 }

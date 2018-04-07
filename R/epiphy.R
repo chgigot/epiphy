@@ -20,3 +20,7 @@
 #' @import ggplot2
 #------------------------------------------------------------------------------#
 NULL
+
+# TODO: Needed for checking process...
+utils::globalVariables(c("Number per sampling unit", "Frequency", "key",
+                         "x", "y", "z", "i", "phs"))

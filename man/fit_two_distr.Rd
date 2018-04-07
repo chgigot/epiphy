@@ -21,11 +21,13 @@ fit_two_distr(data, ...)
 \arguments{
 \item{data}{An \code{intensity} object.}
 
-\item{...}{Not yet implemented.}
+\item{...}{Additional arguments to be passed to other methods.}
 
 \item{random}{Distribution to describe random patterns.}
 
 \item{aggregated}{Distribution to describe aggregated patterns.}
+
+\item{n_est}{Number of estimated parameters for both distributions.}
 }
 \value{
 An object of class \code{fit_two_distr}, which is a list containing at least
@@ -99,7 +101,6 @@ my_data <- incidence(dogwood_anthracnose)
 my_data <- split(my_data, by = "t")
 my_fit_two_distr <- lapply(my_data, fit_two_distr)
 lapply(my_fit_two_distr, function(x) x$param$aggregated[c("prob", "theta"), ])
-lapply(my_fit_two_distr, function(x) with(x$freq, chisq.test2(observed, aggregated, n_est = 2, rescale.p = TRUE)))
 lapply(my_fit_two_distr, plot)
 
 my_agg_index <- lapply(my_data, agg_index)

@@ -23,6 +23,7 @@
 #'     observation sites. FALSE by default.
 #' @param nperm Number of random permutations to assess probabilities.
 #' @param threads Number of threads to perform the computations.
+#' @param ... Additional arguments to be passed to other methods.
 #'
 #' @references
 #'
@@ -88,7 +89,9 @@ mapcomp.data.frame <- function(data, delta, bandwidth, nperm = 100,
         res[["stat"]]
     }, cl = threads)
     coord <- data.frame(grid_inter, phs = res[["phs"]])
-    res <- list(data  = data,
+    res <- list(object = class(data),
+                bandwidth = bandwidth,
+                data  = data,
                 coord = coord,
                 stat  = res[["stat"]],
                 pval  = (sum(randomizations > res[["stat"]]) + 1) / (nperm + 1)) # TODO: To double check
@@ -158,7 +161,10 @@ plot.mapcomp <- function(x, ...) {
                      aes(x, y, z = phs), size = 0.6, color = "black") +
         geom_point(inherit.aes = FALSE, data = x$data,
                    aes(x, y, size = i)) +
-        scale_fill_gradient(low = "white", high = "red") +
+        scale_size_continuous(paste0(tocamel(x[["object"]][1]), " (i)")) + # TODO: Not good
+        scale_fill_gradient(paste0("Theoretical normalized\nintensity for a\n ",
+                                   "bandwidth h = ", x[["bandwidth"]]),
+                            low = "white", high = "red") +
         theme_bw()
     print(gg)
     invisible(NULL)

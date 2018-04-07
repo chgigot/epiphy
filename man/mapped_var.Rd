@@ -12,10 +12,10 @@ mapped_var(x, keep = TRUE) <- value
 \arguments{
 \item{x}{An \code{intensity} object.}
 
-\item{value}{A \code{mapping} object.}
-
 \item{keep}{Logical. Do we keep any previous mapped variables that are not
 redifined in the \code{mapping} object?}
+
+\item{value}{A \code{mapping} object.}
 }
 \description{
 Get or set existing variable mappings.

@@ -19,6 +19,13 @@
 \item{...}{further potential arguments passed to methods.}
 
 \item{by}{The name(s) of the variable(s) which define(s) the grouping.}
+
+\item{unit_size}{Size of a group unit. It must be a named vector, with names
+corresponding to non-observational variables (i.e. space and time
+variables). If the size of a variable in the data set is not a multiple
+of the provided value in \code{unit_size}, some sampling units (the last
+ones) will be dropped so that clumps of individuals remain even
+throughout the data set.}
 }
 \description{
 TODO

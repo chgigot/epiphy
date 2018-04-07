@@ -9,14 +9,16 @@
 a2a(x, ...)
 
 \method{a2a}{numeric}(x, slope, n, from = c("Ai", "ai", "AI", "aI"),
-  to = c("Ai", "ai", "AI", "aI"))
+  to = c("Ai", "ai", "AI", "aI"), ...)
 
-\method{a2a}{list}(x, to = c("Ai", "ai", "AI", "aI"))
+\method{a2a}{list}(x, to = c("Ai", "ai", "AI", "aI"), ...)
 }
 \arguments{
 \item{x}{Intercept parameter to be converted or a named list with the
 parameter to be converted ("Ai", "ai", "AI" or "aI"), the slope
 ("slope"), and the number of individual per sampling unit ("n").}
+
+\item{...}{Additional arguments to be passed to other methods.}
 
 \item{slope}{Slope parameter.}
 
@@ -45,17 +47,17 @@ binomial power law.
 }
 \examples{
 # Values from the power_law() example:
-Ar    <- 38.6245
+Ai    <- 38.6245
 slope <- 1.9356
 n     <- 9
 
 # Usual function call syntax:
-a2a(Ar, slope, n, from = "Ar", to = "ar")
+a2a(Ai, slope, n, from = "Ai", to = "ai")
 
 # Other syntaxes:
-inputs <- list(Ar = Ar, slope = slope, n = n)
-a2a(inputs, "ar")
+inputs <- list(Ai = Ai, slope = slope, n = n)
+a2a(inputs, "ai")
 require(magrittr)
-inputs \%>\% a2a("ar")
+inputs \%>\% a2a("ai")
 
 }

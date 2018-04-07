@@ -2,12 +2,9 @@
 % Please edit documentation in R/mle-factory.R
 \name{coef.smle}
 \alias{coef.smle}
-\alias{coefficients.smle}
 \title{Extract Model Coefficients}
 \usage{
 \method{coef}{smle}(object, ...)
-
-\method{coefficients}{smle}(object, ...)
 }
 \arguments{
 \item{object}{an object for which the extraction of model coefficients is

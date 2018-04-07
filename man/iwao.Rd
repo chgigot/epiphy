@@ -6,6 +6,9 @@
 \usage{
 iwao(data)
 }
+\arguments{
+\item{data}{Data.}
+}
 \description{
 TODO: Not yet implemented.
 }

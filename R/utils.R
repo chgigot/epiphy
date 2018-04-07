@@ -31,6 +31,9 @@ droplevels.list <- function(x, except = NULL, ...) {
 #' Probit is a wrapper around \code{qnorm} (for \eqn{probit}) and \code{pnorm} (for \eqn{probit^{-1}})
 #' Complementary log-log transformation.
 #'
+#' @param x A numeric vector.
+#' @param rev The inverse of the function?
+#'
 #' @name link
 #' @export
 #------------------------------------------------------------------------------#
@@ -131,7 +134,7 @@ llrtest <- function(random, aggregated) {
 
 #------------------------------------------------------------------------------#
 # Estimate extra coef, based on deltamethod
-#' @export
+# @export
 #------------------------------------------------------------------------------#
 estimate_param <- function(model, expr, type = c("t", "norm"), as_list = FALSE) { # as_list... NOT USED. List uniquement pour estimate mean / trouver autre nom
     # NEW !!!
@@ -181,31 +184,31 @@ rbind_param <- function(base_mat, new_param) {
 }
 
 
-#' @export
-extraCoef <- function(model) { ## TODO: USEFUL ???
-    #myfunc <- function(v1) {
-    #    deparse(substitute(v1))
-    #}
-    #
-    #myfunc(foo)
-    #[1] "foo"
-
-    # Retrieve result matrice (to which we will add extra estimates)
-    coefs   <- coef(stats4::summary(model)) # NON pas normal de devoir mettre bbmle ici, pas besoin de le faire dans estimate_param
-    # not need to do that forcoef(model) ... why?
-
-    # pour betabinom uniquement
-    extraCoefs = list(
-        p     = quote(x1 / (x1 + x2)),
-        theta = quote(1  / (x1 + x2)),
-        rho   = quote(1  / (x1 + x2 + 1))
-    )
-
-    newCoefs <- do.call(rbind, lapply(extraCoefs, function(i1) {
-        unlist(estimate_param(model, i1, type = "norm")) # faire plus intelligent ici avec le "norm"
-    }))
-    rbind(coefs, newCoefs)
-}
+# @export
+# extraCoef <- function(model) { ## TODO: USEFUL ???
+#     #myfunc <- function(v1) {
+#     #    deparse(substitute(v1))
+#     #}
+#     #
+#     #myfunc(foo)
+#     #[1] "foo"
+#
+#     # Retrieve result matrice (to which we will add extra estimates)
+#     coefs   <- coef(stats4::summary(model)) # NON pas normal de devoir mettre bbmle ici, pas besoin de le faire dans estimate_param
+#     # not need to do that forcoef(model) ... why?
+#
+#     # pour betabinom uniquement
+#     extraCoefs = list(
+#         p     = quote(x1 / (x1 + x2)),
+#         theta = quote(1  / (x1 + x2)),
+#         rho   = quote(1  / (x1 + x2 + 1))
+#     )
+#
+#     newCoefs <- do.call(rbind, lapply(extraCoefs, function(i1) {
+#         unlist(estimate_param(model, i1, type = "norm")) # faire plus intelligent ici avec le "norm"
+#     }))
+#     rbind(coefs, newCoefs)
+# }
 
 #------------------------------------------------------------------------------#
 # Following function used in power_law and spatial-hier
@@ -277,7 +280,7 @@ tocamel <- function(x) {
 
 
 #------------------------------------------------------------------------------#
-#' @export
+# TODO: to move to somewhere else?
 #------------------------------------------------------------------------------#
 chisq.test2 <- function(x, p, n_est, df, rescale.p = FALSE, ...) {
 

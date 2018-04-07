@@ -149,19 +149,23 @@ print.spatial_hier <- function(x, ...) { # TODO
 #' @export
 #------------------------------------------------------------------------------#
 summary.spatial_hier <- function(object, ...) {
-    # TODO: Bien regarder la structure d'un summary.lm pour bien comprendre
-    # tous ses éléments.
-    summary_model <- summary(object$model)
-    summary_model$call <- object$call
-    summary_model$coefficients <- object$param
-    structure(summary_model, class = "summary.spatial_hier")
+    structure(list(call         = object$call,
+                   model        = object$model,
+                   coefficients = object$param
+    ), class = "summary.spatial_hier")
 }
 
 #------------------------------------------------------------------------------#
 #' @method print summary.spatial_hier
 #' @export
 #------------------------------------------------------------------------------#
-print.summary.spatial_hier <- function(x, ...) stats:::print.summary.lm(x, ...)
+print.summary.spatial_hier <- function(x, ...) {
+    res <- summary.lm(x$model, ...)
+    res$call <- x$call
+    res$coefficients <- x$coefficients
+    print(res)
+    invisible(res)
+}
 
 #------------------------------------------------------------------------------#
 #' @export
