@@ -1,10 +1,12 @@
 Package: epiphy
 Type: Package
-Title: Tool Box for the Analysis of Plant Disease Epidemics
-Version: 0.4.0
-Authors@R: as.person(
-    "Christophe Gigot <ch.gigot@gmail.com> [aut, cre]")
-Description: Coming soon!
+Title: Analysis of Plant Disease Epidemics
+Version: 0.3.2
+Authors@R: c(
+    person("Christophe", "Gigot", email = "ch.gigot@gmail.com",
+    role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1748-2902")))
+Description: Analysis of plant disease epidemics, currently mainly focused on
+    spatial pattern analysis.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

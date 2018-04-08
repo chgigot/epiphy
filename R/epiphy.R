@@ -1,9 +1,21 @@
 #------------------------------------------------------------------------------#
-#' \code{epiphy}: Analyzing plant disease epidemics
+#' \code{epiphy}: A package to analyze plant disease epidemics.
 #'
-#' This package is intended primarily for the plant pathologist community.
+#' This package provides a common framework for spatialized plant disease
+#' intensity data collected at one or more time points. Many statistical methods
+#' developed over the last decades to describe and quantify plant disease
+#' epidemics are implemented (e.g., aggregation indices, Taylor and binary power
+#' laws, distribution fitting, cross-product approaches). A bundle of historical
+#' data sets that were mainly published in plant disease epidemiology literature
+#' is also made available.
 #'
-#' @references
+#' @author
+#'
+#' \strong{Maintainer:} Christophe Gigot <ch.gigot@gmail.com>
+#'
+#' @seealso
+#'
+#' Useful references:
 #'
 #' Gosme M. 2008. Comment analyser la structure spatiale et modéliser le
 #' développement spatio-temporel des épiphyties? Canadian Journal of Plant

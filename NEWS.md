@@ -1,4 +1,4 @@
-# epiphy 0.4.0
+# epiphy 0.3.2
 
 - Fixed sadie algorithm.
 - Add mapcomp procedure.
