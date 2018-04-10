@@ -67,14 +67,14 @@ When creating an object of one of the subclasses of `intensity`, it is necessary
 ```{r create_intensity}
 # Count data
 # We will use only the last assessment date for the arthropods data set:
-arthropods_t6 <- arthropods[arthropods$t == 6, ]
+arthropods_t6 <- arthropods[arthropods$t == 3, ]
 # - Explicit mapping:
-(cou_t6 <- count(arthropods_t6, mapping(x = x, y = y, t = t, i = i)))
+(cou_t3 <- count(arthropods_t6, mapping(x = x, y = y, t = t, i = i)))
 # - Total implicit mapping:
-cou_t6_bis <- count(arthropods_t6)
+cou_t3_bis <- count(arthropods_t6)
 # - Partial implicit mapping:
-cou_t6_ter <- count(arthropods_t6, mapping(i = i))
-all(identical(cou_t6, cou_t6_bis), identical(cou_t6, cou_t6_ter))
+cou_t3_ter <- count(arthropods_t6, mapping(i = i))
+all(identical(cou_t3, cou_t3_bis), identical(cou_t3, cou_t3_ter))
 
 # Implicit mapping for incidence data:
 (inc <- incidence(tomato_tswv$field_1929))
@@ -83,7 +83,7 @@ all(identical(cou_t6, cou_t6_bis), identical(cou_t6, cou_t6_ter))
 Some useful information are displayed when you print an `intensity` object, such as the exact nature of this object (`count`, `incidence` or `severity`). Mapping variables (with squared brackets) and mapped variables (just below mapping variables) are also printed. You can also plot such objects to vizualize all the data in a convenient way.
 
 ```{r plot_count}
-plot(cou_t6, tile = FALSE, size = 5)
+plot(cou_t3, tile = FALSE, size = 5)
 ```
 
 **Figure 1.** Observation sequences of maps of of the counts of arthropods over time.
@@ -136,13 +136,13 @@ In this example, the null hypothesis of non-aggregation is rejected.
 As its name implies, the function `fit_two_distr` try to fit two different distributions to a given data set. One distribution is supposed to be representative of a random pattern, while the second one should denote an aggregated pattern. For `count` data, the default distributions are Poisson and negative binomial for random and aggregated patterns, respectively. For `incidence` data, the default distributions are binomial and beta-binomial for random and aggregated patterns, respectively [@Hughes_Madden_1993; @Madden_Hughes_1995]. In the latter case, `fit_two_distr` may be viewed as an alternative to the BBD software [@Madden_Hughes_1994]. Note that **epiphy** provides also a set of handy functions to work with the beta-binomial distribution (`dbetabinom`, `pbetabinom`, `qbetabinom` and `rbetabinom`).
 
 ```{r fit_distributions, warning=FALSE, fig.width=3, fig.show = "hold"}
-cou_t6_distr <- fit_two_distr(cou_t6)
-summary(cou_t6_distr)
+cou_t3_distr <- fit_two_distr(cou_t3)
+summary(cou_t3_distr)
 
 inc9_t1_distr <- fit_two_distr(inc9_t1)
 summary(inc9_t1_distr)
 
-plot(cou_t6_distr, breaks = 17)
+plot(cou_t3_distr, breaks = 17)
 plot(inc9_t1_distr)
 ```
 
@@ -199,10 +199,11 @@ This two-dimensional geostatistical approach uses the relative locations of the 
 
 To perform a SADIE analysis, the spatial coordinates must reflect the real relative distances between the different sampling units. If you mapped $x$ and $y$ variables to grid coordinates, you can use the `remap` function to map them to metric coordinates (if any in your data set).
 
-```{r sadie_test, fig.height = 5, fig.show = "hold"}
+```{r sadie, fig.height = 5, fig.show = "hold"}
 set.seed(123)
-cou_t6_m <- remap(cou_t6, mapping(x = xm, y = ym))
-res  <- sadie(cou_t6_m)
+cou_t3_m <- remap(cou_t3, mapping(x = xm, y = ym))
+plot(cou_t3_m)
+res <- sadie(cou_t3_m)
 summary(res)
 plot(res)
 plot(res, isoclines = TRUE)
@@ -210,6 +211,23 @@ plot(res, isoclines = TRUE)
 
 **Figure 8.** Maps of clustering indices with index symbols alone (**top**) or with interpolated landscape and contours (**bottom**). For the **top** map, symbols filled with blue (receivers) and red (donors) color indicate that absolute values of Perry's indices are > 1.5.
 
+### Map comparison (MAPCOMP)
+
+The MAPCOMP procedure proposed by @Lavigne_etal_2010 relies on the calculation of the Hellinger distance between the density map of recorded intensity data and the density map of sampling effort.
+
+```{r mapcomp, fig.height = 5}
+set.seed(123)
+res <- mapcomp(cou_t3_m, delta = 4, bandwidth = 60)
+res
+plot(res)
+
+set.seed(123)
+res <- mapcomp(codling_moths, delta = 1, bandwidth = 11)
+res
+plot(res, bins = 10)
+```
+
+**Figure 9.** Density maps.
 
 ## Conclusion
 
@@ -218,7 +236,7 @@ The package **epiphy** implements currently many of the methods described in the
 
 ## Acknowledgments
 
-TODO.
+The authors are grateful to Prof. Xiangming Xu for discussion and advice regarding the SADIE procedure.
 
 
 ## Annexes
