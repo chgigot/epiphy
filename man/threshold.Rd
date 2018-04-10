@@ -4,19 +4,21 @@
 \alias{threshold}
 \title{Threshold : To go to higher level in the hierarchy}
 \usage{
-threshold(data, value = 0)
+threshold(data, value, ...)
 }
 \arguments{
-\item{data}{An \code{intensity} object.}
+\item{data}{A numeric vector or an \code{intensity} object.}
 
 \item{value}{All the intensity values lower or equal to this value  are set
 to 0. The other values are set to 1.}
+
+\item{...}{Additional arguments to be passed to other methods.}
 }
 \description{
-This function transforms the current \code{intensity} data set into a
-"simplified black and white image" of this same data set: every value of
-disease intensity below and above a given threshold is given the value 0 and
-1, respectively.
+This function transforms the current numeric vector or \code{intensity} data
+set into a "simplified black and white image" of this same data set: every
+value of disease intensity below and above a given threshold is given the
+value 0 and 1, respectively.
 }
 \details{
 By default, everything above 0 is given 1, and 0 stays at 0. \code{threshold}

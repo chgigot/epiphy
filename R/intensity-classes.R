@@ -849,23 +849,36 @@ split.intensity <- function(x, f, drop = FALSE, ..., by, unit_size) {
 #------------------------------------------------------------------------------#
 #' Threshold : To go to higher level in the hierarchy
 #'
-#' This function transforms the current \code{intensity} data set into a
-#' "simplified black and white image" of this same data set: every value of
-#' disease intensity below and above a given threshold is given the value 0 and
-#' 1, respectively.
+#' This function transforms the current numeric vector or \code{intensity} data
+#' set into a "simplified black and white image" of this same data set: every
+#' value of disease intensity below and above a given threshold is given the
+#' value 0 and 1, respectively.
 #'
 #' By default, everything above 0 is given 1, and 0 stays at 0. \code{threshold}
 #' is thus useful to report a whole sampling unit as "healthy" (0), if no
 #' diseased individual at all was found within the sampling unit, or "diseased"
 #' (1) if at least one diseased individual was found.
 #'
-#' @param data An \code{intensity} object.
+#' @param data A numeric vector or an \code{intensity} object.
 #' @param value All the intensity values lower or equal to this value  are set
 #'     to 0. The other values are set to 1.
+#' @param ... Additional arguments to be passed to other methods.
 #'
 #' @export
 #------------------------------------------------------------------------------#
-threshold <- function(data, value = 0) {
+threshold <- function(data, value, ...) UseMethod("threshold")
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+threshold.numeric <- function(data, value = 0, ...) {
+    ifelse(data <= value, 0, 1)
+}
+
+#------------------------------------------------------------------------------#
+#' @export
+#------------------------------------------------------------------------------#
+threshold.intensity <- function(data, value = 0, ...) {
     mapped_data <- map_data(data)
     mapped_data[["i"]] <- ifelse((mapped_data[["i"]] <= value), 0, 1)
     if ("n" %in% colnames(mapped_data)) {
@@ -874,6 +887,7 @@ threshold <- function(data, value = 0) {
     unmap_data(mapped_data, data)
 }
 
+#------------------------------------------------------------------------------#
 # TODO: to keep below?
 is.completeArray <- function(object) {
     dt <- as.data.frame(object, fields = c("space", "time"))
