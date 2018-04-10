@@ -11,20 +11,20 @@
 sadie(data, ...)
 
 \method{sadie}{data.frame}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, threads = 1, ...,
-  method = "shortsimplex")
+  nperm = 100, seed = NULL, threads = 1, ..., method = "shortsimplex",
+  verbose = TRUE)
 
 \method{sadie}{matrix}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, threads = 1, ...,
-  method = "shortsimplex")
+  nperm = 100, seed = NULL, threads = 1, ..., method = "shortsimplex",
+  verbose = TRUE)
 
 \method{sadie}{count}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, threads = 1, ...,
-  method = "shortsimplex")
+  nperm = 100, seed = NULL, threads = 1, ..., method = "shortsimplex",
+  verbose = TRUE)
 
 \method{sadie}{incidence}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, rseed = TRUE, seed = 12345, threads = 1, ...,
-  method = "shortsimplex")
+  nperm = 100, seed = NULL, threads = 1, ..., method = "shortsimplex",
+  verbose = TRUE)
 }
 \arguments{
 \item{data}{A data frame or a matrix with only three columns: the two first
@@ -39,15 +39,14 @@ By default, only Perry's index is computed for each sampling unit.}
 
 \item{nperm}{Number of random permutations to assess probabilities.}
 
-\item{rseed}{Is a random seed used for the permutations? (only useful for
-checking purposes).}
-
-\item{seed}{Seed used when \code{rseed = FALSE} (only useful for checking
-purposes).}
+\item{seed}{Fixed seed to be used for randomizations (only useful for
+checking purposes). Not fixed by default (= NULL).}
 
 \item{threads}{Number of threads to perform the computations..}
 
 \item{method}{Method for the transportation algorithm.}
+
+\item{verbose}{Explain what is being done (TRUE by default).}
 }
 \description{
 \code{sadie} performs the SADIE procedure. It computes different indices and
@@ -74,8 +73,7 @@ sadie(my_df)
 my_incidence <- incidence(tomato_tswv$field_1929[tomato_tswv$field_1929$t == 1, ])
 my_incidence <- clump(my_incidence, unit_size = c(x = 6, y = 6))
 plot(my_incidence)
-# TODO: Too long?
-# my_res <- sadie(my_incidence, index = "all", threads = 4)
+my_res <- sadie(my_incidence, index = "all", threads = 2)
 # my_res
 # summary(my_res)
 # plot(my_res) # Identical to: plot(my_res, index = "Perry")

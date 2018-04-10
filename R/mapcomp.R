@@ -23,6 +23,7 @@
 #'     observation sites. FALSE by default.
 #' @param nperm Number of random permutations to assess probabilities.
 #' @param threads Number of threads to perform the computations.
+#' @param verbose Explain what is being done (TRUE by default).
 #' @param ... Additional arguments to be passed to other methods.
 #'
 #' @references
@@ -39,6 +40,7 @@
 #' my_count <- count(codling_moths, mapping(x = xm, y = ym))
 #' my_res <- mapcomp(my_count, 1, 11, edge_correction = FALSE)
 #' my_res
+#' plot(my_res)
 #'
 #' @name mapcomp
 #' @export
@@ -51,7 +53,12 @@ mapcomp <- function(data, ...) UseMethod("mapcomp")
 #' @export
 #------------------------------------------------------------------------------#
 mapcomp.data.frame <- function(data, delta, bandwidth, nperm = 100,
-                               edge_correction = FALSE, threads = 1, ...) {
+                               edge_correction = FALSE, threads = 1,
+                               verbose = TRUE, ...) {
+
+    if (!verbose) {
+        op <- pbapply::pboptions(type = "none")
+    }
 
     dots <- list(...)
     if (is.null(call <- dots[["call"]])) {
@@ -88,6 +95,7 @@ mapcomp.data.frame <- function(data, delta, bandwidth, nperm = 100,
                     delta, bandwidth, edge_correction)
         res[["stat"]]
     }, cl = threads)
+
     coord <- data.frame(grid_inter, phs = res[["phs"]])
     res <- list(object = class(data),
                 bandwidth = bandwidth,
@@ -97,6 +105,11 @@ mapcomp.data.frame <- function(data, delta, bandwidth, nperm = 100,
                 pval  = (sum(randomizations > res[["stat"]]) + 1) / (nperm + 1)) # TODO: To double check
     attr(res, "class") <- "mapcomp"
     attr(res, "call")  <- call
+
+    if (!verbose) {
+        pbapply::pboptions(op)
+    }
+
     res
 }
 
@@ -105,9 +118,11 @@ mapcomp.data.frame <- function(data, delta, bandwidth, nperm = 100,
 #' @export
 #------------------------------------------------------------------------------#
 mapcomp.matrix <- function(data, delta, bandwidth, nperm = 100,
-                           edge_correction = FALSE, threads = 1, ...) {
+                           edge_correction = FALSE, threads = 1,
+                           verbose = TRUE, ...) {
     mapcomp.data.frame(as.data.frame(data), delta, bandwidth, nperm,
-                       edge_correction, threads, ..., call = match.call())
+                       edge_correction, threads, verbose, ...,
+                       call = match.call())
 }
 
 #------------------------------------------------------------------------------#
@@ -115,11 +130,12 @@ mapcomp.matrix <- function(data, delta, bandwidth, nperm = 100,
 #' @export
 #------------------------------------------------------------------------------#
 mapcomp.count <- function(data, delta, bandwidth, nperm = 100,
-                          edge_correction = FALSE, threads = 1, ...) {
+                          edge_correction = FALSE, threads = 1, verbose = TRUE,
+                          ...) {
     mapped_data <- map_data(data)
     mapped_data <- mapped_data[, c("x", "y", "i")] # no t
     mapcomp.data.frame(mapped_data, delta, bandwidth, nperm, edge_correction,
-                       threads, ..., call = match.call())
+                       threads, verbose, ..., call = match.call())
 }
 
 #------------------------------------------------------------------------------#
@@ -127,11 +143,12 @@ mapcomp.count <- function(data, delta, bandwidth, nperm = 100,
 #' @export
 #------------------------------------------------------------------------------#
 mapcomp.incidence <- function(data, delta, bandwidth, nperm = 100,
-                              edge_correction = FALSE, threads = 1, ...) {
+                              edge_correction = FALSE, threads = 1,
+                              verbose = TRUE, ...) {
     mapped_data <- map_data(data)
     mapped_data <- mapped_data[, c("x", "y", "i")] # no t, no n
     mapcomp.data.frame(mapped_data, delta, bandwidth, nperm, edge_correction,
-                       threads, ..., call = match.call())
+                       threads, verbose, ..., call = match.call())
 }
 
 
@@ -153,19 +170,21 @@ print.mapcomp <- function(x, ...) {
 #------------------------------------------------------------------------------#
 #' @export
 #------------------------------------------------------------------------------#
-plot.mapcomp <- function(x, ...) {
-    gg <- ggplot() +
-        geom_raster(inherit.aes = FALSE, data = x$coord,
-                    aes(x, y, fill = phs)) +
-        geom_contour(inherit.aes = FALSE, data = x$coord,
-                     aes(x, y, z = phs), size = 0.6, color = "black") +
-        geom_point(inherit.aes = FALSE, data = x$data,
-                   aes(x, y, size = i)) +
-        scale_size_continuous(paste0(tocamel(x[["object"]][1]), " (i)")) + # TODO: Not good
-        scale_fill_gradient(paste0("Theoretical normalized\nintensity for a\n ",
-                                   "bandwidth h = ", x[["bandwidth"]]),
-                            low = "white", high = "red") +
-        theme_bw()
+plot.mapcomp <- function(x, bins = 5,...) {
+    gg <- ggplot()
+    gg <- gg + geom_raster(inherit.aes = FALSE, data = x$coord,
+                           aes(x, y, fill = phs))
+    gg <- gg + geom_contour(inherit.aes = FALSE, data = x$coord,
+                            aes(x, y, z = phs),
+                            bins = bins, size = 0.6, color = "black")
+    gg <- gg + geom_point(inherit.aes = FALSE, data = x$data,
+                          aes(x, y, size = i))
+    gg <- gg + scale_size_continuous("Observed\nintensity")
+    gg <- gg + scale_fill_gradient(paste0("Theoretical\nnormalized\n",
+                                          "intensity for a\n",
+                                          "bandwidth\nh = ", x[["bandwidth"]]),
+                                   low = "white", high = "red")
+    gg <- gg + theme_bw()
     print(gg)
     invisible(NULL)
 }

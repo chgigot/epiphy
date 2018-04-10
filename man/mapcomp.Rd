@@ -11,16 +11,16 @@
 mapcomp(data, ...)
 
 \method{mapcomp}{data.frame}(data, delta, bandwidth, nperm = 100,
-  edge_correction = FALSE, threads = 1, ...)
+  edge_correction = FALSE, threads = 1, verbose = TRUE, ...)
 
 \method{mapcomp}{matrix}(data, delta, bandwidth, nperm = 100,
-  edge_correction = FALSE, threads = 1, ...)
+  edge_correction = FALSE, threads = 1, verbose = TRUE, ...)
 
 \method{mapcomp}{count}(data, delta, bandwidth, nperm = 100,
-  edge_correction = FALSE, threads = 1, ...)
+  edge_correction = FALSE, threads = 1, verbose = TRUE, ...)
 
 \method{mapcomp}{incidence}(data, delta, bandwidth, nperm = 100,
-  edge_correction = FALSE, threads = 1, ...)
+  edge_correction = FALSE, threads = 1, verbose = TRUE, ...)
 }
 \arguments{
 \item{data}{A data frame or a matrix with only three columns: the two first
@@ -45,6 +45,8 @@ bordering points intrinsically suffer from a lack of neighboring
 observation sites. FALSE by default.}
 
 \item{threads}{Number of threads to perform the computations.}
+
+\item{verbose}{Explain what is being done (TRUE by default).}
 }
 \description{
 \code{mapcomp} performs a spatial pattern analysis based on the calculation
@@ -61,6 +63,7 @@ plot(my_res)
 my_count <- count(codling_moths, mapping(x = xm, y = ym))
 my_res <- mapcomp(my_count, 1, 11, edge_correction = FALSE)
 my_res
+plot(my_res)
 
 }
 \references{
