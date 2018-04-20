@@ -382,7 +382,11 @@ init_intensity <- function(data, mapping, keep_only_std, type) {
 #' plot(my_incidence_1, type = "temporal")
 #'
 #' plot(my_count_1, tile = FALSE, size = 5)
-#' plot(my_count_1, type = "temporal")
+#' plot(my_count_1, type = "temporal") # Not possible: there is only 1 date.
+#'
+#' # Using grayscale:
+#' plot(my_count_1, grayscale = TRUE)
+#' plot(my_count_1, grayscale = TRUE, tile = FALSE, size = 5)
 #'
 #' @name intensity
 #------------------------------------------------------------------------------#
@@ -941,7 +945,8 @@ as.character.severity <- function(x, ...) "<severity object>"
 #' @export
 #------------------------------------------------------------------------------#
 plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "all"),
-                           tile = TRUE, pch = 22, legend.position = "right") {
+                           tile = TRUE, pch = 22, legend.position = "right",
+                           grayscale = FALSE) {
 
     type <- match.arg(type)
 
@@ -961,6 +966,8 @@ plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "all"),
     fill_breaks <- if (max_scale <= 10) seq(0, max_scale)  else waiver()
     fill_limits <- if (max_scale <= 10) range(fill_breaks) else c(0, max_scale)
 
+    color_high <- ifelse(grayscale, "black", "red")
+
     # Temporal figure
     if (type %in% c("temporal", "all") && possible_temporal) {
         nt <- length(unique(mapped_data$t))
@@ -971,13 +978,13 @@ plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "all"),
         gg <- gg + geom_jitter(data = mapped_data, mapping = aes(t, i),
                                alpha = 0.2, width = 0.2, height = 0)
         gg <- gg + stat_summary(data = mapped_data, mapping = aes(t, i),
-                                fun.y = "mean", geom = "line", color = "red",
+                                fun.y = "mean", geom = "line", color = color_high,
                                 linetype = "dashed")
         gg <- gg + stat_summary(data = mapped_data,
                                 mapping = aes(t, i, group = t),
                                 fun.data = "mean_sdl", fun.args = list(mult = 1),
                                 geom = "pointrange", # default
-                                color = "red")
+                                color = color_high)
         gg <- gg + scale_x_continuous("Time (t)", breaks = t_breaks)
         gg <- gg + scale_y_continuous(paste0(tocamel(class(x)[1]), " (i)"),
                                       breaks = i_breaks)
@@ -1008,7 +1015,7 @@ plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "all"),
                                           breaks = y_breaks)
         }
         gg <- gg + scale_fill_gradient(paste0(tocamel(class(x)[1]), " (i)"),
-                                       low = "white", high = "red",
+                                       low = "white", high = color_high,
                                        guide = guide_legend(reverse = TRUE),
                                        breaks = fill_breaks,
                                        limits = fill_limits)

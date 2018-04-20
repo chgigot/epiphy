@@ -1,3 +1,8 @@
+# epiphy 0.3.3
+
+- Add a grayscale feature in plot for intensity objects.
+- Improve documentation and examples (sadie, intensity objects).
+
 # epiphy 0.3.2
 
 ## Major new features
