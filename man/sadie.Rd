@@ -42,7 +42,7 @@ By default, only Perry's index is computed for each sampling unit.}
 \item{seed}{Fixed seed to be used for randomizations (only useful for
 checking purposes). Not fixed by default (= NULL).}
 
-\item{threads}{Number of threads to perform the computations..}
+\item{threads}{Number of threads to perform the computations.}
 
 \item{method}{Method for the transportation algorithm.}
 
@@ -61,23 +61,25 @@ By convention in the SADIE procedure, clustering indices for a donor unit
 respectively.
 }
 \examples{
+# Create an intensity object:
 my_count <- count(aphids, mapping(x = xm, y = ym))
+# Only compute Perry's indices:
 my_res <- sadie(my_count)
 my_res
 summary(my_res)
 plot(my_res)
+plot(my_res, isoclines = TRUE)
 
+# Compute both Perry's and Li-Madden-Xu's indices (using multithreading):
+my_res <- sadie(my_count, index = "all", threads = 2)
+my_res
+summary(my_res)
+plot(my_res) # Identical to: plot(my_res, index = "Perry")
+plot(my_res, index = "Li-Madden-Xu")
+
+# Using usual data frames instead of intensity objects:
 my_df <- aphids[, c("xm", "ym", "i")]
-sadie(my_df)
-
-my_incidence <- incidence(tomato_tswv$field_1929[tomato_tswv$field_1929$t == 1, ])
-my_incidence <- clump(my_incidence, unit_size = c(x = 6, y = 6))
-plot(my_incidence)
-my_res <- sadie(my_incidence, index = "all", threads = 2)
-# my_res
-# summary(my_res)
-# plot(my_res) # Identical to: plot(my_res, index = "Perry")
-# plot(my_res, index = "Li-Madden-Xu")
+sadie(my_df, nperm = 1000)
 
 }
 \references{

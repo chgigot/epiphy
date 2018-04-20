@@ -20,7 +20,7 @@
 #' @param nperm Number of random permutations to assess probabilities.
 #' @param seed Fixed seed to be used for randomizations (only useful for
 #'     checking purposes). Not fixed by default (= NULL).
-#' @param threads Number of threads to perform the computations..
+#' @param threads Number of threads to perform the computations.
 #' @param method Method for the transportation algorithm.
 #' @param verbose Explain what is being done (TRUE by default).
 #' @param ... Additional arguments to be passed to other methods.
@@ -40,23 +40,25 @@
 #' \href{http://dx.doi.org/10.1111/j.2041-210X.2011.00165.x}{doi:10.1111/j.2041-210X.2011.00165.x}
 #'
 #' @examples
+#' # Create an intensity object:
 #' my_count <- count(aphids, mapping(x = xm, y = ym))
+#' # Only compute Perry's indices:
 #' my_res <- sadie(my_count)
 #' my_res
 #' summary(my_res)
 #' plot(my_res)
+#' plot(my_res, isoclines = TRUE)
 #'
+#' # Compute both Perry's and Li-Madden-Xu's indices (using multithreading):
+#' my_res <- sadie(my_count, index = "all", threads = 2)
+#' my_res
+#' summary(my_res)
+#' plot(my_res) # Identical to: plot(my_res, index = "Perry")
+#' plot(my_res, index = "Li-Madden-Xu")
+#'
+#' # Using usual data frames instead of intensity objects:
 #' my_df <- aphids[, c("xm", "ym", "i")]
-#' sadie(my_df)
-#'
-#' my_incidence <- incidence(tomato_tswv$field_1929[tomato_tswv$field_1929$t == 1, ])
-#' my_incidence <- clump(my_incidence, unit_size = c(x = 6, y = 6))
-#' plot(my_incidence)
-#' my_res <- sadie(my_incidence, index = "all", threads = 2)
-#' # my_res
-#' # summary(my_res)
-#' # plot(my_res) # Identical to: plot(my_res, index = "Perry")
-#' # plot(my_res, index = "Li-Madden-Xu")
+#' sadie(my_df, nperm = 1000)
 #'
 #' @name sadie
 #' @export
