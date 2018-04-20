@@ -151,7 +151,7 @@ plot(my_incidence_1, type = "temporal")
 plot(my_count_1, tile = FALSE, size = 5)
 plot(my_count_1, type = "temporal") # Not possible: there is only 1 date.
 
-# Using grayscale
+# Using grayscale:
 plot(my_count_1, grayscale = TRUE)
 plot(my_count_1, grayscale = TRUE, tile = FALSE, size = 5)
 

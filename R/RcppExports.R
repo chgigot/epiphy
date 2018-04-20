@@ -17,15 +17,3 @@ as_matrix_transport <- function(x, dim_mat) {
     .Call('_epiphy_as_matrix_transport', PACKAGE = 'epiphy', x, dim_mat)
 }
 
-ntotfoci <- function(nfoci, xrate, ngen, ngen_active) {
-    .Call('_epiphy_ntotfoci', PACKAGE = 'epiphy', nfoci, xrate, ngen, ngen_active)
-}
-
-dispersalCPP <- function(nfoci, xrate, lambda, ngen, ngen_active = 0L) {
-    .Call('_epiphy_dispersalCPP', PACKAGE = 'epiphy', nfoci, xrate, lambda, ngen, ngen_active)
-}
-
-collectCPP <- function(disperse, quadrat) {
-    .Call('_epiphy_collectCPP', PACKAGE = 'epiphy', disperse, quadrat)
-}
-

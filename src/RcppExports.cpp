@@ -58,56 +58,12 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// ntotfoci
-NumericVector ntotfoci(int nfoci, int xrate, int ngen, int ngen_active);
-RcppExport SEXP _epiphy_ntotfoci(SEXP nfociSEXP, SEXP xrateSEXP, SEXP ngenSEXP, SEXP ngen_activeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type nfoci(nfociSEXP);
-    Rcpp::traits::input_parameter< int >::type xrate(xrateSEXP);
-    Rcpp::traits::input_parameter< int >::type ngen(ngenSEXP);
-    Rcpp::traits::input_parameter< int >::type ngen_active(ngen_activeSEXP);
-    rcpp_result_gen = Rcpp::wrap(ntotfoci(nfoci, xrate, ngen, ngen_active));
-    return rcpp_result_gen;
-END_RCPP
-}
-// dispersalCPP
-NumericMatrix dispersalCPP(int nfoci, int xrate, double lambda, int ngen, int ngen_active);
-RcppExport SEXP _epiphy_dispersalCPP(SEXP nfociSEXP, SEXP xrateSEXP, SEXP lambdaSEXP, SEXP ngenSEXP, SEXP ngen_activeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type nfoci(nfociSEXP);
-    Rcpp::traits::input_parameter< int >::type xrate(xrateSEXP);
-    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< int >::type ngen(ngenSEXP);
-    Rcpp::traits::input_parameter< int >::type ngen_active(ngen_activeSEXP);
-    rcpp_result_gen = Rcpp::wrap(dispersalCPP(nfoci, xrate, lambda, ngen, ngen_active));
-    return rcpp_result_gen;
-END_RCPP
-}
-// collectCPP
-NumericMatrix collectCPP(NumericMatrix disperse, NumericMatrix quadrat);
-RcppExport SEXP _epiphy_collectCPP(SEXP disperseSEXP, SEXP quadratSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type disperse(disperseSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type quadrat(quadratSEXP);
-    rcpp_result_gen = Rcpp::wrap(collectCPP(disperse, quadrat));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_epiphy_p_hscaled", (DL_FUNC) &_epiphy_p_hscaled, 4},
     {"_epiphy_costTotiCPP", (DL_FUNC) &_epiphy_costTotiCPP, 5},
     {"_epiphy_costTotCPP", (DL_FUNC) &_epiphy_costTotCPP, 2},
     {"_epiphy_as_matrix_transport", (DL_FUNC) &_epiphy_as_matrix_transport, 2},
-    {"_epiphy_ntotfoci", (DL_FUNC) &_epiphy_ntotfoci, 4},
-    {"_epiphy_dispersalCPP", (DL_FUNC) &_epiphy_dispersalCPP, 5},
-    {"_epiphy_collectCPP", (DL_FUNC) &_epiphy_collectCPP, 2},
     {NULL, NULL, 0}
 };
 
