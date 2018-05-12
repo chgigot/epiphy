@@ -3,5 +3,5 @@ pkgdown: 1.0.0
 pkgdown_sha: ~
 articles:
   defs-and-eqns: defs-and-eqns.html
-  intro: intro.html
+  epiphy: epiphy.html
 

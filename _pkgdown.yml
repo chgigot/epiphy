@@ -1,0 +1,73 @@
+reference:
+  - title: Data sets
+    contents:
+      - aphids
+      - arthropods
+      - citrus_ctv
+      - codling_moths
+      - dogwood_anthracnose
+      - hop_viruses
+      - offspring_survival
+      - onion_bacterial_blight
+      - pyrethrum_ray_blight
+      - simulated_epidemics
+      - tobacco_viruses
+      - tomato_tswv
+  - title: Disease intensity objects
+    desc: >
+      Create and manipulate disease intensity objects (i.e., count, incidence
+      and severity objects).
+    contents:
+      - as.data.frame.intensity
+      - clump
+      - count
+      - incidence
+      - is.intensity
+      - mapped_var
+      - mapping
+      - severity
+      - split.intensity
+  - title: Statistical methods
+    contents:
+      - agg_index
+      - calpha.test
+      - chisq.test
+      - fit_two_distr
+      - mapcomp
+      - power_law
+      - sadie
+      - spatial_hier
+      - z.test
+  - title: Miscellaneous
+    desc: >
+      Mainly helper functions.
+    contents:
+      - a2a
+      - dbetabinom
+      - pbetabinom
+      - qbetabinom
+      - rbetabinom
+      - logit
+      - probit
+      - cloglog
+      - threshold
+
+navbar:
+  left:
+    - text: Primer
+      href: articles/epiphy.html
+    - text: Functions and data
+      href: reference/index.html
+    - text: Articles
+      menu:
+      - text: Definitions and relationships between parameters
+        href: articles/defs-and-eqns.html
+    - text: News
+      href: news/index.html
+
+
+
+
+
+
+

@@ -37,13 +37,10 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="index.html">
-    <span class="fa fa-home fa-lg"></span>
-     
-  </a>
+  <a href="articles/epiphy.html">Primer</a>
 </li>
 <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="reference/index.html">Functions and data</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -55,16 +52,20 @@
 <li>
       <a href="articles/defs-and-eqns.html">Definitions and relationships between parameters</a>
     </li>
-    <li>
-      <a href="articles/intro.html">Analyzing plant disease epidemics with the R package epiphy</a>
-    </li>
   </ul>
 </li>
 <li>
-  <a href="news/index.html">Changelog</a>
+  <a href="news/index.html">News</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/chgigot/epiphy">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -75,27 +76,40 @@
       
       </header><div class="row">
   <div class="contents col-md-9">
-    <div id="epiphy-a-toolbox-for-plant-disease-epidemics" class="section level1">
+    
+<p><img src="articles/logo-epiphy-01.png" alt="epiphy logo"></p>
+<div id="epiphy-an-r-package-to-analyze-plant-disease-epidemics" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#epiphy-a-toolbox-for-plant-disease-epidemics" class="anchor"></a>epiphy: A toolbox for plant disease epidemics</h1></div>
-<p><strong>epiphy</strong> provides a common framework for spatialized plant disease intensity data collected at one or more time points. Many statistical methods to describe and quantify plant disease epidemics are implemented in this R package.</p>
+<a href="#epiphy-an-r-package-to-analyze-plant-disease-epidemics" class="anchor"></a>epiphy: An R package to analyze plant disease epidemics</h1></div>
+<p><strong>epiphy</strong> provides a common framework for spatialized plant disease intensity data collected at one or more time points. Several statistical methods to describe and quantify plant disease epidemics are implemented in this package.</p>
+<div id="resources" class="section level2">
+<h2 class="hasAnchor">
+<a href="#resources" class="anchor"></a>Resources</h2>
+<p>The online documentation is available at <a href="http://epiphy.org">epiphy.org</a>.</p>
+</div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install the latest development version from github with (in R console):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"devtools"</span>)
+<p>Install the latest development version from <strong>GitHub</strong>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span> (<span class="op">!</span><span class="kw">requireNamespace</span>(<span class="st">"devtools"</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)) {
+    <span class="co"># ^ Returns FALSE if devtools is not installed.</span>
+    <span class="kw">install.packages</span>(<span class="st">"devtools"</span>)
+}
 devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"chgigot/epiphy"</span>)</code></pre></div>
-<p>Note: You can use the following command to make sure to build the vignettes when installing the package:</p>
+<p><strong>Note:</strong> You can also use the following command to build the vignettes when installing the package:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"chgigot/epiphy"</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</code></pre></div>
 </div>
 </div>
+
   </div>
 
   <div class="col-md-3" id="sidebar">
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
-<li>Report a bug at <br><a href="NA">NA</a>
+<li>Browse source code at <br><a href="https://github.com/chgigot/epiphy">https://​github.com/​chgigot/​epiphy</a>
+</li>
+<li>Report a bug at <br><a href="https://github.com/chgigot/epiphy/issues">https://​github.com/​chgigot/​epiphy/​issues</a>
 </li>
 </ul>
 </div>

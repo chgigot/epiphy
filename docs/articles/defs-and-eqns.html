@@ -36,13 +36,10 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
-     
-  </a>
+  <a href="../articles/epiphy.html">Primer</a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../reference/index.html">Functions and data</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -54,16 +51,20 @@
 <li>
       <a href="../articles/defs-and-eqns.html">Definitions and relationships between parameters</a>
     </li>
-    <li>
-      <a href="../articles/intro.html">Analyzing plant disease epidemics with the R package epiphy</a>
-    </li>
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">Changelog</a>
+  <a href="../news/index.html">News</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/chgigot/epiphy">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -78,9 +79,9 @@
       <h1>Definitions and relationships between parameters</h1>
                         <h4 class="author">Christophe Gigot</h4>
             
-            <h4 class="date">2018-05-11</h4>
+            <h4 class="date">2018-05-12</h4>
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/chgigot/epiphy/blob/master/vignettes/defs-and-eqns.Rmd"><code>vignettes/defs-and-eqns.Rmd</code></a></small>
       <div class="hidden name"><code>defs-and-eqns.Rmd</code></div>
 
     </div>
@@ -115,43 +116,17 @@
 <p>The aggregation parameter, <span class="math inline">\(\theta\)</span>, can be computed from the two shape parameters of the beta-binomial distribution, <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span>. Note that in <strong>epiphy</strong>, <span class="math inline">\(\theta = 1 / (\alpha + \beta)\)</span> as in <span class="citation">Madden, Hughes, and Bosch (2007)</span>, but this definition is not necessarily consistent with what can be found somewhere else in the literature. For example, <span class="math inline">\(\theta = \alpha + \beta\)</span> in the package <strong>emdbook</strong>.</p>
 <p>The intra-cluster correlation coefficient, <span class="math inline">\(\rho\)</span> <span class="citation">(Mak 1988)</span>, characterizes the spatial aggregation as the tendency for elements in a sampling unit to have the same disease status more frequently than expected on the basis of spatial randomness <span class="citation">(Madden, Hughes, and Bosch 2007)</span>. In <strong>epiphy</strong>, <span class="math inline">\(\rho = \theta / (\theta + 1)\)</span>.</p>
 </div>
-<div id="relationship-table" class="section level3">
+<div id="base-relationships" class="section level3">
 <h3 class="hasAnchor">
-<a href="#relationship-table" class="anchor"></a>Relationship table</h3>
-<table style="width:22%;" class="table">
-<colgroup>
-<col width="5%">
-<col width="5%">
-<col width="5%">
-<col width="5%">
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><span class="math display">\[f(\alpha, \beta)\]</span></td>
-<td><span class="math display">\[p = \frac{\alpha}{\alpha + \beta};\]</span></td>
-<td><span class="math display">\[\theta = \frac{1}{\alpha + \beta};\]</span></td>
-<td><span class="math display">\[\rho = \frac{1}{\alpha + \beta + 1}\]</span></td>
-</tr>
-<tr class="even">
-<td><span class="math display">\[f(\theta, \rho)\]</span></td>
-<td><span class="math display">\[\theta = \frac{\rho}{1 - \rho};\]</span></td>
-<td><span class="math display">\[\rho = \frac{\theta}{\theta + 1}\]</span></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td><span class="math display">\[f(p, \theta)\]</span></td>
-<td><span class="math display">\[\alpha = \frac{p}{\theta};\]</span></td>
-<td><span class="math display">\[\beta = \frac{1 - p}{\theta}\]</span></td>
-<td></td>
-</tr>
-<tr class="even">
-<td><span class="math display">\[f(p, \rho)\]</span></td>
-<td><span class="math display">\[\alpha = \frac{p(1-\rho)}{\rho};\]</span></td>
-<td><span class="math display">\[\beta = \frac{(1 - p)(1-\rho)}{\rho}\]</span></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+<a href="#base-relationships" class="anchor"></a>Base relationships</h3>
+<p>Functions of the two shape parameters of the beta-binomial distribution (<span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span>):</p>
+<p><span class="math display">\[p = \frac{\alpha}{\alpha + \beta}; \theta = \frac{1}{\alpha + \beta}; \rho = \frac{1}{\alpha + \beta + 1}\]</span></p>
+<p>Functions of the aggregation parameter (<span class="math inline">\(\theta\)</span>) or the intra-cluster correlation coefficient (<span class="math inline">\(\rho\)</span>):</p>
+<p><span class="math display">\[\theta = \frac{\rho}{1 - \rho}; \rho = \frac{\theta}{\theta + 1}\]</span></p>
+<p>Functions of the average disease intensity (<span class="math inline">\(p\)</span>) and the aggregation parameter (<span class="math inline">\(\theta\)</span>):</p>
+<p><span class="math display">\[\alpha = \frac{p}{\theta}; \beta = \frac{1 - p}{\theta}\]</span></p>
+<p>Functions of the average disease intensity (<span class="math inline">\(p\)</span>) and the intra-cluster correlation coefficient (<span class="math inline">\(\rho\)</span>):</p>
+<p><span class="math display">\[\alpha = \frac{p(1-\rho)}{\rho}; \beta = \frac{(1 - p)(1-\rho)}{\rho}\]</span></p>
 </div>
 </div>
 <div id="parameters-of-the-binary-power-law" class="section level2">
