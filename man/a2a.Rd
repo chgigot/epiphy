@@ -4,7 +4,7 @@
 \alias{a2a}
 \alias{a2a.numeric}
 \alias{a2a.list}
-\title{a2a: A wAy to pAinlessly switch between different power LAw formulAtions}
+\title{Easily switch between different power law formulations.}
 \usage{
 a2a(x, ...)
 

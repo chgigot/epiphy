@@ -28,3 +28,4 @@ A matrix of the estimated covariances between the parameter estimates
 Returns the variance-covariance matrix of the main parameters of
   a fitted model object.
 }
+\keyword{internal}

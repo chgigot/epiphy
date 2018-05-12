@@ -3,7 +3,7 @@
 \name{mapped_var}
 \alias{mapped_var}
 \alias{mapped_var<-}
-\title{Existing variable mappings}
+\title{Existing variable mappings.}
 \usage{
 mapped_var(x)
 

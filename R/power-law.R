@@ -5,7 +5,7 @@
 NULL
 
 #------------------------------------------------------------------------------#
-#' Taylor's and binary power laws
+#' Taylor's and binary power laws.
 #'
 #' Assesses the overall degree of heterogeneity in a collection of data sets at
 #' the sampling-unit scale.
@@ -170,19 +170,19 @@ print.summary.power_law <- function(x, ...) {
 }
 
 #------------------------------------------------------------------------------#
-#' Plot results of a power law analysis
-#'
-#' Plot results of a power law analysis.
-#'
-#' @param x A \code{\link{power_law}} object.
-#' @param scale Logarithmic or standard linear scale to display the results?
-#' @param observed Logical.
-#' @param model Logical.
-#' @param random Logical. Theoretical Random distribution.
-#' @param ... Additional arguments to be passed to other methods.
-#' TODO: Dashed lines indicate the cases where both variances are equal, which suggests an absence of aggregation.
-#' Points should lie on this line if ...
-#'
+# Plot results of a power law analysis
+#
+# Plot results of a power law analysis.
+#
+# @param x A \code{\link{power_law}} object.
+# @param scale Logarithmic or standard linear scale to display the results?
+# @param observed Logical.
+# @param model Logical.
+# @param random Logical. Theoretical Random distribution.
+# @param ... Additional arguments to be passed to other methods.
+# TODO: Dashed lines indicate the cases where both variances are equal, which suggests an absence of aggregation.
+# Points should lie on this line if ...
+#
 #' @export
 #------------------------------------------------------------------------------#
 plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"),
@@ -248,6 +248,7 @@ plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"),
 #' of animal populations. Researches on Population Ecology 10, 1–20.
 #' \href{http://dx.doi.org/10.1007/BF02514729}{doi:10.1007/BF02514729}
 #'
+#' @keywords internal
 #' @export
 #------------------------------------------------------------------------------#
 iwao <- function(data) {
@@ -264,7 +265,7 @@ iwao <- function(data) {
 #==============================================================================#
 
 #------------------------------------------------------------------------------#
-#' a2a: A wAy to pAinlessly switch between different power LAw formulAtions
+#' Easily switch between different power law formulations.
 #'
 #' \code{a2a} was designed to avoid headaches that are likely to occur when
 #' working with different formulations of the binomial power law analysis.

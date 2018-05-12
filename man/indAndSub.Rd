@@ -41,3 +41,4 @@ subs <- as.matrix(expand.grid(1:2,2:3))
 sub2ind(subs, dim(mat))
 
 }
+\keyword{internal}

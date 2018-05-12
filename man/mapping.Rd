@@ -4,7 +4,7 @@
 \alias{mapping}
 \alias{mapping_}
 \alias{remap}
-\title{Construct data mappings}
+\title{Construct data mappings.}
 \usage{
 mapping(...)
 

@@ -22,3 +22,4 @@ Coefficients extracted from the model object \code{object}.
   from objects returned by modeling functions.  \code{coefficients} is
   an \emph{alias} for it.
 }
+\keyword{internal}

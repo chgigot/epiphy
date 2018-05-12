@@ -33,14 +33,24 @@ The aggregation parameter, $\theta$, can be computed from the two shape paramete
 
 The intra-cluster correlation coefficient, $\rho$ [@Mak_1988], characterizes the spatial aggregation as the tendency for elements in a sampling unit to have the same disease status more frequently than expected on the basis of spatial randomness [@Madden_etal_2007]. In **epiphy**, $\rho = \theta / (\theta + 1)$.
 
-### Relationship table
+### Base relationships
 
-|   |   |   |   |
-|---|---|---|---|
-| $$f(\alpha, \beta)$$ | $$p = \frac{\alpha}{\alpha + \beta};$$ | $$\theta = \frac{1}{\alpha + \beta};$$ | $$\rho = \frac{1}{\alpha + \beta + 1}$$ |
-| $$f(\theta, \rho)$$ | $$\theta = \frac{\rho}{1 - \rho};$$ | $$\rho = \frac{\theta}{\theta + 1}$$ | |
-| $$f(p, \theta)$$ | $$\alpha = \frac{p}{\theta};$$ | $$\beta = \frac{1 - p}{\theta}$$ | |
-| $$f(p, \rho)$$ | $$\alpha = \frac{p(1-\rho)}{\rho};$$ | $$\beta = \frac{(1 - p)(1-\rho)}{\rho}$$ | |
+Functions of the two shape parameters of the beta-binomial distribution ($\alpha$ and $\beta$):
+
+$$p = \frac{\alpha}{\alpha + \beta}; \theta = \frac{1}{\alpha + \beta}; \rho = \frac{1}{\alpha + \beta + 1}$$
+
+Functions of the aggregation parameter ($\theta$) or the intra-cluster correlation coefficient ($\rho$):
+
+$$\theta = \frac{\rho}{1 - \rho}; \rho = \frac{\theta}{\theta + 1}$$
+
+Functions of the average disease intensity ($p$) and the aggregation parameter ($\theta$):
+
+$$\alpha = \frac{p}{\theta}; \beta = \frac{1 - p}{\theta}$$
+
+Functions of the average disease intensity ($p$) and the intra-cluster correlation coefficient ($\rho$):
+
+$$\alpha = \frac{p(1-\rho)}{\rho}; \beta = \frac{(1 - p)(1-\rho)}{\rho}$$
+
 
 ## Parameters of the binary power law
 

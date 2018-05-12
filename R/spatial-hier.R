@@ -5,7 +5,7 @@
 NULL
 
 #------------------------------------------------------------------------------#
-#' Spatial hierarchy analysis
+#' Spatial hierarchy analysis.
 #'
 #' TODO
 #'

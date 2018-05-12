@@ -24,7 +24,7 @@ droplevels.list <- function(x, except = NULL, ...) {
 }
 
 #------------------------------------------------------------------------------#
-#' Some link functions
+#' Some link functions.
 #'
 #' Logit, probit and cloglog functions are available.
 #' The logit and the logistic (with rev = TRUE), i.e. the inverse-logit functions.
@@ -388,6 +388,7 @@ as.long.data.frame.matrix <- function(x, col_names = c("x", "y", "z"), ...) {
 #' subs <- as.matrix(expand.grid(1:2,2:3))
 #' sub2ind(subs, dim(mat))
 #'
+#' @keywords internal
 #' @name indAndSub
 #------------------------------------------------------------------------------#
 NULL

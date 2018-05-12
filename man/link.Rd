@@ -5,7 +5,7 @@
 \alias{logit}
 \alias{probit}
 \alias{cloglog}
-\title{Some link functions}
+\title{Some link functions.}
 \usage{
 logit(x, rev = FALSE)
 

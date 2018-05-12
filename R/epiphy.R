@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------#
-#' \code{epiphy}: A package to analyze plant disease epidemics.
+#' \code{epiphy}: An R package to analyze plant disease epidemics.
 #'
 #' This package provides a common framework for spatialized plant disease
 #' intensity data collected at one or more time points. Many statistical methods
@@ -24,6 +24,8 @@
 #' Madden LV, Hughes G, van den Bosch F. 2007. Spatial aspects of epidemics -
 #' III: Patterns of plant disease. In: The study of plant disease epidemics,
 #' 235–278. American Phytopathological Society, St Paul, MN.
+#'
+#' @keywords internal
 #'
 #' @docType package
 #' @name epiphy

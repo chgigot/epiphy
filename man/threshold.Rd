@@ -2,7 +2,7 @@
 % Please edit documentation in R/intensity-classes.R
 \name{threshold}
 \alias{threshold}
-\title{Threshold : To go to higher level in the hierarchy}
+\title{To go to higher level in the hierarchy.}
 \usage{
 threshold(data, value, ...)
 }

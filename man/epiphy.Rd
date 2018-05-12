@@ -4,7 +4,7 @@
 \name{epiphy}
 \alias{epiphy}
 \alias{epiphy-package}
-\title{\code{epiphy}: A package to analyze plant disease epidemics.}
+\title{\code{epiphy}: An R package to analyze plant disease epidemics.}
 \description{
 This package provides a common framework for spatialized plant disease
 intensity data collected at one or more time points. Many statistical methods
@@ -28,3 +28,4 @@ III: Patterns of plant disease. In: The study of plant disease epidemics,
 \author{
 \strong{Maintainer:} Christophe Gigot <ch.gigot@gmail.com>
 }
+\keyword{internal}

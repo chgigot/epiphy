@@ -9,7 +9,7 @@ NULL
 #==============================================================================3
 
 #------------------------------------------------------------------------------#
-#' Construct data mappings
+#' Construct data mappings.
 #'
 #' Data mappings describe how variables in the data are mapped to standard names
 #' used throughout \code{epiphy}.
@@ -513,7 +513,7 @@ print.intensity <- function(x, ...) {
 summary.intensity <- function(object, ...) summary(object$data)
 
 #------------------------------------------------------------------------------#
-#' Coerce to a data frame
+#' Coerce to a data frame.
 #'
 #' Functions to coerce an \code{intensity} object to a data frame.
 #'
@@ -538,7 +538,7 @@ as.data.frame.intensity <- function(x, row.names = NULL, optional = FALSE, ...,
 }
 
 #------------------------------------------------------------------------------#
-#' Existing variable mappings
+#' Existing variable mappings.
 #'
 #' Get or set existing variable mappings.
 #'
@@ -613,7 +613,7 @@ dim.intensity <- function(x) lengths(x$struct)
 #==============================================================================#
 
 #------------------------------------------------------------------------------#
-#' Regroup observational data into even clumps of individuals
+#' Regroup observational data into even clumps of individuals.
 #'
 #' This function provides a easy way to regroup recorded data into groups of
 #' same number of individuals.
@@ -739,7 +739,7 @@ clump.intensity <- function(object, unit_size, fun = sum,
 }
 
 #------------------------------------------------------------------------------#
-#' Divide into groups and reassemble
+#' Divide into groups and reassemble.
 #'
 #' TODO
 #'
@@ -851,7 +851,7 @@ split.intensity <- function(x, f, drop = FALSE, ..., by, unit_size) {
 # TODO: Doc and clean below
 
 #------------------------------------------------------------------------------#
-#' Threshold : To go to higher level in the hierarchy
+#' To go to higher level in the hierarchy.
 #'
 #' This function transforms the current numeric vector or \code{intensity} data
 #' set into a "simplified black and white image" of this same data set: every

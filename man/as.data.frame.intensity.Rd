@@ -2,7 +2,7 @@
 % Please edit documentation in R/intensity-classes.R
 \name{as.data.frame.intensity}
 \alias{as.data.frame.intensity}
-\title{Coerce to a data frame}
+\title{Coerce to a data frame.}
 \usage{
 \method{as.data.frame}{intensity}(x, row.names = NULL, optional = FALSE,
   ..., stringsAsFactors = default.stringsAsFactors())

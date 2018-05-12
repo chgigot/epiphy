@@ -3,7 +3,7 @@
 \name{clump}
 \alias{clump}
 \alias{clump.intensity}
-\title{Regroup observational data into even clumps of individuals}
+\title{Regroup observational data into even clumps of individuals.}
 \usage{
 clump(object, ...)
 

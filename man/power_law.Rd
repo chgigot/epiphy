@@ -2,7 +2,7 @@
 % Please edit documentation in R/power-law.R
 \name{power_law}
 \alias{power_law}
-\title{Taylor's and binary power laws}
+\title{Taylor's and binary power laws.}
 \usage{
 power_law(data, log_base = exp(1), ...)
 }

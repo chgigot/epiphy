@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------#
-#' The Beta-Binomial Distribution
+#' The beta-binomial distribution.
 #'
 #' Density, distribution function, quantile function and random generation for
 #' the beta-binomial distribution with parameters \code{size}, \code{prob},

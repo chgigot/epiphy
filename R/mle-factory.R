@@ -212,6 +212,7 @@ smle.intensity <- function(data, f, param_init, max = TRUE, ...) {
 #------------------------------------------------------------------------------#
 #' @inherit stats::coef title description return
 #' @inheritParams stats::coef
+#' @keywords internal
 #' @export
 #------------------------------------------------------------------------------#
 coef.smle <- function(object, ...) object$coef
@@ -219,6 +220,7 @@ coef.smle <- function(object, ...) object$coef
 #------------------------------------------------------------------------------#
 #' @inherit stats::vcov title description return
 #' @inheritParams stats::vcov
+#' @keywords internal
 #' @export
 #------------------------------------------------------------------------------#
 vcov.smle <- function(object, ...) object$vcov

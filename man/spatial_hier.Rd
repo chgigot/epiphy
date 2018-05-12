@@ -2,7 +2,7 @@
 % Please edit documentation in R/spatial-hier.R
 \name{spatial_hier}
 \alias{spatial_hier}
-\title{Spatial hierarchy analysis}
+\title{Spatial hierarchy analysis.}
 \usage{
 spatial_hier(low, high)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/intensity-classes.R
 \name{split.intensity}
 \alias{split.intensity}
-\title{Divide into groups and reassemble}
+\title{Divide into groups and reassemble.}
 \usage{
 \method{split}{intensity}(x, f, drop = FALSE, ..., by, unit_size)
 }
