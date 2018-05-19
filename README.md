@@ -1,8 +1,8 @@
-<img src="vignettes/logo-epiphy-01.png" alt="epiphy logo"/>
+# epiphy <img src="vignettes/logo-epiphy-01.png" align="right" />
 
-# epiphy: An R package to analyze plant disease epidemics
+[![Travis-CI Build Status](https://travis-ci.org/chgigot/epiphy.svg?branch=master)](https://travis-ci.org/chgigot/epiphy)
 
-**epiphy** provides a common framework for spatialized plant disease intensity data collected at one or more time points. Several statistical methods to describe and quantify plant disease epidemics are implemented in this package.
+**epiphy** is an R package to analyze plant disease epidemics. It provides a common framework for spatialized plant disease intensity data collected at one or more time points. Several statistical methods to describe and quantify plant disease epidemics are implemented in this package.
 
 ## Resources
 
