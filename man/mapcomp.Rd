@@ -56,12 +56,12 @@ tests of spatial homogeneity are based on permutations across sampling sites
 and on valuable properties of the Hellinger distance.
 }
 \examples{
-my_res <- mapcomp(codling_moths, 1, 11, edge_correction = FALSE)
+my_res <- mapcomp(codling_moths, 1, 11, edge_correction = FALSE, nperm = 20)
 my_res
 plot(my_res)
 
 my_count <- count(codling_moths, mapping(x = xm, y = ym))
-my_res <- mapcomp(my_count, 1, 11, edge_correction = FALSE)
+my_res <- mapcomp(my_count, 1, 11, edge_correction = FALSE, nperm = 20)
 my_res
 plot(my_res)
 

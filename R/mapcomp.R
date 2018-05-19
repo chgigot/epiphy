@@ -33,12 +33,12 @@
 #' Ecology. 11:734–742.
 #'
 #' @examples
-#' my_res <- mapcomp(codling_moths, 1, 11, edge_correction = FALSE)
+#' my_res <- mapcomp(codling_moths, 1, 11, edge_correction = FALSE, nperm = 20)
 #' my_res
 #' plot(my_res)
 #'
 #' my_count <- count(codling_moths, mapping(x = xm, y = ym))
-#' my_res <- mapcomp(my_count, 1, 11, edge_correction = FALSE)
+#' my_res <- mapcomp(my_count, 1, 11, edge_correction = FALSE, nperm = 20)
 #' my_res
 #' plot(my_res)
 #'

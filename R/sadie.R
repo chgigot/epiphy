@@ -50,7 +50,7 @@
 #' plot(my_res, isoclines = TRUE)
 #'
 #' # Compute both Perry's and Li-Madden-Xu's indices (using multithreading):
-#' my_res <- sadie(my_count, index = "all", threads = 2)
+#' my_res <- sadie(my_count, index = "all", threads = 2, nperm = 20)
 #' my_res
 #' summary(my_res)
 #' plot(my_res) # Identical to: plot(my_res, index = "Perry")
@@ -58,7 +58,7 @@
 #'
 #' # Using usual data frames instead of intensity objects:
 #' my_df <- aphids[, c("xm", "ym", "i")]
-#' sadie(my_df, nperm = 1000)
+#' sadie(my_df)
 #'
 #' @name sadie
 #' @export
