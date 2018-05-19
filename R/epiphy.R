@@ -30,8 +30,13 @@
 #' @docType package
 #' @name epiphy
 #' @useDynLib epiphy
-#' @importFrom Rcpp sourceCpp
+#'
+#' @import stats
 #' @import ggplot2
+#' @importFrom Rcpp sourceCpp
+#' @importFrom grDevices terrain.colors
+#' @importFrom methods is
+#' @importFrom utils head tail
 #------------------------------------------------------------------------------#
 NULL
 
