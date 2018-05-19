@@ -96,8 +96,8 @@ Edinburgh.
 
 Lloyd M. 1967. Mean crowding. The Journal of Animal Ecology 36, 1–30.
 
-Morisita M. 1962. Iδ-Index, a measure of dispersion of individuals.
-Researches on Population Ecology 4, 1–7.
+Morisita M. 1962. I\eqn{\delta}-Index, a measure of dispersion of
+individuals. Researches on Population Ecology 4, 1–7.
 \href{http://dx.doi.org/doi:10.1007/BF02533903}{doi:10.1007/BF02533903}
 
 Madden LV, Hughes G. 1995. Plant disease incidence: Distributions,

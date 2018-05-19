@@ -230,7 +230,7 @@
 #'
 #' @source
 #'
-#' Zarnoch SJ, Anderson RL, Sheffield RM. 1995. Using the β-binomial
+#' Zarnoch SJ, Anderson RL, Sheffield RM. 1995. Using the \eqn{\beta}-binomial
 #'     distribution to characterize forest health. Canadian journal of forest
 #'     research 25, 462–469.
 #------------------------------------------------------------------------------#
