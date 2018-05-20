@@ -4,7 +4,7 @@
 
 ## Overview
 
-**epiphy** makes it easy to analyze plant disease epidemics. It provides a common framework for spatialized plant disease intensity data recorded over time. Implemented statistical methods are currently mainly focused on spatial pattern analysis.
+**epiphy** makes it easy to analyze plant disease epidemics. It provides a common framework for spatialized plant disease intensity data recorded over time. Implemented statistical methods are currently mainly focused on spatial pattern analysis. The online documentation is available at [epiphy.org](http://epiphy.org).
 
 ## Installation
 
@@ -20,7 +20,3 @@ Install the latest development version from **GitHub**:
 # install.packages("devtools")
 devtools::install_github("chgigot/epiphy")
 ```
-
-## Resources
-
-The online documentation is available at [epiphy.org](http://epiphy.org).
