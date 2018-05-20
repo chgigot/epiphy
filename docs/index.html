@@ -12,6 +12,7 @@
 <script src="jquery.sticky-kit.min.js"></script><script src="pkgdown.js"></script><meta property="og:title" content="Analysis of Plant Disease Epidemics">
 <meta property="og:description" content="Analysis of plant disease epidemics, currently mainly focused on
     spatial pattern analysis.">
+<meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -30,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">epiphy</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.3.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.3.4</span>
       </span>
     </div>
 
@@ -76,31 +77,31 @@
       
       </header><div class="row">
   <div class="contents col-md-9">
-    
-<p><img src="articles/logo-epiphy-01.png" alt="epiphy logo"></p>
-<div id="epiphy-an-r-package-to-analyze-plant-disease-epidemics" class="section level1">
+    <div id="epiphy" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#epiphy-an-r-package-to-analyze-plant-disease-epidemics" class="anchor"></a>epiphy: An R package to analyze plant disease epidemics</h1></div>
-<p><strong>epiphy</strong> provides a common framework for spatialized plant disease intensity data collected at one or more time points. Several statistical methods to describe and quantify plant disease epidemics are implemented in this package.</p>
+<a href="#epiphy" class="anchor"></a>epiphy <img src="reference/figures/logo.png" align="right">
+</h1></div>
+
+<div id="overview" class="section level2">
+<h2 class="hasAnchor">
+<a href="#overview" class="anchor"></a>Overview</h2>
+<p><strong>epiphy</strong> makes it easy to analyze plant disease epidemics. It provides a common framework for spatialized plant disease intensity data recorded over time. Implemented statistical methods are currently mainly focused on spatial pattern analysis.</p>
+</div>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p>Install the latest released version from <strong>CRAN</strong>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"epiphy"</span>)</code></pre></div>
+<p>Install the latest development version from <strong>GitHub</strong>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages("devtools")</span>
+devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"chgigot/epiphy"</span>)</code></pre></div>
+</div>
 <div id="resources" class="section level2">
 <h2 class="hasAnchor">
 <a href="#resources" class="anchor"></a>Resources</h2>
 <p>The online documentation is available at <a href="http://epiphy.org">epiphy.org</a>.</p>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>Install the latest development version from <strong>GitHub</strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span> (<span class="op">!</span><span class="kw">requireNamespace</span>(<span class="st">"devtools"</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)) {
-    <span class="co"># ^ Returns FALSE if devtools is not installed.</span>
-    <span class="kw">install.packages</span>(<span class="st">"devtools"</span>)
-}
-devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"chgigot/epiphy"</span>)</code></pre></div>
-<p><strong>Note:</strong> You can also use the following command to build the vignettes when installing the package:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"chgigot/epiphy"</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</code></pre></div>
 </div>
-</div>
-
   </div>
 
   <div class="col-md-3" id="sidebar">
@@ -128,7 +129,13 @@ devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocument
 </ul>
 </div>
 
-  </div>
+  <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://travis-ci.org/chgigot/epiphy"><img src="https://travis-ci.org/chgigot/epiphy.svg?branch=master" alt="Travis-CI Build Status"></a></li>
+</ul>
+</div>
+</div>
 </div>
 
 

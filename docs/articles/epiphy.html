@@ -11,6 +11,7 @@
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script><script src="../pkgdown.js"></script><meta property="og:title" content="Analyzing plant disease epidemics with the R package epiphy">
 <meta property="og:description" content="">
+<meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -29,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epiphy</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.3.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.3.4</span>
       </span>
     </div>
 
@@ -79,7 +80,7 @@
       <h1>Analyzing plant disease epidemics with the R package epiphy</h1>
                         <h4 class="author">Christophe Gigot</h4>
             
-            <h4 class="date">2018-05-12</h4>
+            <h4 class="date">2018-05-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chgigot/epiphy/blob/master/vignettes/epiphy.Rmd"><code>vignettes/epiphy.Rmd</code></a></small>
       <div class="hidden name"><code>epiphy.Rmd</code></div>
@@ -88,9 +89,6 @@
 
     
     
-<div class="figure">
-<img src="logo-epiphy-01.png">
-</div>
 <div id="abstract" class="section level2">
 <h2 class="hasAnchor">
 <a href="#abstract" class="anchor"></a>Abstract</h2>
@@ -101,7 +99,7 @@
 <h2 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h2>
 <p>Performing analyses of plant disease intensity data is a common task for many field phytopathologists. Different softwares have been developped to make computationally available some statistical methods, but there are separated programs and are sometimes restricted to a specific computer system.</p>
-<p>This paper describes the version 0.3.3 of the package <strong>epiphy</strong> for R <span class="citation">(R Core Team 2015)</span>, which offers an uniform and coherent framework to perform spatial analyses in plant disease epidemics. Efforts were made to ensure that the users can fluently and fluidly carry out the data analyses that meet their needs, making it possible to generalize and automate such tasks, and piece together a sequence of operations, while limiting the need for reimplementing methods described in the scientific literature to save time and reduce the potential for error. Another key advantage of this package is to allow users unfamiliar with these methods (e.g. students, other scientists) to use them with safeguards against misuses of methods specific for a given kind of data set for instance. While firstly intented to be a toolbox for phytopathologists, implemented methods may be easily translatable to other data contexts.</p>
+<p>This paper describes the version 0.3.4 of the package <strong>epiphy</strong> for R <span class="citation">(R Core Team 2015)</span>, which offers an uniform and coherent framework to perform spatial analyses in plant disease epidemics. Efforts were made to ensure that the users can fluently and fluidly carry out the data analyses that meet their needs, making it possible to generalize and automate such tasks, and piece together a sequence of operations, while limiting the need for reimplementing methods described in the scientific literature to save time and reduce the potential for error. Another key advantage of this package is to allow users unfamiliar with these methods (e.g. students, other scientists) to use them with safeguards against misuses of methods specific for a given kind of data set for instance. While firstly intented to be a toolbox for phytopathologists, implemented methods may be easily translatable to other data contexts.</p>
 <p>This package consists of three components: a bundle of historical data sets in plant disease epidemiology, a set of relevant data classes to reliably and efficiently handle date sets, and statistical methods developped over the last few decades to extract information from collected data sets. Information about these different components are given in this paper, but the main amphasis is made on the practical tools using code examples.</p>
 <p>As the <strong>epiphy</strong> package is not yet available on CRAN, one needs to use the following lines to install it:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"devtools"</span>) <span class="co"># If not already installed.</span>
@@ -374,18 +372,7 @@ res</code></pre></div>
 ## Stat: 0.0989 (P = 0.019802)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(res)</code></pre></div>
 <p><img src="epiphy_files/figure-html/mapcomp-1.png" width="672"></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">123</span>)
-res &lt;-<span class="st"> </span><span class="kw"><a href="../reference/mapcomp.html">mapcomp</a></span>(codling_moths, <span class="dt">delta =</span> <span class="dv">1</span>, <span class="dt">bandwidth =</span> <span class="dv">11</span>)
-res</code></pre></div>
-<pre><code>## Map Comparison analysis (mapcomp)
-## 
-## Call:
-## mapcomp.data.frame(data = codling_moths, delta = 1, bandwidth = 11)
-## 
-## Stat: 0.3423 (P = 0.009901)</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(res, <span class="dt">bins =</span> <span class="dv">10</span>)</code></pre></div>
-<p><img src="epiphy_files/figure-html/mapcomp-2.png" width="672"></p>
-<p><strong>Figure 9.</strong> Density maps.</p>
+<p><strong>Figure 9.</strong> Density map.</p>
 </div>
 </div>
 <div id="conclusion" class="section level2">
