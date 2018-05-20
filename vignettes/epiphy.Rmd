@@ -13,8 +13,6 @@ bibliography: biblio.bib
 csl: phytopathology_v2.csl
 ---
 
-![](logo-epiphy-01.png)
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(fig.width = 7)
 # To avoid startup messages when loading epiphy hereinafter:
@@ -220,14 +218,9 @@ set.seed(123)
 res <- mapcomp(cou_t3_m, delta = 4, bandwidth = 60)
 res
 plot(res)
-
-set.seed(123)
-res <- mapcomp(codling_moths, delta = 1, bandwidth = 11)
-res
-plot(res, bins = 10)
 ```
 
-**Figure 9.** Density maps.
+**Figure 9.** Density map.
 
 ## Conclusion
 

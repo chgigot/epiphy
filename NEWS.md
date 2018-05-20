@@ -1,3 +1,9 @@
+# epiphy 0.3.4
+
+- Minor bug fixes.
+- Improve documentation.
+- Add Travis CI and a website.
+
 # epiphy 0.3.3
 
 - Add a grayscale feature in plot for intensity objects.
@@ -10,7 +16,7 @@
 - Fixed bugs in the SADIE algorithm.
 - Mapcomp procedure proposed by Lavigne et al. (2010).
 
-# epiphy 0.3.0: First release
+# epiphy 0.3.0
 
 ## Major new features
 
