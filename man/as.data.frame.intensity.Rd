@@ -15,7 +15,10 @@
 
 \item{optional}{logical. If \code{TRUE}, setting row names and
     converting column names (to syntactic names: see
-    \code{\link{make.names}}) is optional.}
+    \code{\link{make.names}}) is optional.  Note that all of \R's
+    \pkg{base} package \code{as.data.frame()} methods use
+    \code{optional} only for column names treatment, basically with the
+    meaning of \code{\link{data.frame}(*, check.names = !optional)}.}
 
 \item{...}{additional arguments to be passed to or from methods.}
 
