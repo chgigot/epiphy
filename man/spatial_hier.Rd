@@ -12,15 +12,13 @@ spatial_hier(low, high)
 \item{high}{An list of \code{intensity} objects.}
 }
 \description{
-TODO
-}
-\details{
 The manner in which the data are collected provides information about
 aggregation of disease at different levels in a spatial hierarchy (Hughes et
 al. 1997). For example, a sampling unit (upper level) can be reported as
 "healthy", if no diseased leaves (lower level) were found within the sampling
 unit.
-
+}
+\details{
 In a pairwise comparison between levels, the probability that an individual
 at the lower hierarchical level is diseased is denoted plow, and phigh refers
 to the probability of disease at the higher level. The relationship between
@@ -49,11 +47,6 @@ from which the value of ln(n) can be obtained as the intercept of a linear
 regression when the slope is constrained to 1.
 }
 \examples{
-my_data_low  <- incidence(tomato_tswv$field_1928)
-# TODO: 2 bugs to correct here (before)
-# my_data_low  <- split(my_data_low, by = "t")[[1]]
-# my_data_high <- clump(my_data_low, unit_size = c(x = 3, y = 3))
-
 my_data_low <- incidence(tomato_tswv$field_1929)
 my_data_low <- clump(my_data_low, c(x = 3, y = 3))
 my_data_high <- my_data_low

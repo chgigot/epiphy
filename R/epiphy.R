@@ -1,13 +1,13 @@
 #------------------------------------------------------------------------------#
 #' \code{epiphy}: An R package to analyze plant disease epidemics.
 #'
-#' This package provides a common framework for spatialized plant disease
-#' intensity data collected at one or more time points. Many statistical methods
-#' developed over the last decades to describe and quantify plant disease
-#' epidemics are implemented (e.g., aggregation indices, Taylor and binary power
-#' laws, distribution fitting, cross-product approaches). A bundle of historical
-#' data sets that were mainly published in plant disease epidemiology literature
-#' is also made available.
+#' \strong{epiphy} makes it easy to analyze plant disease epidemics. It provides
+#' a common framework for plant disease intensity data recorded over time and/or
+#' space. Implemented statistical methods are currently mainly focused on
+#' spatial pattern analysis (e.g., aggregation indices, Taylor and binary power
+#' laws, distribution fitting, SADIE and mapcomp methods). Several data sets
+#' that were mainly published in plant disease epidemiology literature are also
+#' included in this package
 #'
 #' @author
 #'

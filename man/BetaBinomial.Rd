@@ -31,7 +31,8 @@ rbetabinom(n, size, prob, theta, shape1, shape2)
 
 \item{log, log.p}{Logical; if TRUE, probabilities p are given as log(p).}
 
-\item{lower.tail}{[Not yet implemented].}
+\item{lower.tail}{Logical; if TRUE (default), probabilities are
+\eqn{P[X \le x]} otherwise, \eqn{P[X > x]}.}
 
 \item{p}{Vector of probabilities.}
 

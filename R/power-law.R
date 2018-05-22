@@ -232,35 +232,6 @@ plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"),
 
 
 #==============================================================================#
-# Iwao's index
-#==============================================================================#
-
-#------------------------------------------------------------------------------#
-#' indices Iwao's patchiness regression index
-#'
-#' TODO: Not yet implemented.
-#'
-#' @param data Data.
-#'
-#' @references
-#'
-#' Iwao S. 1968. A new regression method for analyzing the aggregation pattern
-#' of animal populations. Researches on Population Ecology 10, 1–20.
-#' \href{http://dx.doi.org/10.1007/BF02514729}{doi:10.1007/BF02514729}
-#'
-#' @keywords internal
-#' @export
-#------------------------------------------------------------------------------#
-iwao <- function(data) {
-    stopifnot(is.count(data))
-    if (is.numeric(data)) {
-        if (!all(is.wholenumber(data))) stop("no whole numbers!")
-    }
-    return(NULL)
-}
-
-
-#==============================================================================#
 # a2a
 #==============================================================================#
 

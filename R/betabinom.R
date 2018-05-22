@@ -19,7 +19,8 @@
 #' @param theta Aggregation parameter (theta = 1 / (shape1 + shape2)).
 #' @param shape1,shape2 Shape parameters.
 #' @param log,log.p Logical; if TRUE, probabilities p are given as log(p).
-#' @param lower.tail [Not yet implemented].
+#' @param lower.tail Logical; if TRUE (default), probabilities are
+#'     \eqn{P[X \le x]} otherwise, \eqn{P[X > x]}.
 #'
 #' @return
 #'

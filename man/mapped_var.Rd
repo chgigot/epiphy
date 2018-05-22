@@ -23,8 +23,6 @@ Get or set existing variable mappings.
 \examples{
 my_data <- count(aphids)
 my_data
-#... TODO
-# x, y, X, Y
 mapped_var(my_data)
 mapped_var(my_data) <- mapping(x = X, y = Y)
 mapped_var(my_data)

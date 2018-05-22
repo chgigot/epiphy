@@ -28,11 +28,5 @@ ones) will be dropped so that clumps of individuals remain even
 throughout the data set.}
 }
 \description{
-TODO
-}
-\examples{
-#inc_spl_t <- split(inc_clu, by = "t")
-#inc_spl_tbis <- split(inc_clu, unit_size = c(x = 8, y = 20, t = 1))
-#identical(unname(inc_spl_t), unname(inc_spl_tbis))
-
+Divide into groups and reassemble.
 }

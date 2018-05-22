@@ -7,8 +7,6 @@ NULL
 #------------------------------------------------------------------------------#
 #' Spatial hierarchy analysis.
 #'
-#' TODO
-#'
 #' The manner in which the data are collected provides information about
 #' aggregation of disease at different levels in a spatial hierarchy (Hughes et
 #' al. 1997). For example, a sampling unit (upper level) can be reported as
@@ -46,11 +44,10 @@ NULL
 #' @param high An list of \code{intensity} objects.
 #'
 #' @examples
-#' my_data_low  <- incidence(tomato_tswv$field_1928)
-#' # TODO: 2 bugs to correct here (before)
-#' # my_data_low  <- split(my_data_low, by = "t")[[1]]
-#' # my_data_high <- clump(my_data_low, unit_size = c(x = 3, y = 3))
-#'
+# # my_data_low  <- incidence(tomato_tswv$field_1928)
+# # TODO: 2 bugs to correct here (before)
+# # my_data_low  <- split(my_data_low, by = "t")[[1]]
+# # my_data_high <- clump(my_data_low, unit_size = c(x = 3, y = 3))
 #' my_data_low <- incidence(tomato_tswv$field_1929)
 #' my_data_low <- clump(my_data_low, c(x = 3, y = 3))
 #' my_data_high <- my_data_low

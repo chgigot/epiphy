@@ -27,7 +27,7 @@ throughout the data set.}
 \item{inclusive_unspecified}{Not yet implemented. Do unspecified mapped
 variables (different from i and n) need to be included into the bigger
 possible sampling unit (TRUE) or splited into as many sampling units as
-possible (FALSE, default).}
+possible (FALSE, default)?}
 }
 \description{
 This function provides a easy way to regroup recorded data into groups of
@@ -48,13 +48,5 @@ plot(my_incidence_clumped_2, type = "all")
 my_incidence_clumped_3 <- clump(my_incidence, unit_size = c(t = 3), fun = mean)
 plot(my_incidence_clumped_3)
 
-# Interest of the parameter inclusive_unspecified. TODO: Not yet implemented.
-#my_incidence1 <- clump(my_incidence, unit_size = c(x = 3, y = 3))
-#my_incidence2 <- clump(my_incidence, unit_size = c(x = 3, y = 3, t = 1))
-#identical(my_incidence1, my_incidence2)
-
-#my_incidence3 <- clump(my_incidence, unit_size = c(x = 3, y = 3), inclusive_unspecified = TRUE)
-#my_incidence4 <- clump(my_incidence, unit_size = c(x = 3, y = 3, t = 3))
-#identical(my_incidence3, my_incidence4)
 
 }
