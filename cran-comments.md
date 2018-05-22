@@ -1,3 +1,11 @@
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+* elaborated the Description a bit in the DESCRIPTION file.
+* added a reference for the methods in the 'Description' field of the DESCRIPTION file.
+* removed examples for not yet implemented functionality in Rd files (in clump.Rd and spatial_hier.Rd).
+
 ## Test environments
 
 * local OS X install, R 3.5.0
