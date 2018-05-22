@@ -41,7 +41,7 @@ my_data <- do.call(c, lapply(citrus_ctv, function(citrus_field) {
        split(by = "t")
 }))
 # my_data is a list of incidence object, each one corresponding to a given
-# given time at a given location.
+# time at a given location.
 my_power_law <- power_law(my_data)
 my_power_law
 summary(my_power_law)
