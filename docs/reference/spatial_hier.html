@@ -30,7 +30,11 @@
 
 <meta property="og:title" content="Spatial hierarchy analysis. — spatial_hier" />
 
-<meta property="og:description" content="TODO" />
+<meta property="og:description" content="The manner in which the data are collected provides information about
+aggregation of disease at different levels in a spatial hierarchy (Hughes et
+al. 1997). For example, a sampling unit (upper level) can be reported as
+"healthy", if no diseased leaves (lower level) were found within the sampling
+unit." />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -115,7 +119,11 @@
 
     <div class="ref-description">
     
-    <p>TODO</p>
+    <p>The manner in which the data are collected provides information about
+aggregation of disease at different levels in a spatial hierarchy (Hughes et
+al. 1997). For example, a sampling unit (upper level) can be reported as
+"healthy", if no diseased leaves (lower level) were found within the sampling
+unit.</p>
     
     </div>
 
@@ -136,12 +144,7 @@
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The manner in which the data are collected provides information about
-aggregation of disease at different levels in a spatial hierarchy (Hughes et
-al. 1997). For example, a sampling unit (upper level) can be reported as
-"healthy", if no diseased leaves (lower level) were found within the sampling
-unit.</p>
-<p>In a pairwise comparison between levels, the probability that an individual
+    <p>In a pairwise comparison between levels, the probability that an individual
 at the lower hierarchical level is diseased is denoted plow, and phigh refers
 to the probability of disease at the higher level. The relationship between
 these two probabilities can be written as</p>
@@ -166,12 +169,7 @@ regression when the slope is constrained to 1.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>my_data_low</span>  <span class='kw'>&lt;-</span> <span class='fu'><a href='intensity.html'>incidence</a></span>(<span class='no'>tomato_tswv</span>$<span class='no'>field_1928</span>)
-<span class='co'># TODO: 2 bugs to correct here (before)</span>
-<span class='co'># my_data_low  &lt;- split(my_data_low, by = "t")[[1]]</span>
-<span class='co'># my_data_high &lt;- clump(my_data_low, unit_size = c(x = 3, y = 3))</span>
-
-<span class='no'>my_data_low</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='intensity.html'>incidence</a></span>(<span class='no'>tomato_tswv</span>$<span class='no'>field_1929</span>)
+    <pre class="examples"><div class='input'><span class='no'>my_data_low</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='intensity.html'>incidence</a></span>(<span class='no'>tomato_tswv</span>$<span class='no'>field_1929</span>)
 <span class='no'>my_data_low</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='clump.html'>clump</a></span>(<span class='no'>my_data_low</span>, <span class='fu'>c</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>3</span>))
 <span class='no'>my_data_high</span> <span class='kw'>&lt;-</span> <span class='no'>my_data_low</span>
 <span class='no'>my_data_high</span>$<span class='no'>data</span>$<span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>

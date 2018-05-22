@@ -139,7 +139,10 @@
       <th>optional</th>
       <td><p>logical. If <code>TRUE</code>, setting row names and
     converting column names (to syntactic names: see
-    <code>make.names</code>) is optional.</p></td>
+    <code>make.names</code>) is optional.  Note that all of <span style="R">R</span>'s
+    <span class="pkg">base</span> package <code>as.data.frame()</code> methods use
+    <code>optional</code> only for column names treatment, basically with the
+    meaning of <code>data.frame(*, check.names = !optional)</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>

@@ -156,30 +156,25 @@ throughout the data set.</p></td>
       <td><p>Not yet implemented. Do unspecified mapped
 variables (different from i and n) need to be included into the bigger
 possible sampling unit (TRUE) or splited into as many sampling units as
-possible (FALSE, default).</p></td>
+possible (FALSE, default)?</p></td>
     </tr>
     </table>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>my_incidence</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='intensity.html'>incidence</a></span>(<span class='no'>tomato_tswv</span>$<span class='no'>field_1929</span>)
-<span class='fu'>plot</span>(<span class='no'>my_incidence</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"all"</span>)</div><div class='img'><img src='clump-1.png' alt='' width='700' height='433' /></div><div class='img'><img src='clump-2.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>plot</span>(<span class='no'>my_incidence</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"all"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Computation failed in `stat_summary()`:</span>
+#&gt; <span class='warning'>Hmisc package required for this function</span></div><div class='img'><img src='clump-1.png' alt='' width='700' height='433' /></div><div class='img'><img src='clump-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># Different spatial size units:</span>
 <span class='no'>my_incidence_clumped_1</span> <span class='kw'>&lt;-</span> <span class='fu'>clump</span>(<span class='no'>my_incidence</span>, <span class='kw'>unit_size</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>3</span>))
-<span class='fu'>plot</span>(<span class='no'>my_incidence_clumped_1</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"all"</span>)</div><div class='img'><img src='clump-3.png' alt='' width='700' height='433' /></div><div class='img'><img src='clump-4.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>plot</span>(<span class='no'>my_incidence_clumped_1</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"all"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Computation failed in `stat_summary()`:</span>
+#&gt; <span class='warning'>Hmisc package required for this function</span></div><div class='img'><img src='clump-3.png' alt='' width='700' height='433' /></div><div class='img'><img src='clump-4.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='no'>my_incidence_clumped_2</span> <span class='kw'>&lt;-</span> <span class='fu'>clump</span>(<span class='no'>my_incidence</span>, <span class='kw'>unit_size</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>5</span>))
-<span class='fu'>plot</span>(<span class='no'>my_incidence_clumped_2</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"all"</span>)</div><div class='img'><img src='clump-5.png' alt='' width='700' height='433' /></div><div class='img'><img src='clump-6.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>plot</span>(<span class='no'>my_incidence_clumped_2</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"all"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Computation failed in `stat_summary()`:</span>
+#&gt; <span class='warning'>Hmisc package required for this function</span></div><div class='img'><img src='clump-5.png' alt='' width='700' height='433' /></div><div class='img'><img src='clump-6.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># To get mean disease incidence for each plant over the 3 scoring dates:</span>
 <span class='no'>my_incidence_clumped_3</span> <span class='kw'>&lt;-</span> <span class='fu'>clump</span>(<span class='no'>my_incidence</span>, <span class='kw'>unit_size</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='kw'>t</span> <span class='kw'>=</span> <span class='fl'>3</span>), <span class='kw'>fun</span> <span class='kw'>=</span> <span class='no'>mean</span>)
 <span class='fu'>plot</span>(<span class='no'>my_incidence_clumped_3</span>)</div><div class='img'><img src='clump-7.png' alt='' width='700' height='433' /></div><div class='input'>
-# Interest of the parameter inclusive_unspecified. TODO: Not yet implemented.
-#my_incidence1 <- clump(my_incidence, unit_size = c(x = 3, y = 3))
-#my_incidence2 <- clump(my_incidence, unit_size = c(x = 3, y = 3, t = 1))
-#identical(my_incidence1, my_incidence2)
-
-#my_incidence3 <- clump(my_incidence, unit_size = c(x = 3, y = 3), inclusive_unspecified = TRUE)
-#my_incidence4 <- clump(my_incidence, unit_size = c(x = 3, y = 3, t = 3))
-#identical(my_incidence3, my_incidence4)
 
 </div></pre>
   </div>

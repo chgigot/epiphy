@@ -10,8 +10,15 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="jquery.sticky-kit.min.js"></script><script src="pkgdown.js"></script><meta property="og:title" content="Analysis of Plant Disease Epidemics">
-<meta property="og:description" content="Analysis of plant disease epidemics, currently mainly focused on
-    spatial pattern analysis.">
+<meta property="og:description" content="epiphy makes it easy to analyze plant disease epidemics. It
+    provides a common framework for plant disease intensity data recorded over
+    time and/or space. Implemented statistical methods are currently mainly
+    focused on spatial pattern analysis (e.g., aggregation indices, Taylor and
+    binary power laws, distribution fitting, SADIE and mapcomp methods). See
+    Madden LV, Hughes G, van den Bosch F. (2007, ISBN: 978-089054-354-2) for
+    further information on these methods. Several data sets that were mainly
+    published in plant disease epidemiology literature are also included in this
+    package.">
 <meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
@@ -79,13 +86,13 @@
   <div class="contents col-md-9">
     <div id="epiphy" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#epiphy" class="anchor"></a>epiphy <img src="reference/figures/logo.png" align="right">
-</h1></div>
+<a href="#epiphy" class="anchor"></a>epiphy</h1></div>
 
 <div id="overview" class="section level2">
 <h2 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h2>
-<p><strong>epiphy</strong> makes it easy to analyze plant disease epidemics. It provides a common framework for spatialized plant disease intensity data recorded over time. Implemented statistical methods are currently mainly focused on spatial pattern analysis.</p>
+<p><img src="reference/figures/logo.png" align="right"></p>
+<p><strong>epiphy</strong> makes it easy to analyze plant disease epidemics. It provides a common framework for plant disease intensity data recorded over time and/or space. Implemented statistical methods are currently mainly focused on spatial pattern analysis (e.g., aggregation indices, Taylor and binary power laws, distribution fitting, SADIE and mapcomp methods). Several data sets that were mainly published in plant disease epidemiology literature are also included in this package. The online documentation is available at <a href="http://epiphy.org">epiphy.org</a>.</p>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
@@ -95,11 +102,6 @@
 <p>Install the latest development version from <strong>GitHub</strong>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages("devtools")</span>
 devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"chgigot/epiphy"</span>)</code></pre></div>
-</div>
-<div id="resources" class="section level2">
-<h2 class="hasAnchor">
-<a href="#resources" class="anchor"></a>Resources</h2>
-<p>The online documentation is available at <a href="http://epiphy.org">epiphy.org</a>.</p>
 </div>
 </div>
   </div>
@@ -133,6 +135,8 @@ devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocument
 <h2>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://travis-ci.org/chgigot/epiphy"><img src="https://travis-ci.org/chgigot/epiphy.svg?branch=master" alt="Travis-CI Build Status"></a></li>
+<li><a href="https://www.r-pkg.org/pkg/epiphy"><img src="https://img.shields.io/badge/lifecycle-maturing-blue.svg" alt="lifecycle"></a></li>
+<li><a href="https://cran.r-project.org/package=epiphy"><img src="http://www.r-pkg.org/badges/version/epiphy" alt="CRAN_Status_Badge"></a></li>
 </ul>
 </div>
 </div>
