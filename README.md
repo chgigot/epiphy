@@ -1,6 +1,8 @@
 # epiphy
 
 [![Travis-CI Build Status](https://travis-ci.org/chgigot/epiphy.svg?branch=master)](https://travis-ci.org/chgigot/epiphy)
+[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.r-pkg.org/pkg/epiphy)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/epiphy)](https://cran.r-project.org/package=epiphy)
 
 ## Overview
 
