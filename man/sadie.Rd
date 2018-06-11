@@ -87,14 +87,14 @@ sadie(my_df)
 }
 \references{
 Perry JN. 1995. Spatial analysis by distance indices. Journal of Animal
-Ecology 64, 303–314. \href{http://dx.doi.org/10.2307/5892}{doi:10.2307/5892}
+Ecology 64, 303–314. \href{https://doi.org/10.2307/5892}{doi:10.2307/5892}
 
 Perry JN, Winder L, Holland JM, Alston RD. 1999. Red–blue plots for detecting
 clusters in count data. Ecology Letters 2, 106–113.
-\href{http://dx.doi.org/10.1046/j.1461-0248.1999.22057.x}{doi:10.1046/j.1461-0248.1999.22057.x}
+\href{https://doi.org/10.1046/j.1461-0248.1999.22057.x}{doi:10.1046/j.1461-0248.1999.22057.x}
 
 Li B, Madden LV, Xu X. 2012. Spatial analysis by distance indices: an
 alternative local clustering index for studying spatial patterns. Methods in
 Ecology and Evolution 3, 368–377.
-\href{http://dx.doi.org/10.1111/j.2041-210X.2011.00165.x}{doi:10.1111/j.2041-210X.2011.00165.x}
+\href{https://doi.org/10.1111/j.2041-210X.2011.00165.x}{doi:10.1111/j.2041-210X.2011.00165.x}
 }

@@ -18,7 +18,7 @@
 Pethybridge SJ, Madden LV. 2003. Analysis of spatiotemporal dynamics
     of virus spread in an Australian hop garden by stochastic modeling. Plant
     Disease 87:56-62.
-    \href{http://dx.doi.org/10.1094/PDIS.2003.87.1.56}{doi:10.1094/PDIS.2003.87.1.56}
+    \href{https://doi.org/10.1094/PDIS.2003.87.1.56}{doi:10.1094/PDIS.2003.87.1.56}
 }
 \usage{
 hop_viruses
