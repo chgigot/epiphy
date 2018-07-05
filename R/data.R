@@ -53,7 +53,7 @@
 #'
 #' Cochran WG. 1936. The statistical analysis of field counts of
 #'     diseased plants. Supplement to the Journal of the Royal Statistical
-#'     Society 3, 49–67. \href{http://dx.doi.org/10.2307/2983677}{doi:10.2307/2983677}
+#'     Society 3, 49–67. \href{https://doi.org/10.2307/2983677}{doi:10.2307/2983677}
 #'
 #' Bald JG. 1937. Investigations on "spotted wilt" of tomatoes. III.
 #'     Infection in field plots. Bulletin 106. Melbourne, Australia: Council for
@@ -100,7 +100,7 @@
 #'
 #' Gibson GJ. 1997. Investigating mechanisms of spatiotemporal epidemic
 #'     spread using stochastic models. Phytopathology 87, 139-46.
-#'     \href{http://dx.doi.org/10.1094/PHYTO.1997.87.2.139}{doi:10.1094/PHYTO.1997.87.2.139}
+#'     \href{https://doi.org/10.1094/PHYTO.1997.87.2.139}{doi:10.1094/PHYTO.1997.87.2.139}
 #------------------------------------------------------------------------------#
 "citrus_ctv"
 
@@ -133,7 +133,7 @@
 #' Pethybridge SJ, Madden LV. 2003. Analysis of spatiotemporal dynamics
 #'     of virus spread in an Australian hop garden by stochastic modeling. Plant
 #'     Disease 87:56-62.
-#'     \href{http://dx.doi.org/10.1094/PDIS.2003.87.1.56}{doi:10.1094/PDIS.2003.87.1.56}
+#'     \href{https://doi.org/10.1094/PDIS.2003.87.1.56}{doi:10.1094/PDIS.2003.87.1.56}
 #------------------------------------------------------------------------------#
 "hop_viruses"
 
@@ -160,7 +160,7 @@
 #' Roumagnac P, Pruvost O, Chiroleu F, Hughes G. 2004. Spatial and
 #'     temporal analyses of bacterial blight of onion caused by Xanthomonas
 #'     axonopodis pv. allii. Phytopathology 94, 138–146.
-#'     \href{http://dx.doi.org/10.1094/PHYTO.2004.94.2.138}{doi:10.1094/PHYTO.2004.94.2.138}
+#'     \href{https://doi.org/10.1094/PHYTO.2004.94.2.138}{doi:10.1094/PHYTO.2004.94.2.138}
 #------------------------------------------------------------------------------#
 "onion_bacterial_blight"
 
@@ -188,7 +188,7 @@
 #'
 #' Xu XM, Madden LV. 2004. Use of SADIE statistics to study spatial
 #'   dynamics of plant disease epidemics. Plant Pathology 53, 38–49.
-#'   \href{http://dx.doi.org/10.1111/j.1365-3059.2004.00949.x}{doi:10.1111/j.1365-3059.2004.00949.x}
+#'   \href{https://doi.org/10.1111/j.1365-3059.2004.00949.x}{doi:10.1111/j.1365-3059.2004.00949.x}
 #------------------------------------------------------------------------------#
 "simulated_epidemics"
 
@@ -254,7 +254,7 @@
 #' Pethybridge SJ, Esker P, Hay F, Wilson C, Nutter FW. 2005.
 #'     Spatiotemporal description of epidemics caused by Phoma ligulicola in
 #'     Tasmanian pyrethrum fields. \emph{Phytopathology} 95, 648–658.
-#'     \href{http://dx.doi.org/10.1094/PHYTO-95-0648}{doi:10.1094/PHYTO-95-0648}
+#'     \href{https://doi.org/10.1094/PHYTO-95-0648}{doi:10.1094/PHYTO-95-0648}
 #------------------------------------------------------------------------------#
 "pyrethrum_ray_blight"
 
@@ -277,7 +277,7 @@
 #'
 #' Perry JN, Winder L, Holland JM, Alston RD. 1999. Red-blue plots for
 #'     detecting clusters in count data. Ecology Letters 2, 106-13.
-#'     \href{http://dx.doi.org/10.1046/j.1461-0248.1999.22057.x}{doi:10.1046/j.1461-0248.1999.22057.x}
+#'     \href{https://doi.org/10.1046/j.1461-0248.1999.22057.x}{doi:10.1046/j.1461-0248.1999.22057.x}
 #------------------------------------------------------------------------------#
 "aphids"
 
@@ -324,7 +324,7 @@
 #' Lavigne C, Ricci B, Franck P, Senoussi R. 2010. Spatial analyses of
 #'     ecological count data: A density map comparison approach. Basic and
 #'     Applied Ecology 11: 734-42.
-#'     \href{http://dx.doi.org/10.1016/j.baae.2010.08.011}{doi:10.1016/j.baae.2010.08.011}
+#'     \href{https://doi.org/10.1016/j.baae.2010.08.011}{doi:10.1016/j.baae.2010.08.011}
 #------------------------------------------------------------------------------#
 "codling_moths"
 

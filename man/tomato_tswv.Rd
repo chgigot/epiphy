@@ -32,7 +32,7 @@
 \source{
 Cochran WG. 1936. The statistical analysis of field counts of
     diseased plants. Supplement to the Journal of the Royal Statistical
-    Society 3, 49–67. \href{http://dx.doi.org/10.2307/2983677}{doi:10.2307/2983677}
+    Society 3, 49–67. \href{https://doi.org/10.2307/2983677}{doi:10.2307/2983677}
 
 Bald JG. 1937. Investigations on "spotted wilt" of tomatoes. III.
     Infection in field plots. Bulletin 106. Melbourne, Australia: Council for

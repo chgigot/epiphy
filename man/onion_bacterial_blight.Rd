@@ -16,7 +16,7 @@
 Roumagnac P, Pruvost O, Chiroleu F, Hughes G. 2004. Spatial and
     temporal analyses of bacterial blight of onion caused by Xanthomonas
     axonopodis pv. allii. Phytopathology 94, 138–146.
-    \href{http://dx.doi.org/10.1094/PHYTO.2004.94.2.138}{doi:10.1094/PHYTO.2004.94.2.138}
+    \href{https://doi.org/10.1094/PHYTO.2004.94.2.138}{doi:10.1094/PHYTO.2004.94.2.138}
 }
 \usage{
 onion_bacterial_blight

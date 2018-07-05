@@ -14,7 +14,7 @@
 Pethybridge SJ, Esker P, Hay F, Wilson C, Nutter FW. 2005.
     Spatiotemporal description of epidemics caused by Phoma ligulicola in
     Tasmanian pyrethrum fields. \emph{Phytopathology} 95, 648–658.
-    \href{http://dx.doi.org/10.1094/PHYTO-95-0648}{doi:10.1094/PHYTO-95-0648}
+    \href{https://doi.org/10.1094/PHYTO-95-0648}{doi:10.1094/PHYTO-95-0648}
 }
 \usage{
 pyrethrum_ray_blight

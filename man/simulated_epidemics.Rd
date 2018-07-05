@@ -17,7 +17,7 @@
 \source{
 Xu XM, Madden LV. 2004. Use of SADIE statistics to study spatial
   dynamics of plant disease epidemics. Plant Pathology 53, 38–49.
-  \href{http://dx.doi.org/10.1111/j.1365-3059.2004.00949.x}{doi:10.1111/j.1365-3059.2004.00949.x}
+  \href{https://doi.org/10.1111/j.1365-3059.2004.00949.x}{doi:10.1111/j.1365-3059.2004.00949.x}
 }
 \usage{
 simulated_epidemics
