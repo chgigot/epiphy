@@ -120,7 +120,7 @@
 #' There are three data frames, one for each virus (\code{HpLV}, \code{HpMV} and
 #' \code{ApMV}). Each data frame consists of 2550 rows and 7 variables:
 #' \tabular{lll}{
-#'     [, 1:2] \tab x,y   \tab Grid spatial coordonates. \cr
+#'     [, 1:2] \tab x,y   \tab Grid spatial coordinates. \cr
 #'     [, 3:4] \tab xm,ym \tab Metric spatial coordinates. \cr
 #'     [, 5]   \tab t     \tab Year of disease assessments. \cr
 #'     [, 6]   \tab i     \tab Incidence. 0: Healthy, 1: Diseased. \cr
