@@ -531,7 +531,7 @@ summary.intensity <- function(object, ...) summary(object$data)
 #' @export
 #------------------------------------------------------------------------------#
 as.data.frame.intensity <- function(x, row.names = NULL, optional = FALSE, ...,
-                                    stringsAsFactors = default.stringsAsFactors()) {
+                                    stringsAsFactors = FALSE) {
     # To keep the standard behavior of as.data.frame(), we need to coerce
     # the input data frame to a "simple" list.
     as.data.frame(as.list(x$data), row.names = row.names, optional = optional,

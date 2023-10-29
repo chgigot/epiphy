@@ -141,7 +141,7 @@ fisher.default <- function(x, flavor = c("count", "incidence"), n = NULL, ...) {
     call <- match.call() # TODO: Not yet used.
     stopifnot(is.numeric(x))
     flavor <- match.arg(flavor)
-    if (!is.null(n) && !is.na(n)) {
+    if (!is.null(n) && !any(is.na(n))) {
         # Force "incidence" flavor if n is provided.
         flavor <- "incidence"
     }
@@ -154,12 +154,14 @@ fisher.default <- function(x, flavor = c("count", "incidence"), n = NULL, ...) {
             res <- v / m
         },
         "incidence" = {
-            stopifnot(!is.null(n) && !is.na(n))
+            stopifnot(!is.null(n) && !any(is.na(n)))
             n <- unique(n)
-            if (length(n) != 1) stop(paste0("Current implementation only deals ",
-                                            "with equal size sampling units."))
-            if (!(n > 1)) stop(paste0("The number of individuals per sampling ",
-                                      " unit ('n') must be > 1."))
+            if (length(n) != 1) stop("Current implementation only deals ",
+                                       "with equal size sampling units.",
+                                     call. = FALSE)
+            if (!(n > 1)) stop("The number of individuals per sampling ",
+                                " unit ('n') must be > 1.",
+                               call. = FALSE)
             stopifnot(all(x <= n))
             m <- mean(x / n)
             v <- var(x / n)
@@ -239,7 +241,7 @@ morisita.default <- function(x, flavor = c("count", "incidence"), n = NULL, ...)
     call <- match.call() # TODO: Not yet used.
     stopifnot(is.numeric(x))
     flavor <- match.arg(flavor)
-    if (!is.null(n) && !is.na(n)) {
+    if (!is.null(n) && !any(is.na(n))) {
         # Force "incidence" flavor if n is provided.
         flavor <- "incidence"
     }
@@ -247,17 +249,19 @@ morisita.default <- function(x, flavor = c("count", "incidence"), n = NULL, ...)
     N <- length(x) # Number of sampling units.
     tot <- sum(x)  # Total number of individuals over all the sampling units.
     res <- N * sum(x * (x - 1)) / (tot * (tot - 1))
-    switch (flavor,
+    switch(flavor,
             "count" = {
                 # Do no more calculation.
             },
             "incidence" = {
-                stopifnot(!is.null(n) && !is.na(n))
+                stopifnot(!is.null(n) && !any(is.na(n)))
                 n <- unique(n)
-                if (length(n) != 1) stop(paste0("Current implementation only deals ",
-                                                "with equal size sampling units."))
-                if (!(n > 1)) stop(paste0("The number of individuals per sampling ",
-                                          " unit ('n') must be > 1."))
+                if (length(n) != 1) stop("Current implementation only deals ",
+                                         "with equal size sampling units.",
+                                         call. = FALSE)
+                if (!(n > 1)) stop("The number of individuals per sampling ",
+                                   " unit ('n') must be > 1.",
+                                   call. = FALSE)
                 stopifnot(all(x <= n))
                 res <- res * (n - 1/N) / (n - 1)
             }
@@ -414,7 +418,8 @@ z.test.default <- function(x, ...) {
     #          call. = FALSE)
     # }
     # snse::z.test(x, ...)
-    stop("No method implemented for this kind of data.")
+    stop("No method implemented for this kind of data.",
+         call. = FALSE)
 }
 
 #------------------------------------------------------------------------------#
@@ -530,7 +535,8 @@ calpha.test.fisher <- function(x, ...) {
     N     <- x[["N"]]
     switch (x[["flavor"]],
             "count" = {
-                stop("No calpha.test for count data.")
+                stop("No calpha.test for count data.",
+                     call. = FALSE)
             },
             "incidence" = {
                 n <- x[["n"]]
@@ -552,8 +558,3 @@ calpha.test.fisher <- function(x, ...) {
     ), class = "htest")
 
 }
-
-
-
-
-

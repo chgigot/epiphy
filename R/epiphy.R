@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------#
-#' \code{epiphy}: An R package to analyze plant disease epidemics.
+#' \CRANpkg{epiphy}: An R package to analyze plant disease epidemics.
 #'
-#' \strong{epiphy} makes it easy to analyze plant disease epidemics. It provides
+#' \CRANpkg{epiphy} makes it easy to analyze plant disease epidemics. It provides
 #' a common framework for plant disease intensity data recorded over time and/or
 #' space. Implemented statistical methods are currently mainly focused on
 #' spatial pattern analysis (e.g., aggregation indices, Taylor and binary power
@@ -11,7 +11,7 @@
 #'
 #' @author
 #'
-#' \strong{Maintainer:} Christophe Gigot <ch.gigot@gmail.com>
+#' \strong{Maintainer:} Christophe Gigot \email{ch.gigot@@gmail.com}
 #'
 #' @seealso
 #'
