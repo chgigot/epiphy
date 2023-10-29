@@ -208,7 +208,8 @@ init_intensity <- function(data, mapping, keep_only_std, type) {
         mapping <- mapping_(paste0(data_std_names, "=", data_std_names))
         # checkings!!!
     } else {
-        if (class(mapping) != "mapping") stop("'mapping' must be a mapping object.")
+        if (isFALSE(inherits(mapping, class(mapping)))) stop("'mapping' must be a mapping object.",
+                                                                call. = FALSE)
         names_mapping <- names(mapping) ## Redondant avec plus bas
         if (!all(i_std <- names_mapping %in% unlist(std_names)) && keep_only_std) { # TODO: What? keep_only_std here?
             #warning("Dropping unrelevant names in mapping.") # NOT CLEAR
@@ -1035,7 +1036,3 @@ plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "all"),
     invisible(NULL)
 
 }
-
-
-
-
