@@ -7,8 +7,7 @@
 \usage{
 clump(object, ...)
 
-\method{clump}{intensity}(object, unit_size, fun = sum,
-  inclusive_unspecified = FALSE, ...)
+\method{clump}{intensity}(object, unit_size, fun = sum, inclusive_unspecified = FALSE, ...)
 }
 \arguments{
 \item{object}{An \code{intensity} object.}

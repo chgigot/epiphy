@@ -10,11 +10,27 @@
 \usage{
 dbetabinom(x, size, prob, theta, shape1, shape2, log = FALSE)
 
-pbetabinom(q, size, prob, theta, shape1, shape2, lower.tail = TRUE,
-  log.p = FALSE)
+pbetabinom(
+  q,
+  size,
+  prob,
+  theta,
+  shape1,
+  shape2,
+  lower.tail = TRUE,
+  log.p = FALSE
+)
 
-qbetabinom(p, size, prob, theta, shape1, shape2, lower.tail = TRUE,
-  log.p = FALSE)
+qbetabinom(
+  p,
+  size,
+  prob,
+  theta,
+  shape1,
+  shape2,
+  lower.tail = TRUE,
+  log.p = FALSE
+)
 
 rbetabinom(n, size, prob, theta, shape1, shape2)
 }

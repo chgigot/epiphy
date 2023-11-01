@@ -16,7 +16,7 @@
 Coefficients extracted from the model object \code{object}.
 
   For standard model fitting classes this will be a named numeric vector.
-  For \code{"maov"} objects (produced by \code{\link{aov}}) it will be a matrix.
+  For \code{"maov"} objects (produced by \code{\link[stats]{aov}}) it will be a matrix.
 }
 \description{
 \code{coef} is a generic function which extracts model coefficients

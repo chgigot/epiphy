@@ -3,10 +3,9 @@
 \docType{package}
 \name{epiphy}
 \alias{epiphy}
-\alias{epiphy-package}
-\title{\code{epiphy}: An R package to analyze plant disease epidemics.}
+\title{\CRANpkg{epiphy}: An R package to analyze plant disease epidemics.}
 \description{
-\strong{epiphy} makes it easy to analyze plant disease epidemics. It provides
+\CRANpkg{epiphy} makes it easy to analyze plant disease epidemics. It provides
 a common framework for plant disease intensity data recorded over time and/or
 space. Implemented statistical methods are currently mainly focused on
 spatial pattern analysis (e.g., aggregation indices, Taylor and binary power
@@ -26,6 +25,6 @@ III: Patterns of plant disease. In: The study of plant disease epidemics,
 235–278. American Phytopathological Society, St Paul, MN.
 }
 \author{
-\strong{Maintainer:} Christophe Gigot <ch.gigot@gmail.com>
+\strong{Maintainer:} Christophe Gigot \email{ch.gigot@gmail.com}
 }
 \keyword{internal}

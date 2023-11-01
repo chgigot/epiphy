@@ -4,7 +4,8 @@
 \name{citrus_ctv}
 \alias{citrus_ctv}
 \title{Incidence of citrus tristeza virus (CTV) disease in three fields.}
-\format{There are three data frames:
+\format{
+There are three data frames:
 \itemize{
     \item \code{IVI3and4}: A data frame with 864 rows and 5 variables.
     \item \code{IVI6and7}: A data frame with 648 rows and 5 variables.
@@ -19,7 +20,8 @@ The structure is the same for all the data frames:
     [, 4]   \tab i   \tab Disease incidence. 0: Healthy, 1: Diseased. \cr
     [, 5]   \tab n   \tab Sampling unit size. n = 1 means that the sampling
                           unit size is the plant. \cr
-}}
+}
+}
 \source{
 Gottwald TR, Cambra M, Moreno P, Camarasa E, Piquer J. 1996. Spatial
     and temporal analyses of citrus tristeza virus in eastern Spain.

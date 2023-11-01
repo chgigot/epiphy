@@ -13,12 +13,12 @@ sub2ind(sub, .dim)
 \arguments{
 \item{ind}{Vector indices.}
 
-\item{.dim}{\code{\link{dim}(.)} integer vector}
+\item{.dim}{\code{\link[base]{dim}(.)} integer vector}
 
-\item{.dimnames}{optional list of character \code{\link{dimnames}(.)}.
+\item{.dimnames}{optional list of character \code{\link[base]{dimnames}(.)}.
    If \code{useNames} is true, to be used for constructing dimnames for
    \code{arrayInd()} (and hence, \code{which(*, arr.ind=TRUE)}).
-   If \code{\link{names}(.dimnames)} is not empty, these are used as
+   If \code{\link[base]{names}(.dimnames)} is not empty, these are used as
    column names.  \code{.dimnames[[1]]} is used as row names.}
 
 \item{useNames}{logical indicating if the value of \code{arrayInd()}

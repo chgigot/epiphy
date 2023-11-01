@@ -4,12 +4,14 @@
 \name{offspring_survival}
 \alias{offspring_survival}
 \title{Offspring survival of rats experiencing different diets.}
-\format{A data frame with 32 rows and 3 variables:
+\format{
+A data frame with 32 rows and 3 variables:
 \tabular{rll}{
     [, 1]   \tab group \tab Either control or treated group. \cr
     [, 2]   \tab i     \tab Pups weaned. \cr
     [, 3]   \tab n     \tab Pups alive at 4 days. \cr
-}}
+}
+}
 \source{
 Weil CS. 1970. Selection of the valid number of sampling units and a
     consideration of their combination in toxicological studies involving

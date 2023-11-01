@@ -10,17 +10,49 @@
 \usage{
 mapcomp(data, ...)
 
-\method{mapcomp}{data.frame}(data, delta, bandwidth, nperm = 100,
-  edge_correction = FALSE, threads = 1, verbose = TRUE, ...)
+\method{mapcomp}{data.frame}(
+  data,
+  delta,
+  bandwidth,
+  nperm = 100,
+  edge_correction = FALSE,
+  threads = 1,
+  verbose = TRUE,
+  ...
+)
 
-\method{mapcomp}{matrix}(data, delta, bandwidth, nperm = 100,
-  edge_correction = FALSE, threads = 1, verbose = TRUE, ...)
+\method{mapcomp}{matrix}(
+  data,
+  delta,
+  bandwidth,
+  nperm = 100,
+  edge_correction = FALSE,
+  threads = 1,
+  verbose = TRUE,
+  ...
+)
 
-\method{mapcomp}{count}(data, delta, bandwidth, nperm = 100,
-  edge_correction = FALSE, threads = 1, verbose = TRUE, ...)
+\method{mapcomp}{count}(
+  data,
+  delta,
+  bandwidth,
+  nperm = 100,
+  edge_correction = FALSE,
+  threads = 1,
+  verbose = TRUE,
+  ...
+)
 
-\method{mapcomp}{incidence}(data, delta, bandwidth, nperm = 100,
-  edge_correction = FALSE, threads = 1, verbose = TRUE, ...)
+\method{mapcomp}{incidence}(
+  data,
+  delta,
+  bandwidth,
+  nperm = 100,
+  edge_correction = FALSE,
+  threads = 1,
+  verbose = TRUE,
+  ...
+)
 }
 \arguments{
 \item{data}{A data frame or a matrix with only three columns: the two first

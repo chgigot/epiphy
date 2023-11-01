@@ -10,8 +10,12 @@ z.test(x, ...)
 
 \method{z.test}{default}(x, ...)
 
-\method{z.test}{fisher}(x, alternative = c("two.sided", "less", "greater"),
-  conf.level = 0.95, ...)
+\method{z.test}{fisher}(
+  x,
+  alternative = c("two.sided", "less", "greater"),
+  conf.level = 0.95,
+  ...
+)
 }
 \arguments{
 \item{x}{The output of the \code{\link{agg_index}} function with

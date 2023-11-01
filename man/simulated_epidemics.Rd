@@ -4,7 +4,8 @@
 \name{simulated_epidemics}
 \alias{simulated_epidemics}
 \title{Examples of simulated epidemic data.}
-\format{A data frame with 864 rows and 6 variables:
+\format{
+A data frame with 864 rows and 6 variables:
 \tabular{rll}{
     [, 1]   \tab pattern \tab Either clumped (i.e. aggregated), random or
                               regular. \cr
@@ -13,7 +14,8 @@
     [, 5]   \tab i       \tab Number of diseased plants (from 0 to 100). \cr
     [, 6]   \tab n       \tab Sampling unit size. Here, n = 100 plants per
                               sampling unit. \cr
-}}
+}
+}
 \source{
 Xu XM, Madden LV. 2004. Use of SADIE statistics to study spatial
   dynamics of plant disease epidemics. Plant Pathology 53, 38–49.

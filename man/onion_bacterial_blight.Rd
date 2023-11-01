@@ -4,14 +4,16 @@
 \name{onion_bacterial_blight}
 \alias{onion_bacterial_blight}
 \title{Incidence of bacterial blight of onion.}
-\format{A data frame with 1134 rows and 5 variables:
+\format{
+A data frame with 1134 rows and 5 variables:
 \tabular{rll}{
     [, 1:2] \tab x,y \tab Grid spatial coordinates. \cr
     [, 3]   \tab t   \tab Date of disease assessments. \cr
     [, 4]   \tab i   \tab Disease incidence. 0: Healthy, 1: Diseased. \cr
     [, 5]   \tab n   \tab Sampling unit size. n = 1 means that the sampling
                           unit size is the plant. \cr
-}}
+}
+}
 \source{
 Roumagnac P, Pruvost O, Chiroleu F, Hughes G. 2004. Spatial and
     temporal analyses of bacterial blight of onion caused by Xanthomonas

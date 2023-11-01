@@ -4,13 +4,15 @@
 \name{dogwood_anthracnose}
 \alias{dogwood_anthracnose}
 \title{Incidence of dogwood anthracnose.}
-\format{A data frame with 329 rows and 3 variables:
+\format{
+A data frame with 329 rows and 3 variables:
 \tabular{rll}{
     [, 1] \tab t \tab Year of disease assessments (1990 or 1991).. \cr
     [, 2] \tab i \tab Number of diseased plants (from 0 to 10). \cr
     [, 3] \tab n \tab Sampling unit size. Here, n = 10 plants per sampling
                       unit (or plot). \cr
-}}
+}
+}
 \source{
 Zarnoch SJ, Anderson RL, Sheffield RM. 1995. Using the \eqn{\beta}-binomial
     distribution to characterize forest health. Canadian journal of forest

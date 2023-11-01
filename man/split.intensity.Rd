@@ -9,9 +9,15 @@
 \arguments{
 \item{x}{vector or data frame containing values to be divided into groups.}
 
-\item{f}{a \sQuote{factor} in the sense that \code{\link{as.factor}(f)}
+\item{f}{a \sQuote{factor} in the sense that \code{\link[base]{as.factor}(f)}
     defines the grouping, or a list of such factors in which case their
-    interaction is used for the grouping.}
+    interaction is used for the grouping. If \code{x} is a data frame,
+    \code{f} can also be a formula of the form \code{ ~ g} to split by
+    the variable \code{g}, or more generally of the form \code{ ~ g1 +
+      \dots + gk} to split by the interaction of the variables
+    \code{g1}, \dots, \code{gk}, where these variables are evaluated in
+    the data frame \code{x} using the usual non-standard evaluation
+    rules.}
 
 \item{drop}{logical indicating if levels that do not occur should be dropped
     (if \code{f} is a \code{factor} or a list).}

@@ -8,8 +8,14 @@
 \usage{
 a2a(x, ...)
 
-\method{a2a}{numeric}(x, slope, n, from = c("Ai", "ai", "AI", "aI"),
-  to = c("Ai", "ai", "AI", "aI"), ...)
+\method{a2a}{numeric}(
+  x,
+  slope,
+  n,
+  from = c("Ai", "ai", "AI", "aI"),
+  to = c("Ai", "ai", "AI", "aI"),
+  ...
+)
 
 \method{a2a}{list}(x, to = c("Ai", "ai", "AI", "aI"), ...)
 }

@@ -4,8 +4,13 @@
 \alias{as.data.frame.intensity}
 \title{Coerce to a data frame.}
 \usage{
-\method{as.data.frame}{intensity}(x, row.names = NULL, optional = FALSE,
-  ..., stringsAsFactors = default.stringsAsFactors())
+\method{as.data.frame}{intensity}(
+  x,
+  row.names = NULL,
+  optional = FALSE,
+  ...,
+  stringsAsFactors = FALSE
+)
 }
 \arguments{
 \item{x}{An \code{intensity} object.}
@@ -15,10 +20,11 @@
 
 \item{optional}{logical. If \code{TRUE}, setting row names and
     converting column names (to syntactic names: see
-    \code{\link{make.names}}) is optional.  Note that all of \R's
+    \code{\link[base]{make.names}}) is optional.  Note that all of \R's
     \pkg{base} package \code{as.data.frame()} methods use
     \code{optional} only for column names treatment, basically with the
-    meaning of \code{\link{data.frame}(*, check.names = !optional)}.}
+    meaning of \code{\link[base]{data.frame}(*, check.names = !optional)}.
+    See also the \code{make.names} argument of the \code{matrix} method.}
 
 \item{...}{additional arguments to be passed to or from methods.}
 

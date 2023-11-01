@@ -4,12 +4,14 @@
 \name{pyrethrum_ray_blight}
 \alias{pyrethrum_ray_blight}
 \title{Incidence of ray blight disease of pyrethrum.}
-\format{A data frame with 62 rows and 2 variables:
+\format{
+A data frame with 62 rows and 2 variables:
 \tabular{rll}{
     [, 1] \tab i \tab Number of diseased plants (from 0 to 6). \cr
     [, 2] \tab n \tab Sampling unit size. Here, n = 6 plants per sampling
                       unit. \cr
-}}
+}
+}
 \source{
 Pethybridge SJ, Esker P, Hay F, Wilson C, Nutter FW. 2005.
     Spatiotemporal description of epidemics caused by Phoma ligulicola in

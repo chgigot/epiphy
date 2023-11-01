@@ -14,18 +14,28 @@
 
 \item{...}{
     additional arguments for method functions.  For the
-    \code{\link{glm}} method this can be used to pass a
-    \code{dispersion} parameter.
-  }
+    \code{\link[stats]{glm}} method this can be used to pass a
+    \code{dispersion} parameter.}
 }
 \value{
 A matrix of the estimated covariances between the parameter estimates
   in the linear or non-linear predictor of the model.  This should have
   row and column names corresponding to the parameter names given by the
-  \code{\link{coef}} method.
+  \code{\link[stats]{coef}} method.
+
+  When some coefficients of the (linear) model are undetermined and
+  hence \code{NA} because of linearly dependent terms (or an
+  \dQuote{over specified} model), also called
+  \dQuote{aliased}, see \code{\link[stats]{alias}}, then since \R version 3.5.0,
+  \code{vcov()} (iff \code{complete = TRUE}, i.e., by default for
+  \code{lm} etc, but not for \code{aov}) contains corresponding rows and
+  columns of \code{NA}s, wherever \code{\link[stats]{coef}()} has always
+  contained such \code{NA}s.
 }
 \description{
 Returns the variance-covariance matrix of the main parameters of
-  a fitted model object.
+  a fitted model object.  The \dQuote{main} parameters of model
+  correspond to those returned by \code{\link[stats]{coef}}, and typically do
+  not contain a nuisance scale parameter (\code{\link[stats]{sigma}}).
 }
 \keyword{internal}

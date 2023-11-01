@@ -4,8 +4,13 @@
 \alias{agg_index}
 \title{Several aggregation indices.}
 \usage{
-agg_index(x, method = c("fisher", "lloyd", "morisita"), flavor = c("count",
-  "incidence"), n = NULL, ...)
+agg_index(
+  x,
+  method = c("fisher", "lloyd", "morisita"),
+  flavor = c("count", "incidence"),
+  n = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A numeric vector or a \code{count}/\code{incidence} object.}

@@ -10,21 +10,49 @@
 \usage{
 sadie(data, ...)
 
-\method{sadie}{data.frame}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, seed = NULL, threads = 1, ..., method = "shortsimplex",
-  verbose = TRUE)
+\method{sadie}{data.frame}(
+  data,
+  index = c("Perry", "Li-Madden-Xu", "all"),
+  nperm = 100,
+  seed = NULL,
+  threads = 1,
+  ...,
+  method = "shortsimplex",
+  verbose = TRUE
+)
 
-\method{sadie}{matrix}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, seed = NULL, threads = 1, ..., method = "shortsimplex",
-  verbose = TRUE)
+\method{sadie}{matrix}(
+  data,
+  index = c("Perry", "Li-Madden-Xu", "all"),
+  nperm = 100,
+  seed = NULL,
+  threads = 1,
+  ...,
+  method = "shortsimplex",
+  verbose = TRUE
+)
 
-\method{sadie}{count}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, seed = NULL, threads = 1, ..., method = "shortsimplex",
-  verbose = TRUE)
+\method{sadie}{count}(
+  data,
+  index = c("Perry", "Li-Madden-Xu", "all"),
+  nperm = 100,
+  seed = NULL,
+  threads = 1,
+  ...,
+  method = "shortsimplex",
+  verbose = TRUE
+)
 
-\method{sadie}{incidence}(data, index = c("Perry", "Li-Madden-Xu", "all"),
-  nperm = 100, seed = NULL, threads = 1, ..., method = "shortsimplex",
-  verbose = TRUE)
+\method{sadie}{incidence}(
+  data,
+  index = c("Perry", "Li-Madden-Xu", "all"),
+  nperm = 100,
+  seed = NULL,
+  threads = 1,
+  ...,
+  method = "shortsimplex",
+  verbose = TRUE
+)
 }
 \arguments{
 \item{data}{A data frame or a matrix with only three columns: the two first
