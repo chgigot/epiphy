@@ -1,4 +1,8 @@
-# epiphy 0.3.4.9000
+# epiphy 0.5.0.9000
+
+- Minor updates :
+    - Works now with R version >= 4.
+    - Update URL of website.
 
 # epiphy 0.3.4
 

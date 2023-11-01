@@ -1,7 +1,7 @@
 Package: epiphy
 Type: Package
 Title: Analysis of Plant Disease Epidemics
-Version: 0.3.4.9000
+Version: 0.5.0.9000
 Authors@R: c(
     person("Christophe", "Gigot", email = "ch.gigot@gmail.com",
     role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1748-2902")))
@@ -15,7 +15,7 @@ Description: A toolbox to make it easy to analyze plant disease epidemics. It
     published in plant disease epidemiology literature are also included in this
     package.
 License: MIT + file LICENSE
-URL: http://epiphy.org, https://github.com/chgigot/epiphy
+URL: https://github.com/chgigot/epiphy
 BugReports: https://github.com/chgigot/epiphy/issues
 Encoding: UTF-8
 LazyData: true
