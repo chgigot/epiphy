@@ -1,3 +1,7 @@
+url: https://chgigot.github.io/epiphy/
+template:
+  bootstrap: 5
+
 reference:
   - title: Data sets
     contents:
@@ -64,10 +68,4 @@ navbar:
         href: articles/defs-and-eqns.html
     - text: News
       href: news/index.html
-
-
-
-
-
-
 

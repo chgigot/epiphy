@@ -15,7 +15,7 @@ Description: A toolbox to make it easy to analyze plant disease epidemics. It
     published in plant disease epidemiology literature are also included in this
     package.
 License: MIT + file LICENSE
-URL: https://github.com/chgigot/epiphy
+URL: https://github.com/chgigot/epiphy, https://chgigot.github.io/epiphy/
 BugReports: https://github.com/chgigot/epiphy/issues
 Encoding: UTF-8
 LazyData: true
