@@ -1,0 +1,11 @@
+pandoc: 2.19.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  defs-and-eqns: defs-and-eqns.html
+  epiphy: epiphy.html
+last_built: 2023-11-05T18:30Z
+urls:
+  reference: https://chgigot.github.io/epiphy/reference
+  article: https://chgigot.github.io/epiphy/articles
+
