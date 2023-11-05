@@ -1,6 +1,6 @@
 url: https://chgigot.github.io/epiphy/
-template:
-  bootstrap: 5
+#template:
+#  bootstrap: 5
 
 reference:
   - title: Data sets

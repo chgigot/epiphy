@@ -1,6 +1,7 @@
 # epiphy
 
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.r-pkg.org/pkg/epiphy)
+[![R-CMD-check](https://github.com/chgigot/epiphy/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/chgigot/epiphy/actions/workflows/R-CMD-check.yaml)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/epiphy)](https://cran.r-project.org/package=epiphy)
 
 ## Overview
