@@ -18,6 +18,10 @@ is.severity(x)
 \arguments{
 \item{x}{An object.}
 }
+\value{
+TRUE if its argument's value is the corresponding \code{intensity}
+    object and FALSE otherwise.
+}
 \description{
 Test if an object is of class \code{intensity} or one of its subclasses
 (i.e. \code{count}, \code{incidence} or \code{severity}).

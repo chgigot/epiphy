@@ -18,6 +18,9 @@ cloglog(x, rev = FALSE)
 
 \item{rev}{The inverse of the function?}
 }
+\value{
+A numeric vector.
+}
 \description{
 Logit, probit and cloglog functions are available.
 The logit and the logistic (with rev = TRUE), i.e. the inverse-logit functions.

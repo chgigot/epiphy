@@ -20,6 +20,10 @@ case, stats::\code{\link[stats]{chisq.test}} is called.}
 \item{...}{Further arguments to be passed to
 stats::\code{\link[stats]{chisq.test}}.}
 }
+\value{
+Same kind of object as the one returns by the stats
+\code{\link[stats]{chisq.test}} function.
+}
 \description{
 Performs chi-squared tests for Fisher's aggregation indices (computed with
 either count or incidence data). If another kind of data is provided, the R

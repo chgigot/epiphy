@@ -12,8 +12,10 @@ is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
 epiphy_env <- new.env()
 epiphy_env$epsilon <- 1e-7
 
+#------------------------------------------------------------------------------#
 ## Below useful for clumped_data in clump (= a list)?drop
 #' @export
+#------------------------------------------------------------------------------#
 droplevels.list <- function(x, except = NULL, ...) {
     ix <- vapply(x, is.factor, logical(1L))
     if (!is.null(except)) {
@@ -33,6 +35,8 @@ droplevels.list <- function(x, except = NULL, ...) {
 #'
 #' @param x A numeric vector.
 #' @param rev The inverse of the function?
+#'
+#' @returns A numeric vector.
 #'
 #' @name link
 #' @export
@@ -373,12 +377,13 @@ as.long.data.frame.matrix <- function(x, col_names = c("x", "y", "z"), ...) {
 #------------------------------------------------------------------------------#
 #' Retrieve vector or array indices
 #'
-#' \code{ind2sub} is a synonym for \code{\link[base]{arrayInd}} in \code{base} package.
-#'
-#' \code{ind2sub} is just an alias for \code{\link[base]{arrayInd}}
+#' \code{ind2sub} is just an alias for \code{\link[base]{arrayInd}}.
+#' \code{sub2ind} is the reverse of \code{ind2sub}.
 #'
 #' @param ind Vector indices.
 #' @param sub Array/matrix indices.
+#'
+#' @returns See \code{\link[base]{arrayInd}}.
 #'
 #' @examples
 #' set.seed(12345)

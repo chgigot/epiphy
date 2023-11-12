@@ -30,8 +30,7 @@ NULL
 #' @param n_est Number of estimated parameters for both distributions.
 #' @param ... Additional arguments to be passed to other methods.
 #'
-#' @return
-#'
+#' @returns
 #' An object of class \code{fit_two_distr}, which is a list containing at least
 #' the following components:
 #' \tabular{ll}{

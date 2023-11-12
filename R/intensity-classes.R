@@ -28,6 +28,8 @@ NULL
 #' @param mapping A \code{mapping} object.
 #' @param keep_only_std Keep only standard variables.
 #'
+#' @returns A list of mapped names.
+#'
 #' @seealso \code{\link{mapped_var}}
 #'
 #' @examples
@@ -456,6 +458,9 @@ severity_data <- function(data, mapping, keep_only_std = TRUE) {
 #'
 #' @param x An object.
 #'
+#' @returns TRUE if its argument's value is the corresponding \code{intensity}
+#'     object and FALSE otherwise.
+#'
 #' @export
 #------------------------------------------------------------------------------#
 is.intensity <- function(x) return(is(x, "intensity"))
@@ -547,6 +552,10 @@ as.data.frame.intensity <- function(x, row.names = NULL, optional = FALSE, ...,
 #' @param value A \code{mapping} object.
 #' @param keep Logical. Do we keep any previous mapped variables that are not
 #'     redifined in the \code{mapping} object?
+#'
+#' @returns
+#' \code{mapped_var} returns the list of current mapped names of the object
+#' \code{x}.
 #'
 #' @seealso \code{\link{mapping}}
 #'

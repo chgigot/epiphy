@@ -17,6 +17,10 @@ redifined in the \code{mapping} object?}
 
 \item{value}{A \code{mapping} object.}
 }
+\value{
+\code{mapped_var} returns the list of current mapped names of the object
+\code{x}.
+}
 \description{
 Get or set existing variable mappings.
 }

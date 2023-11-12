@@ -26,6 +26,17 @@
 #' @param verbose Explain what is being done (TRUE by default).
 #' @param ... Additional arguments to be passed to other methods.
 #'
+#' @returns
+#' An object of class \code{mapcomp}, which is a list containing the following
+#' components:
+#' \tabular{ll}{
+#'     \code{data}       \tab The input data. \cr
+#'     \code{coord}      \tab The coordinates and normalized intensity for each point of the full grid. \cr
+#'     \code{object}     \tab The class of \code{data}. \cr
+#'     \code{bandwidth}  \tab The \code{bandwidth} parameter. \cr
+#'     \code{stat, pval} \tab The statistic and corresponding p-value (see references for more details). \cr
+#' }
+#'
 #' @references
 #'
 #' Lavigne C, Ricci B, Franck P, Senoussi R. 2010. Spatial analyses of
@@ -106,7 +117,7 @@ mapcomp.data.frame <- function(data, delta, bandwidth, nperm = 100,
                 data  = data,
                 coord = coord,
                 stat  = res[["stat"]],
-                pval  = (sum(randomizations > res[["stat"]]) + 1) / (nperm + 1)) # TODO: To double check
+                pval  = (sum(randomizations > res[["stat"]]) + 1) / (nperm + 1)) # To double check
     attr(res, "class") <- "mapcomp"
     attr(res, "call")  <- call
 

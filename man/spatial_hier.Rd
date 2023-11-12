@@ -11,6 +11,9 @@ spatial_hier(low, high)
 
 \item{high}{An list of \code{intensity} objects.}
 }
+\value{
+A \code{spatial_hier} object.
+}
 \description{
 The manner in which the data are collected provides information about
 aggregation of disease at different levels in a spatial hierarchy (Hughes et

@@ -10,7 +10,6 @@
 #' included in this package
 #'
 #' @author
-#'
 #' \strong{Maintainer:} Christophe Gigot \email{ch.gigot@@gmail.com}
 #'
 #' @seealso

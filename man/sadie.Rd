@@ -76,6 +76,9 @@ checking purposes). Not fixed by default (= NULL).}
 
 \item{verbose}{Explain what is being done (TRUE by default).}
 }
+\value{
+A \code{sadie} object.
+}
 \description{
 \code{sadie} performs the SADIE procedure. It computes different indices and
 probabilities based on the distance to regularity for the observed spatial

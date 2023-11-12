@@ -23,6 +23,9 @@ remap(data, mapping, keep_only_std = TRUE)
 
 \item{keep_only_std}{Keep only standard variables.}
 }
+\value{
+A list of mapped names.
+}
 \description{
 Data mappings describe how variables in the data are mapped to standard names
 used throughout \code{epiphy}.

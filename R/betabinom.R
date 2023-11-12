@@ -22,8 +22,7 @@
 #' @param lower.tail Logical; if TRUE (default), probabilities are
 #'     \eqn{P[X \le x]} otherwise, \eqn{P[X > x]}.
 #'
-#' @return
-#'
+#' @returns
 #' \code{dbetabinom} gives the density, \code{pbetabinom} gives the distribution
 #' function, \code{qbetabinom} gives the quantile function and \code{rbetabinom}
 #' generates random deviates.

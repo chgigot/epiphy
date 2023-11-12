@@ -15,6 +15,10 @@ calpha.test(x, ...)
 
 \item{...}{Not yet implemented.}
 }
+\value{
+Same kind of object as the one returns by the stats
+\code{\link[stats]{chisq.test}} function for example.
+}
 \description{
 The C(alpha) test is a test of the binomial distribution against the
 alternative of the beta-binomial distribution.

@@ -43,6 +43,8 @@ NULL
 #' @param low An list of \code{intensity} objects.
 #' @param high An list of \code{intensity} objects.
 #'
+#' @returns A \code{spatial_hier} object.
+#'
 #' @examples
 # # my_data_low  <- incidence(tomato_tswv$field_1928)
 # # TODO: 2 bugs to correct here (before)

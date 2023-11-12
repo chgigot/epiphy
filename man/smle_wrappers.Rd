@@ -21,6 +21,9 @@ smle_betabinom(data)
 one variable), a data frame (if there is one or more variables) or an
 \code{\link{intensity}} object.}
 }
+\value{
+See \code{\link{smle}}
+}
 \description{
 These functions are the core of the fitting processes performed in
 \code{\link{fit_two_distr}}.

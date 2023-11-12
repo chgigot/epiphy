@@ -28,6 +28,17 @@ units.}
 
 \item{...}{Additional arguments to be passed to other methods.}
 }
+\value{
+An object of class \code{agg_index}, which is a list containing the following
+components:
+\tabular{ll}{
+    \code{index}  \tab The value of the index. \cr
+    \code{name}   \tab The name of the index. \cr
+    \code{flavor} \tab The flavor of the calculated index ("count" or "incidence"). \cr
+    \code{N}      \tab The number of sampling units. \cr
+    \code{n}      \tab The number of individuals in each sampling unit (if relevant). \cr
+}
+}
 \description{
 This function can compute different aggregation indices. See "Details"
 section for more information about the available indices.

@@ -26,11 +26,12 @@ sub2ind(sub, .dim)
 
 \item{sub}{Array/matrix indices.}
 }
-\description{
-\code{ind2sub} is a synonym for \code{\link[base]{arrayInd}} in \code{base} package.
+\value{
+See \code{\link[base]{arrayInd}}.
 }
-\details{
-\code{ind2sub} is just an alias for \code{\link[base]{arrayInd}}
+\description{
+\code{ind2sub} is just an alias for \code{\link[base]{arrayInd}}.
+\code{sub2ind} is the reverse of \code{ind2sub}.
 }
 \examples{
 set.seed(12345)

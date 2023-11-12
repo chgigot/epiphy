@@ -28,6 +28,10 @@ It must be one of "two.sided" (default), "less" or "greater".}
 
 \item{conf.level}{The confidence level of the interval.}
 }
+\value{
+Same kind of object as the one returns by the stats
+\code{\link[stats]{chisq.test}} function for example.
+}
 \description{
 Performs z-tests for Fisher's aggregation indices (computed with either count
 or incidence data).

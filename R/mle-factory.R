@@ -38,6 +38,20 @@ NULL
 #'     a minimization of \code{f}.
 #' @param ... Additional arguments to be passed to \code{\link[stats]{optim}}.
 #'
+#' @returns
+#' An object of class \code{smle}, which is a list containing the following
+#' components:
+#' \tabular{ll}{
+#'     \code{call}                    \tab The call. \cr
+#'     \code{coef}                    \tab The estimated coefficients. \cr
+#'     \code{coef_se}                 \tab The standard errors of the estimated coefficients. \cr
+#'     \code{vcov}                    \tab The variance-covariance matrix of the estimated coefficients. \cr
+#'     \code{data}                    \tab The \code{data} parameter. \cr
+#'     \code{f}                       \tab The \code{f} parameter. \cr
+#'     \code{nobs}                    \tab The number of observations. \cr
+#'     \code{full_input, full_output} \tab The full input and output of the \code{optim} function. \cr
+#' }
+#'
 #' @examples
 #' set.seed(12345)
 #' data <- rlogis(100, location = 5, scale = 2)
@@ -404,6 +418,8 @@ ll_betabinom <- function(data, param) {
 #' @param data The data set to work with. It can be a vector (if there is only
 #'     one variable), a data frame (if there is one or more variables) or an
 #'     \code{\link{intensity}} object.
+#'
+#' @returns See \code{\link{smle}}
 #'
 #' @examples
 #' set.seed(12345)

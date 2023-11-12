@@ -32,6 +32,20 @@ provided with such a named vector.}
 \item{max}{Does \code{f} need to be maximized? Set to \code{FALSE} to require
 a minimization of \code{f}.}
 }
+\value{
+An object of class \code{smle}, which is a list containing the following
+components:
+\tabular{ll}{
+    \code{call}                    \tab The call. \cr
+    \code{coef}                    \tab The estimated coefficients. \cr
+    \code{coef_se}                 \tab The standard errors of the estimated coefficients. \cr
+    \code{vcov}                    \tab The variance-covariance matrix of the estimated coefficients. \cr
+    \code{data}                    \tab The \code{data} parameter. \cr
+    \code{f}                       \tab The \code{f} parameter. \cr
+    \code{nobs}                    \tab The number of observations. \cr
+    \code{full_input, full_output} \tab The full input and output of the \code{optim} function. \cr
+}
+}
 \description{
 By default, this function performs a maximum likelihood estimation for one or
 several parameters, but it can be used for any other optimization problems.

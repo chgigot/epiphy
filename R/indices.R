@@ -62,6 +62,17 @@ NULL
 #'     units.
 #' @param ... Additional arguments to be passed to other methods.
 #'
+#' @returns
+#' An object of class \code{agg_index}, which is a list containing the following
+#' components:
+#' \tabular{ll}{
+#'     \code{index}  \tab The value of the index. \cr
+#'     \code{name}   \tab The name of the index. \cr
+#'     \code{flavor} \tab The flavor of the calculated index ("count" or "incidence"). \cr
+#'     \code{N}      \tab The number of sampling units. \cr
+#'     \code{n}      \tab The number of individuals in each sampling unit (if relevant). \cr
+#' }
+#'
 #' @examples
 #' # Count flavor of Fisher's index:
 #' my_fisher_count <- agg_index(aphids$i)
@@ -307,6 +318,10 @@ morisita.incidence <- function(x, ...) {
 #' @param ... Further arguments to be passed to
 #'     stats::\code{\link[stats]{chisq.test}}.
 #'
+#' @returns
+#' Same kind of object as the one returns by the stats
+#' \code{\link[stats]{chisq.test}} function.
+#'
 #' @examples
 #' # For incidence data:
 #' my_incidence <- incidence(tobacco_viruses)
@@ -381,6 +396,10 @@ chisq.test.fisher <- function(x, ...) {
 #'     It must be one of "two.sided" (default), "less" or "greater".
 #' @param conf.level The confidence level of the interval.
 #' @param ... Not yet implemented.
+#'
+#' @returns
+#' Same kind of object as the one returns by the stats
+#' \code{\link[stats]{chisq.test}} function for example.
 #'
 #' @examples
 #' # For incidence data:
@@ -503,6 +522,10 @@ z.test.fisher <- function(x, alternative = c("two.sided", "less", "greater"),
 #' @param x The output of the \code{\link{agg_index}} function with
 #'     \code{method = "fisher"} as parameter.
 #' @param ... Not yet implemented.
+#'
+#' @returns
+#' Same kind of object as the one returns by the stats
+#' \code{\link[stats]{chisq.test}} function for example.
 #'
 #' @examples
 #' # For incidence data:
