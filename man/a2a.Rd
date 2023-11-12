@@ -35,6 +35,9 @@ parameter to be converted ("Ai", "ai", "AI" or "aI"), the slope
 \item{to}{Desired kind for the ouput intercept parameter ("Ai", "ai", "AI" or
 "aI").}
 }
+\value{
+A numeric vector.
+}
 \description{
 \code{a2a} was designed to avoid headaches that are likely to occur when
 working with different formulations of the binomial power law analysis.
@@ -45,10 +48,10 @@ But different forms of (intercept) are possible depending on the formulation of 
 binomial power law.
 \tabular{ccccc}{
       \tab Ai         \tab ai      \tab AI         \tab aI      \cr
-   Ai \tab 1          \tab n^b     \tab n^{2(b-1)} \tab n^{b-2} \cr
-   ai \tab n^{-b}     \tab 1       \tab n^{b-2}    \tab n^{-2}  \cr
-   AI \tab n^{2(1-b)} \tab n^{2-b} \tab 1          \tab n^{-b}  \cr
-   aI \tab n^{2-b}    \tab n^2     \tab n^b        \tab 1       \cr
+   Ai \tab 1          \tab n^b     \tab n^(2(b-1)) \tab n^(b-2) \cr
+   ai \tab n^(-b)     \tab 1       \tab n^(b-2)    \tab n^(-2)  \cr
+   AI \tab n^(2(1-b)) \tab n^(2-b) \tab 1          \tab n^(-b)  \cr
+   aI \tab n^(2-b)    \tab n^2     \tab n^b        \tab 1       \cr
 }
 }
 \examples{

@@ -246,10 +246,10 @@ plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"),
 #' binomial power law.
 #' \tabular{ccccc}{
 #'       \tab Ai         \tab ai      \tab AI         \tab aI      \cr
-#'    Ai \tab 1          \tab n^b     \tab n^{2(b-1)} \tab n^{b-2} \cr
-#'    ai \tab n^{-b}     \tab 1       \tab n^{b-2}    \tab n^{-2}  \cr
-#'    AI \tab n^{2(1-b)} \tab n^{2-b} \tab 1          \tab n^{-b}  \cr
-#'    aI \tab n^{2-b}    \tab n^2     \tab n^b        \tab 1       \cr
+#'    Ai \tab 1          \tab n^b     \tab n^(2(b-1)) \tab n^(b-2) \cr
+#'    ai \tab n^(-b)     \tab 1       \tab n^(b-2)    \tab n^(-2)  \cr
+#'    AI \tab n^(2(1-b)) \tab n^(2-b) \tab 1          \tab n^(-b)  \cr
+#'    aI \tab n^(2-b)    \tab n^2     \tab n^b        \tab 1       \cr
 #' }
 #'
 #' @param x Intercept parameter to be converted or a named list with the
@@ -261,6 +261,8 @@ plot.power_law <- function(x, ..., scale = c("logarithmic", "linear"),
 #' @param slope Slope parameter.
 #' @param n Number of individuals per sampling unit.
 #' @param ... Additional arguments to be passed to other methods.
+#'
+#' @returns A numeric vector.
 #'
 #' @examples
 #' # Values from the power_law() example:
