@@ -29,7 +29,7 @@ Gottwald TR, Cambra M, Moreno P, Camarasa E, Piquer J. 1996. Spatial
 
 Gibson GJ. 1997. Investigating mechanisms of spatiotemporal epidemic
     spread using stochastic models. Phytopathology 87, 139-46.
-    \href{https://doi.org/10.1094/PHYTO.1997.87.2.139}{doi:10.1094/PHYTO.1997.87.2.139}
+    \doi{10.1094/PHYTO.1997.87.2.139}
 }
 \usage{
 citrus_ctv

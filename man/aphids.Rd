@@ -15,7 +15,7 @@ A data frame with 63 rows and 3 variables:
 \source{
 Perry JN, Winder L, Holland JM, Alston RD. 1999. Red-blue plots for
     detecting clusters in count data. Ecology Letters 2, 106-13.
-    \href{https://doi.org/10.1046/j.1461-0248.1999.22057.x}{doi:10.1046/j.1461-0248.1999.22057.x}
+    \doi{10.1046/j.1461-0248.1999.22057.x}
 }
 \usage{
 aphids

@@ -107,12 +107,12 @@ NULL
 #'
 #' Morisita M. 1962. I\eqn{\delta}-Index, a measure of dispersion of
 #' individuals. Researches on Population Ecology 4, 1–7.
-#' \href{https://doi.org/doi:10.1007/BF02533903}{doi:10.1007/BF02533903}
+#' \doi{10.1007/BF02533903}
 #'
 #' Madden LV, Hughes G. 1995. Plant disease incidence: Distributions,
 #' heterogeneity, and temporal analysis. Annual Review of Phytopathology 33(1):
 #' 529–564.
-#' \href{https://doi.org/doi:10.1146/annurev.py.33.090195.002525}{doi:10.1146/annurev.py.33.090195.002525}
+#' \doi{10.1146/annurev.py.33.090195.002525}
 #'
 #' @export
 #------------------------------------------------------------------------------#
@@ -337,7 +337,7 @@ morisita.incidence <- function(x, ...) {
 #' Madden LV, Hughes G. 1995. Plant disease incidence: Distributions,
 #' heterogeneity, and temporal analysis. Annual Review of Phytopathology 33(1):
 #' 529–564.
-#' \href{https://doi.org/doi:10.1146/annurev.py.33.090195.002525}{doi:10.1146/annurev.py.33.090195.002525}
+#' \doi{10.1146/annurev.py.33.090195.002525}
 #'
 #' Patil GP, Stiteler WM. 1973. Concepts of aggregation and their
 #' quantification: a critical review with some new results and applications.

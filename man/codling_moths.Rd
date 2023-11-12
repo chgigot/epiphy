@@ -15,7 +15,7 @@ A data frame with 30 rows and 3 variables:
 Lavigne C, Ricci B, Franck P, Senoussi R. 2010. Spatial analyses of
     ecological count data: A density map comparison approach. Basic and
     Applied Ecology 11: 734-42.
-    \href{https://doi.org/10.1016/j.baae.2010.08.011}{doi:10.1016/j.baae.2010.08.011}
+    \doi{10.1016/j.baae.2010.08.011}
 }
 \usage{
 codling_moths

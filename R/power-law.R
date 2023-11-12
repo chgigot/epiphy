@@ -49,7 +49,7 @@ NULL
 #'
 #' Hughes G, Madden LV. 1992. Aggregation and incidence of disease. Plant
 #' Pathology 41 (6): 657–660.
-#' \href{https://doi.org/10.1111/j.1365-3059.1992.tb02549.x}{doi:10.1111/j.1365-3059.1992.tb02549.x}
+#' \doi{10.1111/j.1365-3059.1992.tb02549.x}
 #'
 #' Madden LV, Hughes G, van den Bosch F. 2007. Spatial aspects of epidemics -
 #' III: Patterns of plant disease. In: The study of plant disease epidemics,

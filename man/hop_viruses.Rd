@@ -20,7 +20,7 @@ There are three data frames, one for each virus (\code{HpLV}, \code{HpMV} and
 Pethybridge SJ, Madden LV. 2003. Analysis of spatiotemporal dynamics
     of virus spread in an Australian hop garden by stochastic modeling. Plant
     Disease 87:56-62.
-    \href{https://doi.org/10.1094/PDIS.2003.87.1.56}{doi:10.1094/PDIS.2003.87.1.56}
+    \doi{10.1094/PDIS.2003.87.1.56}
 }
 \usage{
 hop_viruses
