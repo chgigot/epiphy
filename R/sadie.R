@@ -25,6 +25,8 @@
 #' @param verbose Explain what is being done (TRUE by default).
 #' @param ... Additional arguments to be passed to other methods.
 #'
+#' @returns A \code{sadie} object.
+#'
 #' @references
 #'
 #' Perry JN. 1995. Spatial analysis by distance indices. Journal of Animal
@@ -382,7 +384,8 @@ wrap_transport <- function(start, end, cost, method = "shortsimplex",
 #------------------------------------------------------------------------------#
 #' @method as.matrix transport
 #------------------------------------------------------------------------------#
-as.matrix.transport <- function(x, dim_mat) {
+as.matrix.transport <- function(x, ...) {
+    dim_mat <- list(...)[[1]]
     as_matrix_transport(x, dim_mat)
 }
 
