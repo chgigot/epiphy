@@ -1,7 +1,7 @@
 Package: epiphy
 Type: Package
 Title: Analysis of Plant Disease Epidemics
-Version: 0.5.0.9000
+Version: 0.5.0
 Authors@R: c(
     person("Christophe", "Gigot", email = "ch.gigot@gmail.com",
     role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0002-1748-2902")),
@@ -12,11 +12,11 @@ Description: A toolbox to make it easy to analyze plant disease epidemics. It
     provides a common framework for plant disease intensity data recorded over
     time and/or space. Implemented statistical methods are currently mainly
     focused on spatial pattern analysis (e.g., aggregation indices, Taylor and
-    binary power laws, distribution fitting, SADIE and mapcomp methods). See
-    Madden LV, Hughes G, van den Bosch F (2007, ISBN: 978-089054-354-2) for
-    further information on these methods. Several data sets that were mainly
-    published in plant disease epidemiology literature are also included in this
-    package.
+    binary power laws, distribution fitting, SADIE and 'mapcomp' methods). See
+    Laurence V. Madden, Gareth Hughes, Franck van den Bosch (2007)
+    <doi:10.1094/9780890545058> for further information on these methods.
+    Several data sets that were mainly published in plant disease epidemiology
+    literature are also included in this package.
 License: MIT + file LICENSE
 URL: https://github.com/chgigot/epiphy, https://chgigot.github.io/epiphy/
 BugReports: https://github.com/chgigot/epiphy/issues
