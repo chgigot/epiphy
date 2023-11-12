@@ -20,7 +20,7 @@ parametrizations."><meta property="og:image" content="https://chgigot.github.io/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epiphy</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
       </span>
     </div>
 
@@ -112,6 +112,12 @@ provided with such a named vector.</p></dd>
 a minimization of <code>f</code>.</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p>An object of class <code>smle</code>, which is a list containing the following
+components:</p><table class="table table"><tr><td><code>call</code></td><td>The call.</td></tr><tr><td><code>coef</code></td><td>The estimated coefficients.</td></tr><tr><td><code>coef_se</code></td><td>The standard errors of the estimated coefficients.</td></tr><tr><td><code>vcov</code></td><td>The variance-covariance matrix of the estimated coefficients.</td></tr><tr><td><code>data</code></td><td>The <code>data</code> parameter.</td></tr><tr><td><code>f</code></td><td>The <code>f</code> parameter.</td></tr><tr><td><code>nobs</code></td><td>The number of observations.</td></tr><tr><td><code>full_input, full_output</code></td><td>The full input and output of the <code>optim</code> function.</td></tr></table></div>
     <div id="details">
     <h2>Details</h2>
     <p>The <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim</a></code> tool does the hard work under the hood. Extra

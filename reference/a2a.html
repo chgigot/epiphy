@@ -18,7 +18,7 @@ working with different formulations of the binomial power law analysis."><meta p
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epiphy</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
       </span>
     </div>
 
@@ -113,11 +113,17 @@ parameter to be converted ("Ai", "ai", "AI" or "aI"), the slope
 "aI").</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p>A numeric vector.</p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     <p>The binomial power law can be expressed as: \(s_y^2 = (intercept)(s_{bin}^2)^b\).
 But different forms of (intercept) are possible depending on the formulation of the
-binomial power law.</p><table class="table table"><tr><td></td><td>Ai</td><td>ai</td><td>AI</td><td>aI</td></tr><tr><td>Ai</td><td>1</td><td>n^b</td><td>n^2(b-1)</td><td>n^b-2</td></tr><tr><td>ai</td><td>n^-b</td><td>1</td><td>n^b-2</td><td>n^-2</td></tr><tr><td>AI</td><td>n^2(1-b)</td><td>n^2-b</td><td>1</td><td>n^-b</td></tr><tr><td>aI</td><td>n^2-b</td><td>n^2</td><td>n^b</td><td>1</td></tr></table></div>
+binomial power law.</p><table class="table table"><tr><td></td><td>Ai</td><td>ai</td><td>AI</td><td>aI</td></tr><tr><td>Ai</td><td>1</td><td>n^b</td><td>n^(2(b-1))</td><td>n^(b-2)</td></tr><tr><td>ai</td><td>n^(-b)</td><td>1</td><td>n^(b-2)</td><td>n^(-2)</td></tr><tr><td>AI</td><td>n^(2(1-b))</td><td>n^(2-b)</td><td>1</td><td>n^(-b)</td></tr><tr><td>aI</td><td>n^(2-b)</td><td>n^2</td><td>n^b</td><td>1</td></tr></table></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
