@@ -1,8 +1,8 @@
-# epiphy 0.5.0.9000
+# epiphy 0.5.0
 
-- Minor updates :
-    - Works now with R version >= 4.
-    - Update URL of website.
+- Works now with R >= 4.
+- 'Return value' section for all exported functions.
+- URL of website updated.
 
 # epiphy 0.3.4
 
