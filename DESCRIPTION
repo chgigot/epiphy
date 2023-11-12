@@ -4,7 +4,10 @@ Title: Analysis of Plant Disease Epidemics
 Version: 0.5.0.9000
 Authors@R: c(
     person("Christophe", "Gigot", email = "ch.gigot@gmail.com",
-    role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1748-2902")))
+    role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0002-1748-2902")),
+    person("Adam H.", "Sparks", role = "ctb"),
+    person("Katrin", "Leinweber", role = "ctb")
+    )
 Description: A toolbox to make it easy to analyze plant disease epidemics. It
     provides a common framework for plant disease intensity data recorded over
     time and/or space. Implemented statistical methods are currently mainly
