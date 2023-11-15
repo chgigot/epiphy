@@ -33,6 +33,16 @@ of the provided value in \code{unit_size}, some sampling units (the last
 ones) will be dropped so that clumps of individuals remain even
 throughout the data set.}
 }
+\value{
+A list of \code{\link{intensity}} objects.
+}
 \description{
 Divide into groups and reassemble.
+}
+\examples{
+my_incidence <- incidence(tomato_tswv$field_1929)
+plot(my_incidence, type = "all")
+my_incidence_spl1 <- split(my_incidence, by = "t")
+my_incidence_spl2 <- split(my_incidence, unit_size = c(x = 8, y = 20, t = 1))
+
 }

@@ -337,7 +337,7 @@ init_intensity <- function(data, mapping, keep_only_std, type) {
 #'   Setting \code{keep_only_std} to TRUE may be useful for subsequent data splitting
 #'   using extra labels.
 #'
-#' @return An \code{incidence} object.
+#' @return An \code{intensity} object.
 #'
 #' When printed, difference information are available:
 #'
@@ -599,25 +599,6 @@ mapped_var <- function(x) {
 dim.intensity <- function(x) lengths(x$struct)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #==============================================================================#
 # Advanced manipulations of "intensity" objects
 #==============================================================================#
@@ -642,6 +623,8 @@ dim.intensity <- function(x) lengths(x$struct)
 #'     possible sampling unit (TRUE) or splited into as many sampling units as
 #'     possible (FALSE, default)?
 #' @param ... Additional arguments to be passed to \code{fun}.
+#'
+#' @return An \code{\link{intensity}} object.
 #'
 #' @examples
 #' my_incidence <- incidence(tomato_tswv$field_1929)
@@ -762,10 +745,13 @@ clump.intensity <- function(object, unit_size, fun = sum,
 #'     ones) will be dropped so that clumps of individuals remain even
 #'     throughout the data set.
 #'
-# @examples
-# #inc_spl_t <- split(inc_clu, by = "t")
-# #inc_spl_tbis <- split(inc_clu, unit_size = c(x = 8, y = 20, t = 1))
-# #identical(unname(inc_spl_t), unname(inc_spl_tbis))
+#' @return A list of \code{\link{intensity}} objects.
+#'
+#' @examples
+#' my_incidence <- incidence(tomato_tswv$field_1929)
+#' plot(my_incidence, type = "all")
+#' my_incidence_spl1 <- split(my_incidence, by = "t")
+#' my_incidence_spl2 <- split(my_incidence, unit_size = c(x = 8, y = 20, t = 1))
 #'
 #' @export
 #------------------------------------------------------------------------------#
@@ -873,10 +859,20 @@ split.intensity <- function(x, f, drop = FALSE, ..., by, unit_size) {
 #' diseased individual at all was found within the sampling unit, or "diseased"
 #' (1) if at least one diseased individual was found.
 #'
-#' @param data A numeric vector or an \code{intensity} object.
+#' @param data A numeric vector or an \code{\link{intensity}} object.
 #' @param value All the intensity values lower or equal to this value  are set
 #'     to 0. The other values are set to 1.
 #' @param ... Additional arguments to be passed to other methods.
+#'
+#' @return A numeric vector or an \code{\link{intensity}} object.
+#'
+#' @examples
+#' my_incidence <- incidence(tomato_tswv$field_1929)
+#' plot(my_incidence, type = "all")
+#' my_incidence_clumped_1 <- clump(my_incidence, unit_size = c(x = 3, y = 3))
+#' plot(my_incidence_clumped_1, type = "all")
+#' my_incidence_thr <- threshold(my_incidence_clumped_1, value = 4)
+#' plot(my_incidence_thr, type = "all")
 #'
 #' @export
 #------------------------------------------------------------------------------#
@@ -988,7 +984,7 @@ plot.intensity <- function(x, y, ..., type = c("spatial", "temporal", "all"),
         gg <- gg + geom_jitter(data = mapped_data, mapping = aes(t, i),
                                alpha = 0.2, width = 0.2, height = 0)
         gg <- gg + stat_summary(data = mapped_data, mapping = aes(t, i),
-                                fun.y = "mean", geom = "line", color = color_high,
+                                fun = "mean", geom = "line", color = color_high,
                                 linetype = "dashed")
         gg <- gg + stat_summary(data = mapped_data,
                                 mapping = aes(t, i, group = t),

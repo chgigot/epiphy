@@ -33,7 +33,7 @@ Setting \code{keep_only_std} to TRUE may be useful for subsequent data splitting
 using extra labels.}
 }
 \value{
-An \code{incidence} object.
+An \code{intensity} object.
 
 When printed, difference information are available:
 

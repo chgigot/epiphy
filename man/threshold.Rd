@@ -7,12 +7,15 @@
 threshold(data, value, ...)
 }
 \arguments{
-\item{data}{A numeric vector or an \code{intensity} object.}
+\item{data}{A numeric vector or an \code{\link{intensity}} object.}
 
 \item{value}{All the intensity values lower or equal to this value  are set
 to 0. The other values are set to 1.}
 
 \item{...}{Additional arguments to be passed to other methods.}
+}
+\value{
+A numeric vector or an \code{\link{intensity}} object.
 }
 \description{
 This function transforms the current numeric vector or \code{intensity} data
@@ -25,4 +28,13 @@ By default, everything above 0 is given 1, and 0 stays at 0. \code{threshold}
 is thus useful to report a whole sampling unit as "healthy" (0), if no
 diseased individual at all was found within the sampling unit, or "diseased"
 (1) if at least one diseased individual was found.
+}
+\examples{
+my_incidence <- incidence(tomato_tswv$field_1929)
+plot(my_incidence, type = "all")
+my_incidence_clumped_1 <- clump(my_incidence, unit_size = c(x = 3, y = 3))
+plot(my_incidence_clumped_1, type = "all")
+my_incidence_thr <- threshold(my_incidence_clumped_1, value = 4)
+plot(my_incidence_thr, type = "all")
+
 }

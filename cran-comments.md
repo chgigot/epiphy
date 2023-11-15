@@ -1,10 +1,15 @@
-## Submission
+## Resubmission
 
-In this submission, we have:
+This is a resubmission. In this version I have:
 
-* removed uses of function 'default.stringsAsFactors' to make the package compatible with R>=4.
-* added a 'return value' section for all exported functions where such section was missing.
-* added 'cph' and 'ctb' roles in DESCRIPTION.
+* added a \value section for all exported functions where such section was missing.
+    * clump.Rd
+    * split.intensity.Rd
+    * threshold.Rd
+
+The package was archived on CRAN because of the use of 'default.stringsAsFactors'. See:
+https://cran-archive.r-project.org/web/checks/2022/2022-03-10_check_results_epiphy.html
+Uses of 'default.stringsAsFactors' have been removed to make the package compatible with R>=4.
 
 ## Test environments
 
